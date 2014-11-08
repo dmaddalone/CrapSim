@@ -1,18 +1,49 @@
 #include "QualifiedShooter.h"
 
-/*
 QualifiedShooter::QualifiedShooter()
 {
-    //ctor
+    m_mQualificationMethod["NO_METHOD"]                        = QualificationMethod::QM_NO_METHOD;
+    m_mQualificationMethod["5COUNT"]                           = QualificationMethod::QM_5COUNT;
+    m_mQualificationMethod["AFTER_POINT_MADE"]                 = QualificationMethod::QM_AFTER_POINT_MADE;
+    m_mQualificationMethod["AFTER_LOSING_FIELD_THREE_TIMES"]   = QualificationMethod::QM_AFTER_LOSING_FIELD_THREE_TIMES;
+    m_mQualificationMethod["AFTER_FIVE_NON_SEVEN_ROLLS"]       = QualificationMethod::QM_AFTER_FILE_NON_SEVEN_ROLLS;
 }
 
-QualifiedShooter::~QualifiedShooter()
+bool QualifiedShooter::SetMethod(std::string sMethod)
 {
-    //dtor
-}
-*/
+    if (sMethod.empty())
+        return (false);
 
-bool QualifiedShooter::QualifyShooter(const Table &cTable, const Dice &cDice)
+    std::locale loc;
+    for (std::string::size_type iii = 0; iii < sMethod.length(); iii++)
+        sMethod[iii] = std::toupper(sMethod[iii], loc);
+
+    std::map<std::string, QualificationMethod>::iterator it = m_mQualificationMethod.find(sMethod);
+
+    if (it == m_mQualificationMethod.end()) return (false);
+
+    m_ecQualificationMethod = it->second;
+    return (true);
+}
+
+std::string QualifiedShooter::Method()
+{
+    std::string sMethod("Unknown");
+
+    for (std::map<std::string, QualificationMethod>::iterator it = m_mQualificationMethod.begin(); it != m_mQualificationMethod.end(); it++)
+    {
+        if (m_ecQualificationMethod == it->second)
+        {
+            sMethod = it->first;
+            break;
+        }
+    }
+
+    return(sMethod);
+}
+
+
+bool QualifiedShooter::ShooterQualified(const Table &cTable, const Dice &cDice)
 {
     switch (m_ecQualificationMethod)
     {
@@ -26,7 +57,7 @@ bool QualifiedShooter::QualifyShooter(const Table &cTable, const Dice &cDice)
             return (MethodAfterPointMade(cTable));
             break;
         case QualificationMethod::QM_AFTER_LOSING_FIELD_THREE_TIMES:
-            return (MethodAfterLosingFieldThreeTimes(cDice));
+            return (MethodAfterLosingFieldThreeTimes(cTable, cDice));
             break;
         default:
             break;
@@ -39,10 +70,10 @@ bool QualifiedShooter::Method5Count(const Table &cTable, const Dice &cDice)
 {
     bool bQualified = false;
 
-    if (cTable.NewShooter())
+    if (cTable.NewShooter() && cTable.IsComingOutRoll())
     {
         m_n5Count = 0;
-        if (cDice.IsPoint()) m_n5Count++;
+        if (cDice.IsAPointNumber()) m_n5Count++;
     }
     else if ((m_n5Count >= 1) && (m_n5Count < 4))
     {
@@ -50,7 +81,7 @@ bool QualifiedShooter::Method5Count(const Table &cTable, const Dice &cDice)
     }
     else if (m_n5Count == 4)
     {
-        if (cDice.IsPoint())
+        if (cDice.IsAPointNumber())
         {
             m_n5Count++;
             bQualified = true;

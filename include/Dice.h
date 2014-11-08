@@ -52,7 +52,7 @@ class Dice
         bool  IsEleven() const                 { return (m_nLastDiceRollValue == 11); }
         bool  IsBar() const                    { return (m_nLastDiceRollValue == 12); }
         bool  IsField() const                  { return (std::count(m_anFieldNumbers.begin(), m_anFieldNumbers.end(), m_nLastDiceRollValue)) ? true : false; }
-        bool  IsPoint() const                  { return (std::count(m_anPointNumbers.begin(), m_anPointNumbers.end(), m_nLastDiceRollValue)) ? true : false; }
+        bool  IsAPointNumber() const           { return (std::count(m_anPointNumbers.begin(), m_anPointNumbers.end(), m_nLastDiceRollValue)) ? true : false; }
         int   NumberOfNonFieldInARow() const   { return (m_nNumberOfNonFieldInARow); }
 
         int   RollValueCount(int i) const      { return (m_pnDiceRollValues[i - 1]); }

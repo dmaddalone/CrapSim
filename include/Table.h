@@ -50,7 +50,7 @@ class Table
     public:
         Table();
 
-        void SetTableOdds(TableOdds to) { m_ecTableOdds = to; }
+        //void SetTableOdds(TableOdds to) { m_ecTableOdds = to; }
         //TableOdds GetTableOdds() const  { return (m_ecTableOdds); }
         void   SetMinimumBet(int b)     { assert (b > 0); m_nMinimumBet = b; }
         int    MinimumBet() const       { return (m_nMinimumBet); }
@@ -89,7 +89,7 @@ class Table
         bool        m_bPuckOn       = false;
         int         m_nPoint        = 0;
 
-        bool        m_bNewShooter   = false;
+        bool        m_bNewShooter   = true;
 };
 
 #endif // TABLE_H

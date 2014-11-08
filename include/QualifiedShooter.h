@@ -39,32 +39,36 @@ enum class QualificationMethod
     QM_AFTER_FILE_NON_SEVEN_ROLLS
 };
 
-
 class QualifiedShooter
 {
     public:
-        //QualifiedShooter();
-        //virtual ~QualifiedShooter();
-        void SetMethod(QualificationMethod qm)  { m_ecQualificationMethod = qm; }
-        QualificationMethod Method() const      { return (m_ecQualificationMethod); }
-        bool QualifyingTheShooter() const       { return (m_ecQualificationMethod != QualificationMethod::QM_NO_METHOD); }
-        bool ShooterQualified() const           { return (m_bShooterQualified); }
+        QualifiedShooter();
 
-        bool QualifyShooter(const Table &cTable, const Dice &cDice);
+        bool SetMethod(std::string sMethod);
+        std::string Method();
+
+        bool QualifyingTheShooter() const       { return (m_ecQualificationMethod != QualificationMethod::QM_NO_METHOD); }
+        //bool ShooterQualified() const           { return (m_bShooterQualified); }
+
+        bool ShooterQualified(const Table &cTable, const Dice &cDice);
 
     private:
         QualificationMethod m_ecQualificationMethod = QualificationMethod::QM_NO_METHOD;
         bool m_bShooterQualified                    = false;
+
+        // Map to associate the strings with the enum values
+        std::map<std::string, QualificationMethod> m_mQualificationMethod;
 
         bool Method5Count(const Table &cTable, const Dice &cDice);
         int m_n5Count = 0;
 
         bool MethodAfterPointMade(const Table &cTable);
 
-        bool MethodAfterLosingFieldThreeTimes(const Table &cTable, Dice &cDice);
+        bool MethodAfterLosingFieldThreeTimes(const Table &cTable, const Dice &cDice);
         int m_nLosingFieldInARow = 0;
 
         bool MethodAfterFiveNon7Rolls(const Table &cTable, const Dice &cDice);
+        int m_n7InARow = 0;
 };
 
 #endif // QUALIFIEDSHOOTER_H

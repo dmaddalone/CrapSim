@@ -110,7 +110,8 @@ bool Table::SetTableType(std::string sTableType)
 
     if (it == m_mTableOdds.end()) return (false);
 
-    SetTableOdds(it->second);
+    //SetTableOdds(it->second);
+    m_ecTableOdds = it->second;
     return (true);
 }
 
@@ -118,6 +119,15 @@ std::string Table::TableType()
 {
     std::string sTableType("Unknown");
 
+    for (std::map<std::string, TableOdds>::iterator it = m_mTableOdds.begin(); it != m_mTableOdds.end(); it++)
+    {
+        if (m_ecTableOdds == it->second)
+        {
+            sTableType = it->first;
+            break;
+        }
+    }
+/*
     switch (m_ecTableOdds)
     {
         case TableOdds::TYPE_1X:
@@ -150,10 +160,9 @@ std::string Table::TableType()
         default:
             break;
     }
-
+*/
     return(sTableType);
 }
-
 
 void Table::Update(const Dice &cDice)
 {
