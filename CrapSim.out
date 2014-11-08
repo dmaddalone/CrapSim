@@ -1,0 +1,125 @@
+Craps Simulation
+Table
+	Type:		10x Odds
+	Minimum Wager:	5
+	Maximum Wager:	100
+Strategies
+	Number of strategies:	10
+Simulation
+	Number of runs:	200
+Muster
+           Name: Elementary
+    Description: Pass only, single odds to start
+       Pass Bet: 1         Standard Wager: 5
+      Come Bets: 0       Initial Bankroll: 300
+     Place Bets: 0          Standard Odds: 1
+     Field Bets: false
+Sig. Win. Mult.: 2
+ Use Confidence: false
+     Confidence: n/a
+
+           Name: Super Aggressive
+    Description: Aggressive with max odds
+       Pass Bet: 1         Standard Wager: 5
+      Come Bets: 2       Initial Bankroll: 300
+     Place Bets: 1          Standard Odds: 100
+     Field Bets: false
+Sig. Win. Mult.: 2
+ Use Confidence: false
+     Confidence: n/a
+
+           Name: Conventional
+    Description: Pass and two Comes, single odds to start
+       Pass Bet: 1         Standard Wager: 5
+      Come Bets: 2       Initial Bankroll: 300
+     Place Bets: 0          Standard Odds: 1
+     Field Bets: false
+Sig. Win. Mult.: 2
+ Use Confidence: false
+     Confidence: n/a
+
+           Name: Conventional Double Odds
+    Description: Conventional and double odds
+       Pass Bet: 1         Standard Wager: 5
+      Come Bets: 2       Initial Bankroll: 300
+     Place Bets: 0          Standard Odds: 2
+     Field Bets: false
+Sig. Win. Mult.: 2
+ Use Confidence: false
+     Confidence: n/a
+
+           Name: Conventional Triple Odds
+    Description: Conventional and triple odds
+       Pass Bet: 1         Standard Wager: 5
+      Come Bets: 2       Initial Bankroll: 300
+     Place Bets: 0          Standard Odds: 3
+     Field Bets: false
+Sig. Win. Mult.: 2
+ Use Confidence: false
+     Confidence: n/a
+
+           Name: Conventional Max Odds
+    Description: Conventional and maximum odds
+       Pass Bet: 1         Standard Wager: 5
+      Come Bets: 2       Initial Bankroll: 300
+     Place Bets: 0          Standard Odds: 100
+     Field Bets: false
+Sig. Win. Mult.: 2
+ Use Confidence: false
+     Confidence: n/a
+
+           Name: Conv And Arith. Conf.
+    Description: Conventional and arithmetic confidence
+       Pass Bet: 1         Standard Wager: 5
+      Come Bets: 2       Initial Bankroll: 300
+     Place Bets: 0          Standard Odds: 1
+     Field Bets: false
+Sig. Win. Mult.: 2
+ Use Confidence: true
+     Confidence: Arithmetic
+
+           Name: Conv, Arith. Conf, Double Odds
+    Description: Conventional and arithmetic confidence and double odds
+       Pass Bet: 1         Standard Wager: 5
+      Come Bets: 2       Initial Bankroll: 300
+     Place Bets: 0          Standard Odds: 2
+     Field Bets: false
+Sig. Win. Mult.: 2
+ Use Confidence: true
+     Confidence: Arithmetic
+
+           Name: Conv, Arith. Conf, Triple Odds
+    Description: Conventional and arithmetic confidence and double odds
+       Pass Bet: 1         Standard Wager: 5
+      Come Bets: 2       Initial Bankroll: 300
+     Place Bets: 0          Standard Odds: 3
+     Field Bets: false
+Sig. Win. Mult.: 2
+ Use Confidence: true
+     Confidence: Arithmetic
+
+           Name: Conv And Geo. Conf.
+    Description: Conventional and geometric confidence
+       Pass Bet: 1         Standard Wager: 5
+      Come Bets: 2       Initial Bankroll: 300
+     Place Bets: 0          Standard Odds: 1
+     Field Bets: false
+Sig. Win. Mult.: 2
+ Use Confidence: true
+     Confidence: Geometric
+
+
+Starting Simulation
+Completed 100 out of 200 runsCompleted 200 out of 200 runs
+                                                                 Rolls to Win      Rolls to Lose
+                                   Name Plays Wins Losses Win %   Avg  Min    Max  Avg  Min    Max
+                              Elementary 200   44   156    22.0  2977  735   8145 3108  459  11949
+                        Super Aggressive 200   74   126    37.0    69   15    186   45    9    208
+                            Conventional 200   165  35     82.5  1296  159   6945 1097  157   4337
+                Conventional Double Odds 200   176  24     88.0   453   71   2065  396  122   1272
+                Conventional Triple Odds 200   160  40     80.0   302   71    956  270   39    806
+                   Conventional Max Odds 200   112  88     56.0    71   11    237   50   10    182
+                   Conv And Arith. Conf. 200   171  29     85.5   768   72   3169  679  157   1621
+          Conv, Arith. Conf, Double Odds 200   172  28     86.0   379   71   1844  352  118    916
+          Conv, Arith. Conf, Triple Odds 200   155  45     77.5   270   58   1011  229   39    804
+                     Conv And Geo. Conf. 200   157  43     78.5   587   71   2125  605  139   2089

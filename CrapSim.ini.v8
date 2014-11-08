@@ -1,0 +1,304 @@
+;
+; CrapSIm.ini
+;
+; 	Configuration file used for CrapSim.
+;
+;
+;	Section:		Simulation
+; 	Description:	Sets attributes for the simulation.
+;
+;	Key:			Runs
+;	Description:	Sets the number of simulation runs.
+;	Values:		Any positive integer.
+;	Default value:	none
+;	Required:		Yes
+;
+;	Key:			Muster
+;	Description:	Generates a must report before the simulation runs begin.
+;	Values:		true or false
+;	Default value:	true
+;	Required:		No
+;
+[Simulation]
+Runs=200
+Muster=true
+Tally=true
+
+[Result]
+FileName=crapsim.csv
+FileType=csv
+FileOverwrite=Yes
+
+;	Section:		Table
+; 	Description:	Sets the table attributes
+;
+;	Key:			Type
+;	Description:	Sets the table odds.
+;	Values:		1X, 2X, FULL_DOUBLE, 3X, 3X_4X_5X, 5X, 10X, 20X, 100X
+;	Default value:	3X_4X_5X
+;	Required:		No
+;
+;	Key:			MinimumWager
+;	Description:	Sets the minimum wager for the table.
+;	Values:		Any postive integer.
+;	Default value:	5
+;	Required:		No
+;
+;	Key:			MaximumWager
+;	Description:	Sets the maximum wager for the table.
+;	Values:		Any positive integer.
+;	Default value:	1000
+;	Required:		No
+;
+[Table]
+Type=3x_4x_5x
+;Type=10x
+MinimumWager=5
+MaximumWager=100
+
+;	Section:		DefaultStrategy
+; 	Description:	Sets default attributes for all strategies.  These may be overwritten by individual
+;					strategies.
+;
+;	Key:			StandardWager
+;	Description:	Sets the default minimum wager for a strategy.
+;	Values:		Any positive integer.
+;	Default value:	none
+;	Required:		No
+;
+;	Key:			InitialBankroll
+;	Description:	Sets the default initial bankroll for a strategy.
+;	Values:		Any postive integer.
+;	Default value:	none
+;	Required:		No
+;
+;	Key:			SWM
+;	Description:	Sets the default significant winnings multiple for a strategy.
+;	Values:		Any postive integer.
+;	Default value:	none
+;	Required:		No
+;
+[DefaultStrategy]
+StandardWager=5
+InitialBankroll=300
+SWM=2
+
+;	Section:		Strategy
+; 	Description:	Sets default attributes for infividual strategies.  Up to ten Stratregy sections may be
+;					created, each one appended by a numeral 1 through 10, e.g., Strategy1, Strategy2.
+;
+;	Key:			Name
+;	Description:	Sets the name for the strategy.
+;	Values:		String
+;	Default value:	The strategy section name
+;	Required:		No
+;
+;	Key:			Description
+;	Description:	Sets a description for the strategy.
+;	Values:		String
+;	Default value:	none
+;	Required:		No
+;
+;	Key:			StandardWager
+;	Description:	Sets the default minimum wager for the strategy.
+;	Values:		Any  integer greater than zero.
+;	Default value:	none
+;	Required:		Yes, if [AllStrategies] StandardWager is not set.
+;
+;	Key:			FullWager
+;	Description:	If true, updates wager to full payoff amount before making a bet.
+;	Values:		true or false
+;	Default value:	false
+;	Required:		No
+;
+;	Key:			InitialBankroll
+;	Description:	Sets the default initial bankroll for the strategy.
+;	Values:		Any  integer greater than zero.
+;	Default value:	none
+;	Required:		Yes, if [AllStrategies] InitialBankroll is not set.
+;
+;	Key:			StandardOdds
+;	Description:	Sets the standard odds bet wager multiplier for the strategy.
+;	Values:		Any float greater than or equal to 1.0.
+;	Default value:	1.0
+;	Required:		No
+;
+;	Key:			SWM
+;	Description:	Sets the significant winnings multiple for the strategy.  If the strategy's bankroll
+;					exceeds the amount of the initial bankroll multiplies by the SWM figure, the strategy 
+;					stops playing and this is considered a win.
+;	Values:		Any float greater than 1.0.
+;	Default value:	2.0
+;	Required:		No
+;
+;	Key:			PassBet
+;	Description:	Sets whether the stratgy places a Pass bet.
+;	Values:		1 or 0
+;	Default value:	0
+;	Required:		No
+;
+;	Key:			DontPassBet
+;	Description:	Sets whether the stratgy places a Dont Pass bet.
+;	Values:		1 or 0
+;	Default value:	0
+;	Required:		No
+;
+;	Key:			ComeBets
+;	Description:	Sets the total number of Come bets allowed.
+;	Values:		0 through 6
+;	Default value:	0
+;	Required:		No
+;
+;	Key:			DontComeBets
+;	Description:	Sets the total number of Dont Come bets allowed.
+;	Values:		0 through 6
+;	Default value:	0
+;	Required:		No
+;
+;	Key:			PlaceBets
+;	Description:	Sets the total number of Place bets allowed. 
+;	Values:		0 through 6
+;	Default value:	0
+;	Required:		No
+;
+;	Key:			PlaceBetsMadeAtOnce
+;	Description:	Sets the number of Place bets made at one time.
+;	Values:		0 through 6.  (Is limited to the PlaceBets setting.)
+;	Default value:	0
+;	Required:		No
+;
+;	Key:			PlaceAfterCome
+;	Description:	Sets whether the stratgy places Place bets after all Come Bets are made.  If true, 
+;					Place bets are made only after all allowed Come bets are made and the six or eight 
+;					is not already covered by a bet.
+;	Values:		true or false
+;	Default value:	false
+;	Required:		No
+;
+;	Key:			PlacePreferred
+;	Description:	Sets the preferred place bet number.
+;	Values:		4, 5, 6, 8, 9, 10
+;	Default value:	8
+;	Required:		No
+;
+;	Key:			FieldBets
+;	Description:	Sets whether the stratgy places Field bets.
+;	Values:		true or false
+;	Default value:	false
+;	Required:		No
+;
+;	Key:			OddsWorking
+;	Description:	Sets whether the odds are working on a table come out roll.
+;	Values:		true or false
+;	Default value:	false
+;	Required:		No
+;
+;	Key:			OddsProgression
+;	Description:	Sets whether the stratgy uses increases its odds bet amount if it has increased its
+;					bankroll.
+;	Values:		true or false
+;	Default value:	false
+;	Required:		No
+;
+;	Key:			OddsProgressionMethod
+;	Description:	Sets the type of increase in odds bet amounts if UseConfidence is set to true.  
+;	Values:		Arithmetic or Geometric
+;	Default value:	none
+;	Required:		No
+;
+;	Key:			Predefined
+;	Description:	Sets a predefined strategy.
+;	Values:		Elementary
+;						PassBet 			= 1
+;						ComeBets 		= 0
+;						PlaceBets 			= 0
+;						FieldBets 			= 0
+;						StandardOdds 	= 1.0
+;	Values:		Conservative
+;						PassBet 			= 1
+;						ComeBets 		= 1
+;						PlaceBets 			= 0
+;						FieldBets 			= 0
+;						StandardOdds 	= 1.0
+;	Values:		Conventional
+;						PassBet 			= 1
+;						ComeBets 		= 2
+;						PlaceBets 			= 1
+;						FieldBets 			= 0
+;						StandardOdds 	= 1.0
+;	Values:		Aggressive
+;						PassBet 			= 1
+;						ComeBets 		= 2
+;						PlaceBets 			= 1
+;						FieldBets 			= 0
+;						StandardOdds 	= 2.0
+;	Default value:	none
+;	Required:		No
+;
+[Strategy1]
+Name=Two Place Bets
+Description=Two place bets, always
+PlaceBets=2
+PlaceBetsMadeAtOnce=3
+FullWager=true
+
+[Strategy2]
+Predefined=Aggressive
+Name=Super Aggressive Full Wager
+Description=Aggressive with max odds and full wager
+StandardOdds=100
+PlaceAfterCome=true
+FullWager=true
+
+[Strategy3]
+Predefined=Aggressive
+Name=Super Aggressive
+Description=Aggressive with max odds, but without full wager
+StandardOdds=100
+PlaceAfterCome=true
+
+[Strategy4]
+Name=Conventional Double Odds
+Predefined=Conventional
+Description=Conventional and double odds
+StandardOdds=2.0
+
+[Strategy5]
+Name=Conventional Triple Odds
+Predefined=Conventional
+Description=Conventional and triple odds
+StandardOdds=3.0
+
+[Strategy6]
+Name=Conventional Max Odds
+Predefined=Conventional
+Description=Conventional and maximum odds
+StandardOdds=100
+
+[Strategy7]
+Name=Conv And Arith. Conf.
+Description=Conventional and arithmetic confidence
+Predefined=Conventional
+OddsProgression	=True
+OddsProgressionMethod=Arithmetic
+
+[Strategy8]
+Name=Conv, Arith. Conf, Double Odds
+Description=Conventional and arithmetic confidence and double odds
+Predefined=Conventional
+OddsProgression	=True
+OddsProgressionMethod=Arithmetic
+StandardOdds=2.0
+
+[Strategy9]
+Name=Conv, Arith. Conf, Triple Odds
+Description=Conventional and arithmetic confidence and double odds
+Predefined=Conventional
+OddsProgression	=True
+OddsProgressionMethod=Arithmetic
+StandardOdds=3.0
+
+;[Strategy10]
+;Name=Dont Pass
+;Description=Dont Pass
+;DontPassBet=1

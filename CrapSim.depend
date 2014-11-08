@@ -1,0 +1,130 @@
+# depslib dependency file v1.0
+1415240397 source:/home/maddalone/CCPP/CrapSim/main.cpp
+	<iostream>
+	<cassert>
+	<climits>
+	<cfloat>
+	"Die.h"
+	"Dice.h"
+	"Table.h"
+	"Money.h"
+	"Bet.h"
+	"Strategy.h"
+	"Simulation.h"
+	"CDataFile.h"
+
+1415080159 source:/home/maddalone/CCPP/CrapSim/src/Die.cpp
+	"Die.h"
+
+1415080159 /home/maddalone/CCPP/CrapSim/include/Die.h
+	<random>
+	<functional>
+	<algorithm>
+	<iterator>
+
+1415333337 source:/home/maddalone/CCPP/CrapSim/src/Dice.cpp
+	<iostream>
+	"Dice.h"
+
+1415333337 /home/maddalone/CCPP/CrapSim/include/Dice.h
+	<algorithm>
+	<array>
+	<list>
+	"Die.h"
+
+1415337343 source:/home/maddalone/CCPP/CrapSim/src/Table.cpp
+	"Table.h"
+
+1415337344 /home/maddalone/CCPP/CrapSim/include/Table.h
+	<cassert>
+	<map>
+	<string>
+	<locale>
+	"Dice.h"
+
+1415158602 source:/home/maddalone/CCPP/CrapSim/src/Bet.cpp
+	"Bet.h"
+
+1415158333 /home/maddalone/CCPP/CrapSim/include/Bet.h
+
+1415329751 source:/home/maddalone/CCPP/CrapSim/src/Strategy.cpp
+	"Strategy.h"
+	<fstream>
+	<iostream>
+	<iomanip>
+
+1415241860 /home/maddalone/CCPP/CrapSim/include/Strategy.h
+	<algorithm>
+	<cassert>
+	<climits>
+	<string>
+	<list>
+	<vector>
+	"Table.h"
+	"Bet.h"
+	"Money.h"
+	"StrategyTracker.h"
+
+1415080159 /home/maddalone/CCPP/CrapSim/include/Simulation.h
+	"Dice.h"
+	"Table.h"
+	"Strategy.h"
+	<vector>
+
+1415335084 source:/home/maddalone/CCPP/CrapSim/src/Simulation.cpp
+	"Simulation.h"
+	<iostream>
+	<iomanip>
+
+1415080158 /home/maddalone/CCPP/CrapSim/include/Money.h
+	<cassert>
+	<climits>
+	<iostream>
+
+1415080158 source:/home/maddalone/CCPP/CrapSim/src/Money.cpp
+	"Money.h"
+
+1413649596 source:/home/maddalone/CCPP/CDataFile/src/CDataFile.cpp
+	<vector>
+	<string>
+	<ctype.h>
+	<cctype>
+	<cstdio>
+	<cstdarg>
+	<fstream>
+	<cfloat>
+	<cstring>
+	<ios>
+	<iostream>
+	<climits>
+	<windows.h>
+	"CDataFile.h"
+
+1413426992 /home/maddalone/CCPP/CDataFile/include/CDataFile.h
+	<vector>
+	<fstream>
+	<string>
+	<locale>
+
+1413644161 source:/home/maddalone/CCPP/CrapSim/src/TestDie.cpp
+	<iostream>
+	"Die.h"
+
+1415080159 /home/maddalone/CCPP/CrapSim/include/StrategyTracker.h
+	<string>
+	<fstream>
+	"Strategy.h"
+	"Table.h"
+	"Bet.h"
+
+1415080159 source:/home/maddalone/CCPP/CrapSim/src/StrategyTracker.cpp
+	<iostream>
+	"StrategyTracker.h"
+
+1415337585 source:/home/maddalone/CCPP/CrapSim/src/QualifiedShooter.cpp
+	"QualifiedShooter.h"
+
+1415337810 /home/maddalone/CCPP/CrapSim/include/QualifiedShooter.h
+	"Dice.h"
+	"Table.h"
+
