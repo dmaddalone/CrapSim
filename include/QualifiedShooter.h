@@ -30,6 +30,7 @@
 #include "Dice.h"
 #include "Table.h"
 
+// Used to identify a qualification method
 enum class QualificationMethod
 {
     QM_NO_METHOD,
@@ -43,30 +44,32 @@ class QualifiedShooter
 {
     public:
         QualifiedShooter();
-
+        // Set and return the qualification method
         bool SetMethod(std::string sMethod);
         std::string Method();
 
+        // Check whether we are qualifying a shooter
         bool QualifyingTheShooter() const       { return (m_ecQualificationMethod != QualificationMethod::QM_NO_METHOD); }
-        //bool ShooterQualified() const           { return (m_bShooterQualified); }
-
+        // Check whether the shooter has been qualified
         bool ShooterQualified(const Table &cTable, const Dice &cDice);
 
     private:
+        // Set defaults
         QualificationMethod m_ecQualificationMethod = QualificationMethod::QM_NO_METHOD;
         bool m_bShooterQualified                    = false;
 
         // Map to associate the strings with the enum values
         std::map<std::string, QualificationMethod> m_mQualificationMethod;
 
+        // The 5 Count method
         bool Method5Count(const Table &cTable, const Dice &cDice);
         int m_n5Count = 0;
-
+        // The After Point Made method
         bool MethodAfterPointMade(const Table &cTable);
-
+        // The After Losing Field Three Times method
         bool MethodAfterLosingFieldThreeTimes(const Table &cTable, const Dice &cDice);
         int m_nLosingFieldInARow = 0;
-
+        // The After Five Non Seven Rolls method
         bool MethodAfterFiveNon7Rolls(const Table &cTable, const Dice &cDice);
         int m_n7InARow = 0;
 };

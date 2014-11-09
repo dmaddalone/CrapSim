@@ -35,21 +35,31 @@
 class Die
 {
     public:
+        // Declare a Die with i number of faces
         explicit Die(int i);
+        // Copy constructor
         Die(const Die& cSource);
+        // Assignment constructor
         Die& operator=(const Die& cSource);
+        // Destructor
         ~Die();
 
+        // Roll the die
         int Roll();
 
-        int   RollValueCount(int i) const      { return m_pnDieRollValues[i-1];}
+        // Return the number of times a particular value is rolled
+        int   RollValueCount(int i) const      { return m_pnDieRolValues[i-1];}
+        // Return the total number of times the die has been rolled
         int   TotalRolls() const               { return m_nTotalDieRolls; }
+        // Return the percentage of times a value is rolled
         float RollValuePercentage(int i) const { return (float)RollValueCount(i) / TotalRolls() * 100; }
 
     private:
+        // Set counters to zero
         int m_nTotalDieRolls    = 0;
         int m_nLastDieRollValue = 0;
         int m_nFaces            = 0;
+        // Pointer / array to capture roll values
         int *m_pnDieRollValues;
 };
 

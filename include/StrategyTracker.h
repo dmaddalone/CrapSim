@@ -40,23 +40,29 @@ class StrategyTracker
     public:
         StrategyTracker(Strategy *pcStrategy);
         virtual ~StrategyTracker();
+        // Create a new record
         void RecordNew(const Strategy *pcStrategy, const Table &cTable);
+        // Update record with current and newly made bets
         void RecordBetsBeforeRoll(const Strategy *pcStrategy, const std::list<Bet> &lBets);
+        // Update record with bet results after the roll
         void RecordBetsAfterRoll(const Strategy *pcStrategy, const std::list<Bet> &lBets, int nRoll);
+        // Post the record
         void Post();
 
     private:
+        // Create a file for basic records
         std::ofstream m_ofsBasics                   {};
+        // Create a file for Single bets (e.g., Pass, Field)
         std::ofstream m_ofsSingleBets               {};
 
+        // Basic record fields
         int   m_nSequence                           {};
         int   m_nBeginningBankroll                  {};
         int   m_nWager                              {};
         float m_fOdds                               {};
-
         bool  m_bTableComeOutRoll                   {};
         int   m_nTablePoint                         {};
-
+        // Single bet fields before the roll
         struct BeforeSingleBets
         {
             int   nPassBetWager {};
@@ -70,14 +76,15 @@ class StrategyTracker
             int   nDontPassPoint {};
         } m_stBeforeSingleBets;
 
+        // Containers for multiple bets (e.g., Come, Place) before the roll
         std::map<int, int> m_mBeforeComeBetWager    {};
         std::map<int, int> m_mBeforeDontComeBetWager{};
         std::map<int, int> m_mBeforePlaceBetWager   {};
 
         int   m_nBeforeBankroll                     {};
-
         int   m_nRoll                               {};
 
+        // Single bet field after the roll
         struct AfteSingleBets
         {
             int   nPassBetWager {};
@@ -91,6 +98,7 @@ class StrategyTracker
             int   nDontPassPoint {};
         } m_stAfterSingleBets;
 
+        // Containers for multiple bets after the roll
         std::map<int, int> m_mAfterComeBetWager     {};
         std::map<int, int> m_mAfterDontComeBetWager {};
         std::map<int, int> m_mAfterPlaceBetWager    {};

@@ -32,6 +32,7 @@
 #include <locale>
 #include "Dice.h"
 
+// Used to identify the type of table odds
 enum class TableOdds
 {
     TYPE_1X,
@@ -50,46 +51,46 @@ class Table
     public:
         Table();
 
-        //void SetTableOdds(TableOdds to) { m_ecTableOdds = to; }
-        //TableOdds GetTableOdds() const  { return (m_ecTableOdds); }
+        // Set and return the minimum and maximum bet wagers
         void   SetMinimumBet(int b)     { assert (b > 0); m_nMinimumBet = b; }
         int    MinimumBet() const       { return (m_nMinimumBet); }
         void   SetMaximumBet(int b)     { assert (b > 0); m_nMaximumBet = b; }
         int    MaximumBet() const       { return (m_nMaximumBet); }
-
+        // Set and return the table point
         void   SetPoint(int p)          { m_bPuckOn = true; m_nPoint = p; }
         int    Point() const            { return (m_nPoint); }
-
+        // Set puck off
         void   SetPuckOff()             { m_bPuckOn = false; m_nPoint = 0; }
+        // Return whether the puck is on
         bool   IsPuckOn() const         { return m_bPuckOn; }
-
+        // Set and return whether a new shooter
         void   SetNewShooter(bool b)    { m_bNewShooter = b; }
         bool   NewShooter() const       { return (m_bNewShooter); }
-
+        // Return whether the table is coming out
         bool   IsComingOutRoll() const  { return (!m_bPuckOn); }
-
+        // Get maximum table odds for a bet
         float GetMaxOdds(int i) const;
+        // Update the table state based on the dice roll
         void  Update(const Dice &cDice);
-
+        // Reset the table - meant to be called before a new Simulation run
         void  Reset()                   { SetPuckOff(); SetNewShooter(true); }
-
+        // Set and return the table type (odds offered)
         std::string TableType();
         bool SetTableType(std::string sTableType);
-
+        // Return the bar, for Don't Pass bets.  TODO: make configurable
         std::string Bar()               { return "Bar 12"; }
 
     private:
+        // Set table defaults
         TableOdds   m_ecTableOdds   = TableOdds::TYPE_3X_4X_5X;
-        // Map to associate the strings with the enum values
-        std::map<std::string, TableOdds> m_mTableOdds;
-
         int         m_nMinimumBet   = 5;
         int         m_nMaximumBet   = 1000;
-
         bool        m_bPuckOn       = false;
         int         m_nPoint        = 0;
-
         bool        m_bNewShooter   = true;
+
+        // Map used to associate the string names with the enum values
+        std::map<std::string, TableOdds> m_mTableOdds;
 };
 
 #endif // TABLE_H

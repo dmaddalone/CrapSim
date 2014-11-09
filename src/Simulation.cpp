@@ -29,11 +29,6 @@ using std::flush;
 
 Simulation::Simulation() : m_cDice(2, 6) {}
 
-//Simulation::~Simulation()
-//{
-//    //dtor
-//}
-
 void Simulation::Run(int nNumberOfRuns, bool bMusterReport, bool bTally)
 {
     cout << "Table" << endl;

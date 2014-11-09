@@ -1201,7 +1201,6 @@ void Strategy::Report()
     if (m_nTimesStrategyWon > 0)  nWinRollsAvg   = (static_cast<int>(m_nWinRollsTotal / m_nTimesStrategyWon));
     if (m_nTimesStrategyLost > 0) nLossRollsAvg  = (static_cast<int>(m_nLossRollsTotal / m_nTimesStrategyLost));
 
-
     std::cout << std::setw(40) << std::right << m_sName << " " <<
                  std::setw(6)  << std::left << m_nTimesStrategyRun <<
                  std::setw(5)  << std::left << m_nTimesStrategyWon <<

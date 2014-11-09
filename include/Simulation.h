@@ -35,24 +35,34 @@
 class Simulation
 {
     public:
+        // Constructor creates two dice
         Simulation();
 
+        // Add classes to the Simulation
         void AddTable(Table cTable)          { this->m_cTable = cTable; }
         void AddStrategy(Strategy cStrategy) { m_vStrategies.push_back(cStrategy); }
 
+        // Run number of nRuns simulations.  Flags to generate a muster and the working tally.
         void Run(int nRuns, bool bMusterReport, bool bTally);
-
+        // End of simulation report.
         void Report();
 
     private:
+        // Dice and Table
         Dice                    m_cDice;
         Table                   m_cTable;
+        // Container of Strategies
         std::vector<Strategy>   m_vStrategies;
 
+        // Direct Strategies to make their bets
         void MakeBets();
+        // Direct Strategies to resolve their bets
         void ResolveBets();
+        // Check if Strategies (Players) are still playing
         bool PlayersStillLeft();
+        // Capture stats
         void UpdateStatisticsAndReset();
+        // Create a muster report before starting the simulation
         void Muster();
 };
 
