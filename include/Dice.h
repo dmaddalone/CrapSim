@@ -38,6 +38,11 @@ class Dice
     public:
         // Create nDice number of die with nFaces number of faces
         Dice(int nDice, int nFaces);
+        // Copy constructor
+        Dice(const Dice& cSource);
+        // Assignment constructor
+        Dice& operator=(const Dice& cSource);
+        // Destructor
         ~Dice();
 
         // Roll the dice
@@ -76,9 +81,9 @@ class Dice
         int  *m_pnDiceRollValues;
 
         // Array to hold field numbers
-        std::array<int, 7> m_anFieldNumbers;  // Synchronize field numbers with Bet.cpp CalculatePayoff()
+        std::array<int, 7> m_anFieldNumbers {{2, 3, 4, 9, 10, 11, 12}};  // Synchronize field numbers with Bet.cpp CalculatePayoff()
         // Array to hold point numbers
-        std::array<int, 6> m_anPointNumbers;
+        std::array<int, 6> m_anPointNumbers {{4, 5, 6, 8, 9, 10}};
 };
 
 #endif // DICE_H

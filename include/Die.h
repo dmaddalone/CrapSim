@@ -48,11 +48,14 @@ class Die
         int Roll();
 
         // Return the number of times a particular value is rolled
-        int   RollValueCount(int i) const      { return m_pnDieRolValues[i-1];}
+        int   RollValueCount(int i) const      { return m_pnDieRollValues[i-1];}
         // Return the total number of times the die has been rolled
         int   TotalRolls() const               { return m_nTotalDieRolls; }
         // Return the percentage of times a value is rolled
         float RollValuePercentage(int i) const { return (float)RollValueCount(i) / TotalRolls() * 100; }
+
+        // Return the number of faces
+        int Faces() const { return (m_nFaces); }
 
     private:
         // Set counters to zero

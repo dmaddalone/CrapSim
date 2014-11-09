@@ -21,23 +21,107 @@
 
 #include "Dice.h"
 
+/**
+  * Construct a Dice.
+  *
+  * Create an array / pointer to the number of values that the dice may
+  * generate; construct the number of Die specified; populate the number
+  * arrays.
+  *
+  * \param nDice Specifices the number of dice
+  * \param nFaces Specifices the number of faces of the die
+  */
+
 Dice::Dice(int nDice, int nFaces)
 {
     m_pnDiceRollValues  = new int[nDice * nFaces]();
 
     for (int iii = 0; iii < nDice; iii++)
     {
-        m_lDice.push_back(Die(nFaces));
+        m_lDice.emplace_back(nFaces);
+    }
+}
+
+/**
+  * Copy constructor for Dice.
+  *
+  *
+  * \param cSource The source of the copy
+  */
+
+Dice::Dice(const Dice& cSource) : m_lDice(cSource.m_lDice)
+{
+    m_nTotalDiceRolls         = cSource.m_nTotalDiceRolls;
+    m_nLastDiceRollValue      = cSource.m_nLastDiceRollValue;
+    m_nNumberOfNonFieldInARow = cSource.m_nNumberOfNonFieldInARow;
+
+    if (cSource.m_pnDiceRollValues)
+    {
+        m_pnDiceRollValues = new int[m_lDice.size() * m_lDice.front().Faces()];
+        for (std::list<Die>::size_type iii = 0; iii < m_lDice.size() * m_lDice.front().Faces(); iii++)
+        {
+            m_pnDiceRollValues[iii] = cSource.m_pnDiceRollValues[iii];
+        }
+    }
+    else
+    {
+        m_pnDiceRollValues = 0;
+    }
+}
+
+/**
+  * Copy assignment constructor for Dice.
+  *
+  *
+  * \param cSource The source of the copy assignment
+  */
+
+Dice& Dice::operator=(const Dice& cSource)
+{
+    if (this == &cSource)
+        return (*this);
+
+    m_lDice = cSource.m_lDice;
+
+    m_nTotalDiceRolls         = cSource.m_nTotalDiceRolls;
+    m_nLastDiceRollValue      = cSource.m_nLastDiceRollValue;
+    m_nNumberOfNonFieldInARow = cSource.m_nNumberOfNonFieldInARow;
+
+    delete[] m_pnDiceRollValues;
+
+    if (cSource.m_pnDiceRollValues)
+    {
+        m_pnDiceRollValues = new int[m_lDice.size() * m_lDice.front().Faces()];
+        for (std::list<Die>::size_type iii = 0; iii < m_lDice.size() * m_lDice.front().Faces(); iii++)
+        {
+            m_pnDiceRollValues[iii] = cSource.m_pnDiceRollValues[iii];
+        }
+    }
+    else
+    {
+        m_pnDiceRollValues = 0;
     }
 
-    m_anFieldNumbers = {2, 3, 4, 9, 10, 11, 12};  // Synchronize field numbers with Bet.cpp CalculatePayoff()
-    m_anPointNumbers = {4, 5, 6, 8, 9, 10};
+    return (*this);
 }
+
+/**
+  * Destructor for Die.
+  */
 
 Dice::~Dice()
 {
     delete[] m_pnDiceRollValues;
 }
+
+/**
+  * Roll the Dice.
+  *
+  * Roll each Die and capture tha value; record number of rolls and
+  * other Dice statistics.
+  *
+  *\return The value of the rolled Dice.
+  */
 
 int Dice::Roll()
 {

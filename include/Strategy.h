@@ -89,7 +89,7 @@ class Strategy
         void SetConventional();
         void SetAggressive();
         // Odds methods
-        void SetComeOddsWorking(bool b)     { m_bComOddsWorking = b; }
+        void SetComeOddsWorking(bool b)     { m_bComeOddsWorking = b; }
         void UseOddsProgression(bool b)     { m_bOddsProgression = b; }
         void IncreaseOdds()                 { if (IsArithmeticOddsProgression()) m_fOdds += 1; else m_fOdds *= 2; }
         void ResetOdds()                    { m_fOdds = m_fStandardOdds; }
@@ -117,14 +117,58 @@ class Strategy
         void  Report();
 
     private:
+        // Make different types of bets
+        void MakePassBet(const Table &cTable);
+        void MakeComeBet(const Table &cTable);
+        void MakeDontPassBet(const Table &cTable);
+        void MakeDontComeBet(const Table &cTable);
+        void MakeOddsBet(const Table &cTable);
+        void MakeFieldBet();
+        void MakeBigBet();
+        // Set wager to an amount that creates a full payoff
+        int  OddsBetFullPayoffWager(const int  nWager, const int nPointNumber);
+
+        // Make appropriate Place bets
+        void MakePlaceBets(const Table &cTable);
+        // Maake a Place bet
+        void MakePlaceBet();
+        // Modify Place bet wager to create maximum payoff
+        int  PlaceBetFullPayoffWager(const int nPlaceNumber);
+        // Container for Place bets
+        std::map<int, bool>  m_mPlaceBets { {4, false}, {5, false}, {6, false}, {8, false}, {9, false}, {10, false} };
+        // Returns next Place bet number
+        int  PlaceBetNumber();
+
+        // Resolve bets
+        void ResolvePass(const Dice &cDice);
+        void ResolvePassOdds(const Table &cTable, const Dice &cDice);
+        void ResolveDontPass(const Dice &cDice);
+        void ResolveDontPassOdds(const Table &cTable, const Dice &cDice);
+        void ResolveCome(const Dice &cDice);
+        void ResolveComeOdds(const Table &cTable, const Dice &cDice);
+        void ResolveDontCome(const Dice &cDice);
+        void ResolveDontComeOdds(const Dice &cDice);
+        void ResolvePlace(const Table &cTable, const Dice &cDice);
+        void ResolveField(const Dice &cDice);
+        void ResolveBig(const Dice &cDice);
+
+        // Check to see if a current bet covers 6 or 8
+        bool SixOrEightCovered();
+        // Checks to see if the odds progression method is Arithmetic
+        bool IsArithmeticOddsProgression() { return (m_ecOddsProgressionMethod == OddsProgressionMethod::ARITHMETIC); }
+
+
         std::string m_sName;
         std::string m_sDescription;
+
         // Money class to track bankroll
         Money m_cMoney;
+
         // StrategyTracker class to provide detailed (roll-by-roll) records of
         // a Strategy.  Used for debugging.  Recommend to a use in conjunction
-        // a single simultion.
+        // a single simulation run.
         StrategyTracker* m_pcStrategyTracker;
+
         // Set Strategy defaults
         int m_nNumberOfPassBetsAllowed      = 0;
         int m_nNumberOfComeBetsAllowed      = 0;
@@ -152,6 +196,7 @@ class Strategy
         bool  m_bOddsProgression            = false;
         OddsProgressionMethod m_ecOddsProgressionMethod = OddsProgressionMethod::ARITHMETIC;
         int m_nPreferredPlaceBet            = 8;
+
         // Set counters to zero
         int m_nTimesStrategyRun             = 0;
         int m_nTimesStrategyWon             = 0;
@@ -163,49 +208,12 @@ class Strategy
         int m_nLossRollsMin                 = INT_MAX;
         int m_nLossRollsMax                 = INT_MIN;
         int m_nLossRollsTotal               = 0;
+
         // Don't track results by default
         bool m_bTrackResults                = false;
+
         // Container for bets
         std::list<Bet>       m_lBets;
-        // Make different types of bets
-        void MakePassBet(const Table &cTable);
-        void MakeComeBet(const Table &cTable);
-        void MakeDontPassBet(const Table &cTable);
-        void MakeDontComeBet(const Table &cTable);
-        void MakeOddsBet(const Table &cTable);
-        void MakeFieldBet();
-        void MakeBigBet();
-
-        // Make appropriate Place bets
-        void MakePlaceBets(const Table &cTable);
-        // Maake a Place bet
-        void MakePlaceBet();
-        // Modify Place bet wager to create maximum payoff
-        int  PlaceBetFullPayoffWager(const int nPlaceNumber);
-        // Container for Place bets
-        std::map<int, bool>  m_mPlaceBets { {4, false}, {5, false}, {6, false}, {8, false}, {9, false}, {10, false} };
-        // Returns next Place bet number
-        int  PlaceBetNumber();
-
-        // Set wager to an amount that creates a full payoff
-        int  OddsBetFullPayoffWager(const int  nWager, const int nPointNumber)
-        // Resolve bets
-        void ResolvePass(const Dice &cDice);
-        void ResolvePassOdds(const Table &cTable, const Dice &cDice);
-        void ResolveDontPass(const Dice &cDice);
-        void ResolveDontPassOdds(const Table &cTable, const Dice &cDice);
-        void ResolveCome(const Dice &cDice);
-        void ResolveComeOdds(const Table &cTable, const Dice &cDice);
-        void ResolveDontCome(const Dice &cDice);
-        void ResolveDontComeOdds(const Dice &cDice);
-        void ResolvePlace(const Table &cTable, const Dice &cDice);
-        void ResolveField(const Dice &cDice);
-        void ResolveBig(const Dice &cDice);
-
-        // Check to see if a current bet covers 6 or 8
-        bool SixOrEightCovered();
-        // Checks to see if the odds progression method is Arithmetic
-        bool IsArithmeticOddsProgression() { return (m_ecOddsProgressionMethod == OddsProgressionMethod::ARITHMETIC); }
 };
 
 #endif // STRATEGY_H

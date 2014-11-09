@@ -65,7 +65,7 @@ void CreateStrategy(const std::string &sStrategy, CDataFile &cConfigFile, const 
     bool        bTrackResults           = cConfigFile.GetBool("TrackResults", sStrategy);
 
     // Set initial bankroll.  Use AllStrategies setting if individual strategy's InitialBankroll is not set.
-    if (nInitialBankroll== INT_MIN) nInitialBankroll = nAllInitialBankroll;
+    if (nInitialBankroll == INT_MIN) nInitialBankroll = nAllInitialBankroll;
     //if (nInitialBankroll <= 0) // If InitialBankroll still not set, exit with error
     //{
     //    cerr << "ERROR: InitialBankroll not set: " << nInitialBankroll << endl;

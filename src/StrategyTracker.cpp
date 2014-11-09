@@ -32,8 +32,9 @@ StrategyTracker::StrategyTracker(Strategy *pcStrategy)
     }
 
     sFileName = "CrapSim" + sStrategyName + "Basics.csv";
-    m_ofsBasics.open(sFileName);
-    if (!m_ofsBasics.is_open())
+    m_ofsBasics = new std::ofstream();
+    m_ofsBasics->open(sFileName);
+    if (!m_ofsBasics->is_open())
     {
         std::cerr << "ERROR (StrategyTracker): Could not open " << sFileName << " for writing" << std::endl;
         std::cerr << "Exiting" << std::endl;
@@ -41,8 +42,9 @@ StrategyTracker::StrategyTracker(Strategy *pcStrategy)
     }
 
     sFileName = "CrapSim" + sStrategyName + "SingleBets.csv";
-    m_ofsSingleBets.open(sFileName);
-    if (!m_ofsSingleBets.is_open())
+    m_ofsSingleBets = new std::ofstream();
+    m_ofsSingleBets->open(sFileName);
+    if (!m_ofsSingleBets->is_open())
     {
         std::cerr << "ERROR (StrategyTracker): Could not open " << sFileName << " for writing" << std::endl;
         std::cerr << "Exiting" << std::endl;
@@ -50,10 +52,76 @@ StrategyTracker::StrategyTracker(Strategy *pcStrategy)
     }
 }
 
+StrategyTracker::StrategyTracker(const StrategyTracker &cSource) :
+    m_ofsBasics(cSource.m_ofsBasics),
+    m_ofsSingleBets(cSource.m_ofsSingleBets),
+    m_mBeforeComeBetWager(cSource.m_mBeforeComeBetWager),
+    m_mBeforeDontComeBetWager(cSource.m_mBeforeDontComeBetWager),
+    m_mBeforePlaceBetWager(cSource.m_mBeforePlaceBetWager),
+    m_mAfterComeBetWager(cSource.m_mAfterComeBetWager),
+    m_mAfterDontComeBetWager(cSource.m_mAfterDontComeBetWager),
+    m_mAfterPlaceBetWager(cSource.m_mAfterPlaceBetWager)
+{
+    m_nSequence          = cSource.m_nSequence;
+    m_nBeginningBankroll = cSource.m_nBeginningBankroll;
+    m_nWager             = cSource.m_nWager;
+    m_fOdds              = cSource.m_fOdds;
+    m_bTableComeOutRoll  = cSource.m_bTableComeOutRoll;
+    m_nTablePoint        = cSource.m_nTablePoint;
+
+    m_stBeforeSingleBets = cSource.m_stBeforeSingleBets;
+
+    m_nBeforeBankroll    = cSource.m_nBeforeBankroll;
+    m_nRoll              = cSource.m_nRoll;
+
+    m_stAfterSingleBets  = cSource.m_stAfterSingleBets;
+
+    m_nAfterBankroll     = cSource.m_nAfterBankroll;
+}
+
+StrategyTracker& StrategyTracker::operator=(const StrategyTracker& cSource)
+{
+    if (this == &cSource)
+        return (*this);
+
+    //m_ofsBasics(cSource.m_ofsBasics);
+    m_ofsBasics = new std::ofstream();
+    m_ofsBasics = cSource.m_ofsBasics;
+
+    //m_ofsSingleBets(cSource.m_ofsSingleBets);
+    m_ofsSingleBets = new std::ofstream();
+    m_ofsSingleBets = cSource.m_ofsSingleBets;
+
+    m_mBeforeComeBetWager     = cSource.m_mBeforeComeBetWager;
+    m_mBeforeDontComeBetWager = cSource.m_mBeforeDontComeBetWager;
+    m_mBeforePlaceBetWager    = cSource.m_mBeforePlaceBetWager;
+    m_mAfterComeBetWager      = cSource.m_mAfterComeBetWager;
+    m_mAfterDontComeBetWager  = cSource.m_mAfterDontComeBetWager;
+    m_mAfterPlaceBetWager     = cSource.m_mAfterPlaceBetWager;
+
+    m_nSequence          = cSource.m_nSequence;
+    m_nBeginningBankroll = cSource.m_nBeginningBankroll;
+    m_nWager             = cSource.m_nWager;
+    m_fOdds              = cSource.m_fOdds;
+    m_bTableComeOutRoll  = cSource.m_bTableComeOutRoll;
+    m_nTablePoint        = cSource.m_nTablePoint;
+
+    m_stBeforeSingleBets = cSource.m_stBeforeSingleBets;
+
+    m_nBeforeBankroll    = cSource.m_nBeforeBankroll;
+    m_nRoll              = cSource.m_nRoll;
+
+    m_stAfterSingleBets  = cSource.m_stAfterSingleBets;
+
+    m_nAfterBankroll     = cSource.m_nAfterBankroll;
+
+    return (*this);
+}
+
 StrategyTracker::~StrategyTracker()
 {
-    m_ofsBasics.close();
-    m_ofsSingleBets.close();
+    if (m_ofsBasics->is_open()) m_ofsBasics->close();
+    if (m_ofsSingleBets->is_open()) m_ofsSingleBets->close();
 }
 
 // Start a new record, which updates bankroll, and update table stats
@@ -162,7 +230,7 @@ void StrategyTracker::RecordBetsAfterRoll(const Strategy *pcStrategy, const std:
 // Record the ending bankroll and post the record
 void StrategyTracker::Post()
 {
-    m_ofsBasics <<  m_nSequence                     << "," <<
+    *m_ofsBasics <<  m_nSequence                     << "," <<
                     m_nWager                        << "," <<
                     m_fOdds                         << "," <<
                     m_nBeginningBankroll            << "," <<
@@ -173,7 +241,7 @@ void StrategyTracker::Post()
                     m_nAfterBankroll                <<
                     std::endl;
 
-    m_ofsSingleBets <<  m_nSequence                  << "," <<
+    *m_ofsSingleBets <<  m_nSequence                  << "," <<
                         m_stBeforeSingleBets.nPassBetWager        << "," <<
                         m_stBeforeSingleBets.nPassOddsWager       << "," <<
                         m_stBeforeSingleBets.nPassPoint           << "," <<

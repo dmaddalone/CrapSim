@@ -23,7 +23,7 @@
 #include <iostream>
 #include <iomanip>
 
-Strategy::Strategy(std::string sName, std::string sDesc, int nInitiBank, int nStdWager, bool bTrackResults) //: m_pcStrategyTracker(this)
+Strategy::Strategy(std::string sName, std::string sDesc, int nInitiBank, int nStdWager, bool bTrackResults)
 {
     m_sName.assign(sName);
     m_sDescription.assign(sDesc);
@@ -39,7 +39,9 @@ Strategy::Strategy(std::string sName, std::string sDesc, int nInitiBank, int nSt
 
 Strategy::~Strategy()
 {
-    if (m_bTrackResults) delete m_pcStrategyTracker;
+    // Do not delete pointer to Strategy Tracker.  Need copy and
+    // assignment constructor to pick up object.
+    //if (m_bTrackResults) delete m_pcStrategyTracker;
     m_pcStrategyTracker = 0;
 }
 

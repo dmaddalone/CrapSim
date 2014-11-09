@@ -19,9 +19,21 @@
 
 #include "Die.h"
 
+// Setup random number generator, using Mersenne Twister 19937.  Assign it to
+// function rollDie().
 std::random_device   rdev{};
 std::mt19937         generator{rdev()};
 std::function<int()> rollDie;
+
+/**
+  * Construct a Die.
+  *
+  * Set the random number generator to a uniform distribution of 1..nFaces;
+  * bind rollDie to the distribution and generator; set up array / pointer to
+  * nFaces number of values.
+  *
+  * \param nFaces Specifices the number of faces of the die
+  */
 
 Die::Die(int nFaces)
 {
@@ -31,25 +43,39 @@ Die::Die(int nFaces)
 	m_pnDieRollValues  = new int[m_nFaces]();
 }
 
+/**
+  * Copy constructor for Die.
+  *
+  *
+  * \param cSource The source of the copy
+  */
+
 Die::Die(const Die& cSource)
 {
-        m_nTotalDieRolls    = cSource.m_nTotalDieRolls;
-        m_nLastDieRollValue = cSource.m_nLastDieRollValue;
-        m_nFaces            = cSource.m_nFaces;
+    m_nTotalDieRolls    = cSource.m_nTotalDieRolls;
+    m_nLastDieRollValue = cSource.m_nLastDieRollValue;
+    m_nFaces            = cSource.m_nFaces;
 
-        if (cSource.m_pnDieRollValues)
+    if (cSource.m_pnDieRollValues)
+    {
+        m_pnDieRollValues = new int[m_nFaces];
+        for (int iii = 0; iii < m_nFaces; iii++)
         {
-            m_pnDieRollValues = new int[m_nFaces];
-            for (int iii = 0; iii < m_nFaces; iii++)
-            {
-                m_pnDieRollValues[iii] = cSource.m_pnDieRollValues[iii];
-            }
+            m_pnDieRollValues[iii] = cSource.m_pnDieRollValues[iii];
         }
-        else
-        {
-            m_pnDieRollValues = 0;
-        }
+    }
+    else
+    {
+        m_pnDieRollValues = 0;
+    }
 }
+
+/**
+  * Copy assignment constructor for Die.
+  *
+  *
+  * \param cSource The source of the copy assignment
+  */
 
 Die& Die::operator=(const Die& cSource)
 {
@@ -78,10 +104,24 @@ Die& Die::operator=(const Die& cSource)
     return (*this);
 }
 
+/**
+  * Destructor for Die.
+  */
+
 Die::~Die()
 {
 	delete[] m_pnDieRollValues;
 }
+
+/**
+  * Roll the Die.
+  *
+  * Call the function bound to the number generator and uniform ditribution,
+  * rollDie(); capture the value; record the value in the array for later
+  * analysis.
+  *
+  *\return The value of the rolled Die.
+  */
 
 int Die::Roll()
 {

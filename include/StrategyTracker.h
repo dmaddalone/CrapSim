@@ -38,7 +38,13 @@ class Strategy;
 class StrategyTracker
 {
     public:
+        // Constructor
         StrategyTracker(Strategy *pcStrategy);
+        // Copy constructor
+        StrategyTracker(const StrategyTracker& cSource);
+        // Assignment constructor
+        StrategyTracker& operator=(const StrategyTracker& cSource);
+        // Destructor
         virtual ~StrategyTracker();
         // Create a new record
         void RecordNew(const Strategy *pcStrategy, const Table &cTable);
@@ -51,9 +57,9 @@ class StrategyTracker
 
     private:
         // Create a file for basic records
-        std::ofstream m_ofsBasics                   {};
+        std::ofstream *m_ofsBasics                   {};
         // Create a file for Single bets (e.g., Pass, Field)
-        std::ofstream m_ofsSingleBets               {};
+        std::ofstream *m_ofsSingleBets               {};
 
         // Basic record fields
         int   m_nSequence                           {};
@@ -62,6 +68,7 @@ class StrategyTracker
         float m_fOdds                               {};
         bool  m_bTableComeOutRoll                   {};
         int   m_nTablePoint                         {};
+
         // Single bet fields before the roll
         struct BeforeSingleBets
         {
@@ -104,7 +111,6 @@ class StrategyTracker
         std::map<int, int> m_mAfterPlaceBetWager    {};
 
         int   m_nAfterBankroll                      {};
-
 };
 
 #endif // STRATEGYTRACKER_H

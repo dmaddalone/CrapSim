@@ -147,9 +147,4 @@ void Simulation::Report()
     {
         it->Report();
     }
-
-    for (std::vector<Strategy>::iterator it = m_vStrategies.begin();it != m_vStrategies.end(); it++)
-    {
-    //    it->ReportResults();
-    }
 }
