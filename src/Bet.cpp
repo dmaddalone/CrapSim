@@ -19,6 +19,14 @@
 
 #include "Bet.h"
 
+/**
+  * Calculate a bet payoff.
+  *
+  * Based on bet type and wager, calculate the payoff.
+  *
+  *\return The value of the bet's payoff.
+  */
+
 int Bet::CalculatePayoff ()
 {
     switch (m_ecType)
@@ -106,7 +114,6 @@ int Bet::CalculatePayoff ()
         case BetType::TYPE_FIELD:
             switch (Point())
             {
-
                 case 3:
                 case 4:
                 case 9:
@@ -147,8 +154,3 @@ int Bet::CalculatePayoff ()
 
     return (0);
 }
-
-
-
-
-

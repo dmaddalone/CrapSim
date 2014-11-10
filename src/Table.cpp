@@ -19,6 +19,14 @@
 
 #include "Table.h"
 
+
+/**
+  * Construct a Table.
+  *
+  * Sets up a map for Table Odds.
+  *
+  */
+
 Table::Table()
 {
     m_mTableOdds["1X"]          = TableOdds::TYPE_1X;
@@ -32,13 +40,19 @@ Table::Table()
     m_mTableOdds["100X"]        = TableOdds::TYPE_100X;
 }
 
-//Table::~Table()
-//{
-//    //dtor
-//}
+/**
+  * Return the maximum odds offered by the Table.
+  *
+  * Based on the table odds and the point, return maximum odds offered.
+  *
+  * \param nPoint The point is used on some table odds.
+  *
+  * \return Maximum odds offered.  Default is 1.0.
+  */
 
-float Table::GetMaxOdds(int nPoint) const
+float Table::MaxOdds(int nPoint) const
 {
+    // TODO: replace with IsAPointNumber and an exit if not so
     assert ((nPoint == 4) || (nPoint == 5) || (nPoint == 6) || (nPoint == 8) || (nPoint == 9) || (nPoint ==10));
 
     switch (m_ecTableOdds)
@@ -97,6 +111,17 @@ float Table::GetMaxOdds(int nPoint) const
     return(1.0);
 }
 
+/**
+  * Set the table type.
+  *
+  * Based on a passed string, sets the table odds.  The string is set in the
+  * map of strings and TableOdds types.
+  *
+  * \param sTableType The type of table odds, e.g., 3X_4X_5X, 10X.
+  *
+  * \return True if type of odds is known, false otherwise.
+  */
+
 bool Table::SetTableType(std::string sTableType)
 {
     if (sTableType.empty())
@@ -115,6 +140,16 @@ bool Table::SetTableType(std::string sTableType)
     return (true);
 }
 
+/**
+  * Return the table type in string format.
+  *
+  * Loops the known table types and compares to this table's odds.  When found,
+  * return correspnding string. The string is set in the map of strings and
+  * TableOdds types.
+  *
+  * \return String representing the type of table odds.
+  */
+
 std::string Table::TableType()
 {
     std::string sTableType("Unknown");
@@ -127,42 +162,18 @@ std::string Table::TableType()
             break;
         }
     }
-/*
-    switch (m_ecTableOdds)
-    {
-        case TableOdds::TYPE_1X:
-            sTableType = "1x Odds";
-            break;
-        case TableOdds::TYPE_2X:
-            sTableType = "2x Odds";
-            break;
-        case TableOdds::TYPE_FULL_DOUBLE:
-            sTableType = "Full Double Odds";
-            break;
-        case TableOdds::TYPE_3X:
-            sTableType = "3x Odds";
-            break;
-        case TableOdds::TYPE_3X_4X_5X:
-            sTableType = "3x 4x 5x Odds";
-            break;
-        case TableOdds::TYPE_5X:
-            sTableType = "5x Odds";
-            break;
-        case TableOdds::TYPE_10X:
-            sTableType = "10x Odds";
-            break;
-        case TableOdds::TYPE_20X:
-            sTableType = "20x Odds";
-            break;
-        case TableOdds::TYPE_100X:
-            sTableType = "100x Odds";
-            break;
-        default:
-            break;
-    }
-*/
+
     return(sTableType);
 }
+
+/**
+  * Update the Table state.
+  *
+  * Based on the roll, update the Table, including the puck, coming out,
+  * table point, and the shooter.
+  *
+  * \param cDice Dice. Used for the roll value.
+  */
 
 void Table::Update(const Dice &cDice)
 {
@@ -187,4 +198,3 @@ void Table::Update(const Dice &cDice)
         }
     }
 }
-

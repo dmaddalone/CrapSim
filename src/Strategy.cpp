@@ -23,6 +23,18 @@
 #include <iostream>
 #include <iomanip>
 
+/**
+  * Construct a Strategy.
+  *
+  * Set basic information for a Strategy (e.g., name, description, bankroll)
+  * create a StrategyTracker if tracking results is set to true.
+  *
+  * \param sName         Name of the Strategy
+  * \param sDesc         Description of the Strategy
+  * \param nInitBank     Initial bankroll amount, used for Money
+  * \param bTrackResults Flag to track results
+  */
+
 Strategy::Strategy(std::string sName, std::string sDesc, int nInitiBank, int nStdWager, bool bTrackResults)
 {
     m_sName.assign(sName);
@@ -37,16 +49,31 @@ Strategy::Strategy(std::string sName, std::string sDesc, int nInitiBank, int nSt
     if (m_bTrackResults) m_pcStrategyTracker = new StrategyTracker(this);
 }
 
+/**
+  * Destructor for Strategy.
+  */
+
 Strategy::~Strategy()
 {
-    // Do not delete pointer to Strategy Tracker.  Need copy and
-    // assignment constructor to pick up object.
+    // Do not delete pointer to Strategy Tracker.
+    // TODO: Need copy and assignment constructor to pick up object.
     //if (m_bTrackResults) delete m_pcStrategyTracker;
     m_pcStrategyTracker = 0;
 }
 
+/**
+  * Set an Elementary Strategy.
+  *
+  * As described in "Beat the Craps Table" by Martin Jensen.
+  * Make Pass bets and take single odds.
+  * Take double odds after winning twice original wager and odds.
+  * After losing, go back to single odds.
+  */
+
 void Strategy::SetElementary()
 {
+    // TODO: Use Odds Progression: take double odds after winning an amount
+    // equal to double wager and odds
     m_nNumberOfPassBetsAllowed     = 1;
     m_nNumberOfComeBetsAllowed     = 0;
     m_nNumberOfPlaceBetsAllowed    = 0;
@@ -56,8 +83,22 @@ void Strategy::SetElementary()
     if (m_sDescription.empty()) SetDescription("Pass only, single odds to start");
 }
 
+/**
+  * Set a Conservative Strategy.
+  *
+  * As described in "Beat the Craps Table" by Martin Jensen.
+  * Make Pass bets and one Come bet and take single odds.
+  * Take double odds after winning twice original wager and odds for both
+  * Pass and Come bets.
+  * Increase odds incrementally as winnings increase.
+  * After losing, go back to single odds.
+  */
+
 void Strategy::SetConservative()
 {
+    // TODO: Use Odds Progression: increease odds incrementally after winning
+    // an amounts equal to double, triple, etc. of wager and odds amounts of
+    // Pass and Come wagers.
     m_nNumberOfPassBetsAllowed     = 1;
     m_nNumberOfComeBetsAllowed     = 1;
     m_nNumberOfPlaceBetsAllowed    = 0;
@@ -78,8 +119,23 @@ void Strategy::SetConventional()
     if (m_sDescription.empty()) SetDescription("Pass and two Comes, single odds to start");
 }
 
+/**
+  * Set an Aggressive Strategy.
+  *
+  * As described in "Beat the Craps Table" by Martin Jensen, this strategy
+  * extends the Conventional Strategyout to four bets.
+  * Make Pass bets and two Come bets and take double odds.
+  * Make a Place bet after the previous bets are made, on a 6 or 8.  If 6 and 8
+  * are already covered, make a third Come bet.
+  * Increase odds incrementally as winnings increase.
+  * After losing, go back to double odds.
+  */
+
 void Strategy::SetAggressive()
 {
+    // TODO: Use Odds Progression: increease odds incrementally after winning
+    // an amounts equal to double, triple, etc. of wager and odds amounts of
+    // Pass and Come wagers.
     m_nNumberOfPassBetsAllowed     = 1;
     m_nNumberOfComeBetsAllowed     = 2;
     m_nNumberOfPlaceBetsAllowed    = 1;
@@ -176,7 +232,7 @@ void Strategy::ResolveBets(const Table &cTable, const Dice &cDice)
 
         if (m_bOddsProgression)
         {
-            // If using Odds Porgression, and bankroll has increased, increase Odds
+            // If using Odds Progression, and bankroll has increased, increase Odds
             if (m_cMoney.Bankroll() > nStartingBankroll)
                 IncreaseOdds();
             // Else reset odds
@@ -277,7 +333,7 @@ void Strategy::MakeOddsBet(const Table &cTable)
                 if (!it->IsOddsBetMade())          // Pass Bet without Odds Bet?
                 {
                     // Calculate maximum odds wager, based on Strategy and Table type
-                    int nWager = it->Wager() * std::min(cTable.GetMaxOdds(it->Point()), m_fOdds);
+                    int nWager = it->Wager() * std::min(cTable.MaxOdds(it->Point()), m_fOdds);
 
                     // Check for Full Wager; if set, update nWager
                     if (m_bFullWager) nWager = OddsBetFullPayoffWager(nWager, it->Point());
@@ -301,7 +357,7 @@ void Strategy::MakeOddsBet(const Table &cTable)
                 if (!it->IsOddsBetMade())          // Dont Pass Bet without Odds Bet?
                 {
                     // Calculate maximum odds wager, based on Strategy and Table type
-                    int nWager = it->Wager() * std::min(cTable.GetMaxOdds(it->Point()), m_fOdds);
+                    int nWager = it->Wager() * std::min(cTable.MaxOdds(it->Point()), m_fOdds);
                     // Check for Full Wager; if set, update nWager
                     if (m_bFullWager) nWager = OddsBetFullPayoffWager(nWager, it->Point());
 
@@ -329,7 +385,7 @@ void Strategy::MakeOddsBet(const Table &cTable)
                 if (!it->IsOddsBetMade())             // Come Bet without Odds Bet?
                 {
                     // Calculate maximum odds wager, based on Strategy and Table type
-                    int nWager = it->Wager() * std::min(cTable.GetMaxOdds(it->Point()), m_fOdds);
+                    int nWager = it->Wager() * std::min(cTable.MaxOdds(it->Point()), m_fOdds);
                     // Check for Full Wager; if set, update nWager
                     if (m_bFullWager) nWager = OddsBetFullPayoffWager(nWager, it->Point());
 
@@ -356,7 +412,7 @@ void Strategy::MakeOddsBet(const Table &cTable)
                 if (!it->IsOddsBetMade())          // Dont Pass Bet without Odds Bet?
                 {
                     // Calculate maximum odds wager, based on Strategy and Table type
-                    int nWager = it->Wager() * std::min(cTable.GetMaxOdds(it->Point()), m_fOdds);
+                    int nWager = it->Wager() * std::min(cTable.MaxOdds(it->Point()), m_fOdds);
                     // Check for Full Wager; if set, update nWager
                     if (m_bFullWager) nWager = OddsBetFullPayoffWager(nWager, it->Point());
 

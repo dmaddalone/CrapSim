@@ -19,6 +19,14 @@
 
 #include "Money.h"
 
+/**
+  * Initialize the bankroll.
+  *
+  * Set initial, current, and max bankroll values.
+  *
+  * \param n The amount used for the initial bankroll.
+  */
+
 void Money::Initialize(int n)
 {
     if (n <= 0)
@@ -30,6 +38,16 @@ void Money::Initialize(int n)
 
     m_nInitialBankroll = m_nBankroll = m_nMaxBankroll = n;
 }
+
+/**
+  * Check for significant winnings.
+  *
+  * Using the significant winning multiple and the significant winning
+  * absolute figure, return true if current bankroll is greater than
+  * these values.
+  *
+  * \return True if current bankroll exceeds significant winnings goal.
+  */
 
 bool Money::HasSignificantWinnings() const
 {

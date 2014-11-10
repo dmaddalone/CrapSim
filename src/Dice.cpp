@@ -155,7 +155,3 @@ int Dice::Roll()
 
     return(m_nLastDiceRollValue);
 }
-
-
-
-
