@@ -166,10 +166,11 @@ void CreateStrategy(const std::string &sStrategy, CDataFile &cConfigFile, const 
     // If Significant Winngings Multiple has been set, pass to Strategy
     if (nSignificantWinnings != INT_MIN) cStrategy.SetSignificantWinnings(nSignificantWinnings);
 
-    // If Use Confidence is set to true, pass Use Confidence to Strategy; default is false
-    // And check for confidence type of Arithmetic or Geometric.  If neither is set, exit with error.
+
+    // And check for Odds Progression  type of Arithmetic or Geometric.  If neither is set, exit with error.
     if (bOddsProgression)
     {
+        // Pass Odds Progression to Strategy; default is false
         cStrategy.UseOddsProgression(bOddsProgression);
 
         std::locale loc;
@@ -195,7 +196,7 @@ int CrapsSimulation(std::string sINIFile)
     cout << "Craps Simulation" << endl;
 
     Simulation  cSim;
-    Table       cTable;
+    Table       cTable(5, 5000);
 
     if (sINIFile.empty())
     {
@@ -227,6 +228,9 @@ int CrapsSimulation(std::string sINIFile)
         exit (EXIT_FAILURE);
     }
 
+    if (nMinimumWager != INT_MIN) cTable.SetMinimumBet(nMinimumWager);
+    if (nMaximumWager != INT_MIN) cTable.SetMaximumBet(nMaximumWager);
+
     if (!sTableType.empty())
     {
         if (!cTable.SetTableType(sTableType))
@@ -237,20 +241,25 @@ int CrapsSimulation(std::string sINIFile)
         }
     }
 
-    if (nMinimumWager != INT_MIN) cTable.SetMinimumBet(nMinimumWager);
-    if (nMaximumWager != INT_MIN) cTable.SetMaximumBet(nMaximumWager);
     cSim.AddTable(cTable);
 
-    if (cConfigFile.CheckSectionName("Strategy1"))  CreateStrategy("Strategy1", cConfigFile, nDefaultInitialBankroll, nDefaultStandardWager, fDefaultSWM, nDefaultSignificantWinnings, cSim);
-    if (cConfigFile.CheckSectionName("Strategy2"))  CreateStrategy("Strategy2", cConfigFile, nDefaultInitialBankroll, nDefaultStandardWager, fDefaultSWM, nDefaultSignificantWinnings, cSim);
-    if (cConfigFile.CheckSectionName("Strategy3"))  CreateStrategy("Strategy3", cConfigFile, nDefaultInitialBankroll, nDefaultStandardWager, fDefaultSWM, nDefaultSignificantWinnings, cSim);
-    if (cConfigFile.CheckSectionName("Strategy4"))  CreateStrategy("Strategy4", cConfigFile, nDefaultInitialBankroll, nDefaultStandardWager, fDefaultSWM, nDefaultSignificantWinnings, cSim);
-    if (cConfigFile.CheckSectionName("Strategy5"))  CreateStrategy("Strategy5", cConfigFile, nDefaultInitialBankroll, nDefaultStandardWager, fDefaultSWM, nDefaultSignificantWinnings, cSim);
-    if (cConfigFile.CheckSectionName("Strategy6"))  CreateStrategy("Strategy6", cConfigFile, nDefaultInitialBankroll, nDefaultStandardWager, fDefaultSWM, nDefaultSignificantWinnings, cSim);
-    if (cConfigFile.CheckSectionName("Strategy7"))  CreateStrategy("Strategy7", cConfigFile, nDefaultInitialBankroll, nDefaultStandardWager, fDefaultSWM, nDefaultSignificantWinnings, cSim);
-    if (cConfigFile.CheckSectionName("Strategy8"))  CreateStrategy("Strategy8", cConfigFile, nDefaultInitialBankroll, nDefaultStandardWager, fDefaultSWM, nDefaultSignificantWinnings, cSim);
-    if (cConfigFile.CheckSectionName("Strategy9"))  CreateStrategy("Strategy9", cConfigFile, nDefaultInitialBankroll, nDefaultStandardWager, fDefaultSWM, nDefaultSignificantWinnings, cSim);
-    if (cConfigFile.CheckSectionName("Strategy10")) CreateStrategy("Strategy10", cConfigFile, nDefaultInitialBankroll, nDefaultStandardWager, fDefaultSWM, nDefaultSignificantWinnings, cSim);
+    std::string sStrategyName;
+    for (int iii = 1; iii <= 24; iii++)
+    {
+        sStrategyName = "Strategy" + std::to_string(iii);
+        if (cConfigFile.CheckSectionName(sStrategyName)) CreateStrategy(sStrategyName, cConfigFile, nDefaultInitialBankroll, nDefaultStandardWager, fDefaultSWM, nDefaultSignificantWinnings, cSim);
+    }
+
+    //if (cConfigFile.CheckSectionName("Strategy1"))  CreateStrategy("Strategy1", cConfigFile, nDefaultInitialBankroll, nDefaultStandardWager, fDefaultSWM, nDefaultSignificantWinnings, cSim);
+    //if (cConfigFile.CheckSectionName("Strategy2"))  CreateStrategy("Strategy2", cConfigFile, nDefaultInitialBankroll, nDefaultStandardWager, fDefaultSWM, nDefaultSignificantWinnings, cSim);
+    //if (cConfigFile.CheckSectionName("Strategy3"))  CreateStrategy("Strategy3", cConfigFile, nDefaultInitialBankroll, nDefaultStandardWager, fDefaultSWM, nDefaultSignificantWinnings, cSim);
+    //if (cConfigFile.CheckSectionName("Strategy4"))  CreateStrategy("Strategy4", cConfigFile, nDefaultInitialBankroll, nDefaultStandardWager, fDefaultSWM, nDefaultSignificantWinnings, cSim);
+    //if (cConfigFile.CheckSectionName("Strategy5"))  CreateStrategy("Strategy5", cConfigFile, nDefaultInitialBankroll, nDefaultStandardWager, fDefaultSWM, nDefaultSignificantWinnings, cSim);
+    //if (cConfigFile.CheckSectionName("Strategy6"))  CreateStrategy("Strategy6", cConfigFile, nDefaultInitialBankroll, nDefaultStandardWager, fDefaultSWM, nDefaultSignificantWinnings, cSim);
+    //if (cConfigFile.CheckSectionName("Strategy7"))  CreateStrategy("Strategy7", cConfigFile, nDefaultInitialBankroll, nDefaultStandardWager, fDefaultSWM, nDefaultSignificantWinnings, cSim);
+    //if (cConfigFile.CheckSectionName("Strategy8"))  CreateStrategy("Strategy8", cConfigFile, nDefaultInitialBankroll, nDefaultStandardWager, fDefaultSWM, nDefaultSignificantWinnings, cSim);
+    //if (cConfigFile.CheckSectionName("Strategy9"))  CreateStrategy("Strategy9", cConfigFile, nDefaultInitialBankroll, nDefaultStandardWager, fDefaultSWM, nDefaultSignificantWinnings, cSim);
+    //if (cConfigFile.CheckSectionName("Strategy10")) CreateStrategy("Strategy10", cConfigFile, nDefaultInitialBankroll, nDefaultStandardWager, fDefaultSWM, nDefaultSignificantWinnings, cSim);
 
     // Stop CDataFile cConfigFile from Save() and writing out the file
     cConfigFile.Clear();

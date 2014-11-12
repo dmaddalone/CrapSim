@@ -1,10 +1,10 @@
+#include <iostream>
 #include "QualifiedShooter.h"
 
 /**
   * Construct a QualifiedShooter.
   *
   * Sets up a map of strings and qualification methods.
-  *
   */
 
 QualifiedShooter::QualifiedShooter()
@@ -13,7 +13,7 @@ QualifiedShooter::QualifiedShooter()
     m_mQualificationMethod["5COUNT"]                           = QualificationMethod::QM_5COUNT;
     m_mQualificationMethod["AFTER_POINT_MADE"]                 = QualificationMethod::QM_AFTER_POINT_MADE;
     m_mQualificationMethod["AFTER_LOSING_FIELD_THREE_TIMES"]   = QualificationMethod::QM_AFTER_LOSING_FIELD_THREE_TIMES;
-    m_mQualificationMethod["AFTER_FIVE_NON_SEVEN_ROLLS"]       = QualificationMethod::QM_AFTER_FILE_NON_SEVEN_ROLLS;
+    m_mQualificationMethod["AFTER_FIVE_NON_SEVEN_ROLLS"]       = QualificationMethod::QM_AFTER_FIVE_NON_SEVEN_ROLLS;
 }
 
 /**
@@ -74,7 +74,8 @@ std::string QualifiedShooter::Method()
   * Return the table type in string format.
   *
   * Depending on the set qualification method, calls the corresponding
-  * qualification method.
+  * qualification method.  The qualification methods are based  on the Table
+  * class, specifically NewShooter(), and the Dice class.
   *
   * \param cTable The Table.
   * \param cDice The Dice.
@@ -94,10 +95,13 @@ bool QualifiedShooter::ShooterQualified(const Table &cTable, const Dice &cDice)
             return (Method5Count(cTable, cDice));
             break;
         case QualificationMethod::QM_AFTER_POINT_MADE:
-            return (MethodAfterPointMade(cTable));
+            return (MethodAfterPointMade(cTable, cDice));
             break;
         case QualificationMethod::QM_AFTER_LOSING_FIELD_THREE_TIMES:
             return (MethodAfterLosingFieldThreeTimes(cTable, cDice));
+            break;
+        case QualificationMethod::QM_AFTER_FIVE_NON_SEVEN_ROLLS:
+            return (MethodAfterFiveNon7Rolls(cDice));
             break;
         default:
             break;
@@ -131,7 +135,7 @@ bool QualifiedShooter::ShooterQualified(const Table &cTable, const Dice &cDice)
 
 bool QualifiedShooter::Method5Count(const Table &cTable, const Dice &cDice)
 {
-    bool bQualified = false;
+    m_bShooterQualified = false;
 
     if (cTable.NewShooter() && cTable.IsComingOutRoll())
     {
@@ -140,22 +144,26 @@ bool QualifiedShooter::Method5Count(const Table &cTable, const Dice &cDice)
     }
     else if ((m_n5Count >= 1) && (m_n5Count < 4))
     {
-        m_n5Count++;
+        if (!cDice.IsSeven()) m_n5Count++;
+        if (cDice.IsSeven() && cTable.IsComingOutRoll()) m_n5Count++;
     }
     else if (m_n5Count == 4)
     {
         if (cDice.IsAPointNumber())
         {
             m_n5Count++;
-            bQualified = true;
+            m_bShooterQualified = true;
         }
     }
     else if (m_n5Count == 5)
     {
-        bQualified = true;
+        if (!cDice.IsSeven()) m_bShooterQualified = true;
+        if (cDice.IsSeven() && cTable.IsComingOutRoll()) m_bShooterQualified = true;
     }
 
-    return (bQualified);
+    std::cout << "DEBUG: m_n5Count=" << m_n5Count << "\t";
+
+    return (m_bShooterQualified);
 }
 
 /**
@@ -169,29 +177,30 @@ bool QualifiedShooter::Method5Count(const Table &cTable, const Dice &cDice)
   * \return True if the shooter has qualified, false otherwise.
   */
 
-bool QualifiedShooter::MethodAfterPointMade(const Table &cTable)
+bool QualifiedShooter::MethodAfterPointMade(const Table &cTable, const Dice &cDice)
 {
-    bool bQualified = false;
+    m_bShooterQualified = false;
 
-    if (!cTable.NewShooter())
+    if (cTable.NewShooter())
     {
-        bQualified = true;
+        if (cTable.Point() == cDice.RollValue()) m_bShooterQualified = true;
     }
     else
     {
-        bQualified = false;
+        if (cTable.IsComingOutRoll()) m_bShooterQualified = true;
+        if (!cTable.IsComingOutRoll() && !cDice.IsSeven()) m_bShooterQualified = true;
     }
 
-    return (bQualified);
+    return (m_bShooterQualified);
 }
 
 /**
   * Begin betting after a new shooter rolls three non Field numbers in a row.
   *
   * Method:
-  * 1) Begin counting with a new shooter.
-  * 2) If a non Field numbers is rolled (a number where the Field loses)
-  * beging counting.
+  * 1) Beging counting with a new shooter.
+  * 2) If a non Field number is rolled (a number where the Field loses),
+  * count it.
   * 3) If three non Field numbers are rolled in a row, the shooter is
   * qualified.
   *
@@ -203,37 +212,80 @@ bool QualifiedShooter::MethodAfterPointMade(const Table &cTable)
 
 bool QualifiedShooter::MethodAfterLosingFieldThreeTimes(const Table &cTable, const Dice &cDice)
 {
-    bool bQualified = false;
+    m_bShooterQualified = false;
 
-    if (cTable.NewShooter())
+    if (cTable.NewShooter() && cTable.IsComingOutRoll())
     {
-        m_nLosingFieldInARow = 0;
+        if (cDice.IsSeven())
+        {
+            m_nLosingFieldInARow++;
+        }
+        else if (cDice.IsField())
+        {
+            m_nLosingFieldInARow = 0;
+        }
+        else
+        {
+            m_nLosingFieldInARow++;
+        }
     }
-    else if (cDice.IsField())
+    else if (cTable.NewShooter() && !cTable.IsComingOutRoll())
     {
-        m_nLosingFieldInARow = 0;
+        if (cDice.IsSeven())
+        {
+            m_nLosingFieldInARow = 0;
+        }
+        else if (cDice.IsField())
+        {
+            if (m_nLosingFieldInARow < 3) m_nLosingFieldInARow = 0;
+        }
+        else
+        {
+            m_nLosingFieldInARow++;
+        }
+    }
+    else if (!cTable.NewShooter() && cTable.IsComingOutRoll())
+    {
+        if (cDice.IsSeven())
+        {
+            m_nLosingFieldInARow++;
+        }
+        else if (cDice.IsField())
+        {
+            if (m_nLosingFieldInARow < 3) m_nLosingFieldInARow = 0;
+        }
+        else
+        {
+            m_nLosingFieldInARow++;
+        }
     }
     else
     {
-        m_nLosingFieldInARow++;
-
-        if (m_nLosingFieldInARow == 3)
+        if (cDice.IsSeven())
         {
-            bQualified = true;
             m_nLosingFieldInARow = 0;
+        }
+        else if (cDice.IsField())
+        {
+            if (m_nLosingFieldInARow < 3) m_nLosingFieldInARow = 0;
+        }
+        else
+        {
+            m_nLosingFieldInARow++;
         }
     }
 
-    return (bQualified);
+    if (m_nLosingFieldInARow >= 3) m_bShooterQualified = true;
+
+    return (m_bShooterQualified);
 }
 
 /**
   * Begin betting after a new shooter rolls five non-7 rolls.
   *
   * Method:
-  * 1) Begin counting with a new shooter.
-  * 2) If a non 7 number is rolled beging counting.
-  * 3) If five non 7 numbers are rolled in a row, the shooter is qualified.
+  * 1) If a non 7 number is rolled beging counting.
+  * 2) If five non 7 numbers are rolled in a row, the shooter is qualified.
   *
   * \param cTable The Table.
   * \param cDice The Dice.
@@ -241,34 +293,22 @@ bool QualifiedShooter::MethodAfterLosingFieldThreeTimes(const Table &cTable, con
   * \return True if the shooter has qualified, false otherwise.
   */
 
-bool QualifiedShooter::MethodAfterFiveNon7Rolls(const Table &cTable, const Dice &cDice)
+bool QualifiedShooter::MethodAfterFiveNon7Rolls(const Dice &cDice)
 {
-    bool bQualified = false;
+    m_bShooterQualified = false;
 
-    if (cTable.NewShooter())
+    if (!cDice.IsSeven())
     {
-        m_n7InARow = 0;
-    }
-    else if (!cDice.IsSeven())
-    {
-        if (m_n7InARow == 5)
-        {
-            bQualified = true;
-        }
-        else
-        {
-            m_n7InARow = 0;
-        }
+        m_nNon7InARow ++;
     }
     else
     {
-        m_n7InARow++;
-
-        if (m_n7InARow == 5)
-        {
-            bQualified = true;
-        }
+        m_nNon7InARow = 0;
     }
 
-    return (bQualified);
+    if (m_nNon7InARow >= 5) m_bShooterQualified = true;
+
+    std::cout << "\tm_nNon7InARow=" << m_nNon7InARow;
+
+    return (m_bShooterQualified);
 }

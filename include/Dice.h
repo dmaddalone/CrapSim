@@ -36,7 +36,7 @@
 class Dice
 {
     public:
-        // Create nDice number of die with nFaces number of faces
+        // Create nDice number of dice with nFaces number of faces
         Dice(int nDice, int nFaces);
         // Copy constructor
         Dice(const Dice& cSource);
@@ -47,19 +47,18 @@ class Dice
 
         // Roll the dice
         int   Roll();
-
         // Return last roll value
-        int   RollValue() const                { return (m_nLastDiceRollValue); }
+        int   RollValue() const                { return (m_nRollValue); }
         // Set of Craps specific dice value checks
-        bool  IsCraps() const                  { return ((m_nLastDiceRollValue == 2) || (m_nLastDiceRollValue == 3) || (m_nLastDiceRollValue == 12)); }
-        bool  IsNatural() const                { return ((m_nLastDiceRollValue == 7) || (m_nLastDiceRollValue == 11)); }
-        bool  IsSix() const                    { return (m_nLastDiceRollValue == 6); }
-        bool  IsSeven() const                  { return (m_nLastDiceRollValue == 7); }
-        bool  IsEight() const                  { return (m_nLastDiceRollValue == 8); }
-        bool  IsEleven() const                 { return (m_nLastDiceRollValue == 11); }
-        bool  IsBar() const                    { return (m_nLastDiceRollValue == 12); }
-        bool  IsField() const                  { return (std::count(m_anFieldNumbers.begin(), m_anFieldNumbers.end(), m_nLastDiceRollValue)) ? true : false; }
-        bool  IsAPointNumber() const           { return (std::count(m_anPointNumbers.begin(), m_anPointNumbers.end(), m_nLastDiceRollValue)) ? true : false; }
+        bool  IsCraps() const                  { return ((m_nRollValue == 2) || (m_nRollValue == 3) || (m_nRollValue == 12)); }
+        bool  IsNatural() const                { return ((m_nRollValue == 7) || (m_nRollValue == 11)); }
+        bool  IsSix() const                    { return (m_nRollValue == 6); }
+        bool  IsSeven() const                  { return (m_nRollValue == 7); }
+        bool  IsEight() const                  { return (m_nRollValue == 8); }
+        bool  IsEleven() const                 { return (m_nRollValue == 11); }
+        bool  IsBar() const                    { return (m_nRollValue == 12); }
+        bool  IsField() const                  { return (std::count(m_anFieldNumbers.begin(), m_anFieldNumbers.end(), m_nRollValue)) ? true : false; }
+        bool  IsAPointNumber() const           { return (std::count(m_anPointNumbers.begin(), m_anPointNumbers.end(), m_nRollValue)) ? true : false; }
         // Return the number of rolls in a row that are not Field numbers
         int   NumberOfNonFieldInARow() const   { return (m_nNumberOfNonFieldInARow); }
         // Return the number times a value has been rolled
@@ -68,14 +67,16 @@ class Dice
         int   TotalRolls() const               { return (m_nTotalDiceRolls); }
         // Return the percentage of times a value is rolled
         float RollValuePercentage(int i) const { return ((float)RollValueCount(i) / TotalRolls() * 100); }
+        // Reset the table - meant to be called before a new Simulation run
+        void  Reset()                          { m_nRollValue = m_nNumberOfNonFieldInARow = 0; }
 
     private:
-        // Container of die
+        // Container of dice
         std::list<Die> m_lDice;
         // Set counters to zero
-        int  m_nTotalDiceRolls       = 0;
-        int  m_nLastDiceRollValue    = 0;
-        int m_nNumberOfNonFieldInARow = 0;
+        int  m_nTotalDiceRolls         = 0;
+        int  m_nRollValue              = 0;
+        int  m_nNumberOfNonFieldInARow = 0;
 
         // Pointer / array to roll values
         int  *m_pnDiceRollValues;

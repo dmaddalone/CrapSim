@@ -23,12 +23,15 @@
 /**
   * Construct a Table.
   *
-  * Sets up a map for Table Odds.
+  * Set minimum and maximum wagers and sets up a map for Table Odds.
   *
   */
 
-Table::Table()
+Table::Table(int nMin, int nMax)
 {
+    nMin > 0 ? m_nMinimumBet = nMin : m_nMinimumBet = 5;
+    nMax > 0 ? m_nMaximumBet = nMax : m_nMaximumBet = 5000;
+
     m_mTableOdds["1X"]          = TableOdds::TYPE_1X;
     m_mTableOdds["2X"]          = TableOdds::TYPE_2X;
     m_mTableOdds["FULL_DOUBLE"] = TableOdds::TYPE_FULL_DOUBLE;

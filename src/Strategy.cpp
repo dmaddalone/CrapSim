@@ -72,12 +72,12 @@ Strategy::~Strategy()
 
 void Strategy::SetElementary()
 {
-    // TODO: Use Odds Progression: take double odds after winning an amount
-    // equal to double wager and odds
     m_nNumberOfPassBetsAllowed     = 1;
     m_nNumberOfComeBetsAllowed     = 0;
     m_nNumberOfPlaceBetsAllowed    = 0;
     m_fStandardOdds                = 1.0;
+    m_bOddsProgression             = true;
+    m_ecOddsProgressionMethod      = OddsProgressionMethod::ARITHMETIC;
 
     if (m_sName.empty()) SetName("Elementary");
     if (m_sDescription.empty()) SetDescription("Pass only, single odds to start");
@@ -96,17 +96,27 @@ void Strategy::SetElementary()
 
 void Strategy::SetConservative()
 {
-    // TODO: Use Odds Progression: increease odds incrementally after winning
-    // an amounts equal to double, triple, etc. of wager and odds amounts of
-    // Pass and Come wagers.
     m_nNumberOfPassBetsAllowed     = 1;
     m_nNumberOfComeBetsAllowed     = 1;
     m_nNumberOfPlaceBetsAllowed    = 0;
     m_fStandardOdds                = 1.0;
+    m_bOddsProgression             = true;
+    m_ecOddsProgressionMethod      = OddsProgressionMethod::ARITHMETIC;
 
     if (m_sName.empty()) SetName("Conservative");
     if (m_sDescription.empty()) SetDescription("Pass and one Come, single odds to start");
 }
+
+/**
+  * Set a Conventional Strategy.
+  *
+  * As described in "Beat the Craps Table" by Martin Jensen.
+  * Make Pass bets and two Come bets and take single odds.
+  * Take double odds after winning twice original wager and odds for both
+  * Pass and Come bets.
+  * Increase odds incrementally as winnings increase.
+  * After losing, go back to single odds.
+  */
 
 void Strategy::SetConventional()
 {
@@ -114,6 +124,8 @@ void Strategy::SetConventional()
     m_nNumberOfComeBetsAllowed     = 2;
     m_nNumberOfPlaceBetsAllowed    = 0;
     m_fStandardOdds                = 1.0;
+    m_bOddsProgression             = true;
+    m_ecOddsProgressionMethod      = OddsProgressionMethod::ARITHMETIC;
 
     if (m_sName.empty()) SetName("Conventional");
     if (m_sDescription.empty()) SetDescription("Pass and two Comes, single odds to start");
@@ -133,16 +145,15 @@ void Strategy::SetConventional()
 
 void Strategy::SetAggressive()
 {
-    // TODO: Use Odds Progression: increease odds incrementally after winning
-    // an amounts equal to double, triple, etc. of wager and odds amounts of
-    // Pass and Come wagers.
     m_nNumberOfPassBetsAllowed     = 1;
     m_nNumberOfComeBetsAllowed     = 2;
     m_nNumberOfPlaceBetsAllowed    = 1;
     m_fStandardOdds                = 2.0;
+    m_bOddsProgression             = true;
+    m_ecOddsProgressionMethod      = OddsProgressionMethod::ARITHMETIC;
 
     if (m_sName.empty()) SetName("Aggressive");
-    if (m_sDescription.empty()) SetDescription("Pass and either: 1) three Comes or 2) two Comes and one Place , double odds to start");
+    if (m_sDescription.empty()) SetDescription("Pass and either: 1) three Comes or 2) two Comes and one Place, double odds to start");
 }
 
 void Strategy::SanityCheck(const Table &cTable)

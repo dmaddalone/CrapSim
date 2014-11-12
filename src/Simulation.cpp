@@ -27,7 +27,10 @@ using std::cout;
 using std::endl;
 using std::flush;
 
-Simulation::Simulation() : m_cDice(2, 6) {}
+Simulation::Simulation() :
+    m_cDice(2, 6),
+    m_cTable(5, 5000)
+{}
 
 void Simulation::Run(int nNumberOfRuns, bool bMusterReport, bool bTally)
 {
@@ -57,13 +60,14 @@ void Simulation::Run(int nNumberOfRuns, bool bMusterReport, bool bTally)
     for (int iii = 0; iii < nNumberOfRuns; iii++)
     {
         m_cTable.Reset();
+        m_cTable.Reset();
 
         do
         {
             MakeBets();
             m_cDice.Roll();
+            // QualifyShooter;
             ResolveBets();
-            // QualifyShooter();
             m_cTable.Update(m_cDice);
 
         } while (PlayersStillLeft());
@@ -76,6 +80,14 @@ void Simulation::Run(int nNumberOfRuns, bool bMusterReport, bool bTally)
 
     cout << endl;
 }
+
+//void Simulation::QualifyShooter()
+//{
+//    for (std::vector<Strategy>::iterator it = m_vStrategies.begin();it != m_vStrategies.end(); it++)
+//    {
+//        it->QualifyShooter(m_cTable, m_cDice);
+//    }
+//}
 
 void Simulation::MakeBets()
 {

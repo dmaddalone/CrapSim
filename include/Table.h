@@ -49,7 +49,8 @@ enum class TableOdds
 class Table
 {
     public:
-        Table();
+        // Create a table with minimum and maximum wager limits
+        Table(int nMin, int nMax);
 
         // Set and return the minimum and maximum bet wagers
         void   SetMinimumBet(int b)     { assert (b > 0); m_nMinimumBet = b; }
@@ -69,11 +70,11 @@ class Table
         // Return whether the table is coming out
         bool   IsComingOutRoll() const  { return (!m_bPuckOn); }
         // Get maximum table odds for a bet
-        float GetMaxOdds(int i) const;
+        float  MaxOdds(int i) const;
         // Update the table state based on the dice roll
-        void  Update(const Dice &cDice);
+        void   Update(const Dice &cDice);
         // Reset the table - meant to be called before a new Simulation run
-        void  Reset()                   { SetPuckOff(); SetNewShooter(true); }
+        void   Reset()                  { SetPuckOff(); SetNewShooter(true); }
         // Set and return the table type (odds offered)
         std::string TableType();
         bool SetTableType(std::string sTableType);

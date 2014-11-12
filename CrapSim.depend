@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1415553348 source:/home/maddalone/CCPP/CrapSim/main.cpp
+1415770736 source:/home/maddalone/CCPP/CrapSim/main.cpp
 	<iostream>
 	<cassert>
 	<climits>
@@ -22,32 +22,32 @@
 	<algorithm>
 	<iterator>
 
-1415559510 source:/home/maddalone/CCPP/CrapSim/src/Dice.cpp
+1415760276 source:/home/maddalone/CCPP/CrapSim/src/Dice.cpp
 	<iostream>
 	"Dice.h"
 
-1415556912 /home/maddalone/CCPP/CrapSim/include/Dice.h
+1415760350 /home/maddalone/CCPP/CrapSim/include/Dice.h
 	<algorithm>
 	<array>
 	<list>
 	"Die.h"
 
-1415477833 source:/home/maddalone/CCPP/CrapSim/src/Table.cpp
+1415760232 source:/home/maddalone/CCPP/CrapSim/src/Table.cpp
 	"Table.h"
 
-1415509904 /home/maddalone/CCPP/CrapSim/include/Table.h
+1415760232 /home/maddalone/CCPP/CrapSim/include/Table.h
 	<cassert>
 	<map>
 	<string>
 	<locale>
 	"Dice.h"
 
-1415158602 source:/home/maddalone/CCPP/CrapSim/src/Bet.cpp
+1415595157 source:/home/maddalone/CCPP/CrapSim/src/Bet.cpp
 	"Bet.h"
 
 1415509904 /home/maddalone/CCPP/CrapSim/include/Bet.h
 
-1415571341 source:/home/maddalone/CCPP/CrapSim/src/Strategy.cpp
+1415763503 source:/home/maddalone/CCPP/CrapSim/src/Strategy.cpp
 	"Strategy.h"
 	<fstream>
 	<iostream>
@@ -71,7 +71,7 @@
 	"Strategy.h"
 	<vector>
 
-1415548086 source:/home/maddalone/CCPP/CrapSim/src/Simulation.cpp
+1415678631 source:/home/maddalone/CCPP/CrapSim/src/Simulation.cpp
 	"Simulation.h"
 	<iostream>
 	<iomanip>
@@ -81,7 +81,7 @@
 	<climits>
 	<iostream>
 
-1415080158 source:/home/maddalone/CCPP/CrapSim/src/Money.cpp
+1415595157 source:/home/maddalone/CCPP/CrapSim/src/Money.cpp
 	"Money.h"
 
 1413649596 source:/home/maddalone/CCPP/CDataFile/src/CDataFile.cpp
@@ -117,14 +117,15 @@
 	"Table.h"
 	"Bet.h"
 
-1415561604 source:/home/maddalone/CCPP/CrapSim/src/StrategyTracker.cpp
+1415571932 source:/home/maddalone/CCPP/CrapSim/src/StrategyTracker.cpp
 	<iostream>
 	"StrategyTracker.h"
 
-1415480889 source:/home/maddalone/CCPP/CrapSim/src/QualifiedShooter.cpp
+1415763249 source:/home/maddalone/CCPP/CrapSim/src/QualifiedShooter.cpp
+	<iostream>
 	"QualifiedShooter.h"
 
-1415509904 /home/maddalone/CCPP/CrapSim/include/QualifiedShooter.h
+1415763233 /home/maddalone/CCPP/CrapSim/include/QualifiedShooter.h
 	"Dice.h"
 	"Table.h"
 

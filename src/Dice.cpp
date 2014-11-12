@@ -34,6 +34,8 @@
 
 Dice::Dice(int nDice, int nFaces)
 {
+    // TODO: Check nDice and nfaces values
+
     m_pnDiceRollValues  = new int[nDice * nFaces]();
 
     for (int iii = 0; iii < nDice; iii++)
@@ -52,7 +54,7 @@ Dice::Dice(int nDice, int nFaces)
 Dice::Dice(const Dice& cSource) : m_lDice(cSource.m_lDice)
 {
     m_nTotalDiceRolls         = cSource.m_nTotalDiceRolls;
-    m_nLastDiceRollValue      = cSource.m_nLastDiceRollValue;
+    m_nRollValue              = cSource.m_nRollValue;
     m_nNumberOfNonFieldInARow = cSource.m_nNumberOfNonFieldInARow;
 
     if (cSource.m_pnDiceRollValues)
@@ -84,7 +86,7 @@ Dice& Dice::operator=(const Dice& cSource)
     m_lDice = cSource.m_lDice;
 
     m_nTotalDiceRolls         = cSource.m_nTotalDiceRolls;
-    m_nLastDiceRollValue      = cSource.m_nLastDiceRollValue;
+    m_nRollValue              = cSource.m_nRollValue;
     m_nNumberOfNonFieldInARow = cSource.m_nNumberOfNonFieldInARow;
 
     delete[] m_pnDiceRollValues;
@@ -125,7 +127,7 @@ Dice::~Dice()
 
 int Dice::Roll()
 {
-    m_nLastDiceRollValue = 0;
+    m_nRollValue = 0;
 
     // Roll the dice
     std::list<Die>::iterator it;
@@ -133,12 +135,12 @@ int Dice::Roll()
     while (it != m_lDice.end())
     {
         // Record the roll value
-        m_nLastDiceRollValue += it->Roll();
+        m_nRollValue += it->Roll();
         it++;
     }
 
     // Increment the dice value count
-    m_pnDiceRollValues[m_nLastDiceRollValue - 1]++;
+    m_pnDiceRollValues[m_nRollValue - 1]++;
 
     // Increment the total number of throws
     m_nTotalDiceRolls++;
@@ -153,5 +155,5 @@ int Dice::Roll()
         m_nNumberOfNonFieldInARow = 0;
     }
 
-    return(m_nLastDiceRollValue);
+    return(m_nRollValue);
 }

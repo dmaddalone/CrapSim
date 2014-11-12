@@ -37,7 +37,7 @@ enum class QualificationMethod
     QM_5COUNT,
     QM_AFTER_POINT_MADE,
     QM_AFTER_LOSING_FIELD_THREE_TIMES,
-    QM_AFTER_FILE_NON_SEVEN_ROLLS
+    QM_AFTER_FIVE_NON_SEVEN_ROLLS
 };
 
 class QualifiedShooter
@@ -65,13 +65,13 @@ class QualifiedShooter
         bool Method5Count(const Table &cTable, const Dice &cDice);
         int m_n5Count = 0;
         // The After Point Made method
-        bool MethodAfterPointMade(const Table &cTable);
+        bool MethodAfterPointMade(const Table &cTable, const Dice &cDice);
         // The After Losing Field Three Times method
         bool MethodAfterLosingFieldThreeTimes(const Table &cTable, const Dice &cDice);
         int m_nLosingFieldInARow = 0;
         // The After Five Non Seven Rolls method
-        bool MethodAfterFiveNon7Rolls(const Table &cTable, const Dice &cDice);
-        int m_n7InARow = 0;
+        bool MethodAfterFiveNon7Rolls(const Dice &cDice);
+        int m_nNon7InARow = 0;
 };
 
 #endif // QUALIFIEDSHOOTER_H
