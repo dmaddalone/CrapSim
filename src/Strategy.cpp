@@ -207,6 +207,10 @@ void Strategy::MakeBets(const Table &cTable)
 
         MakeBigBet();
 
+        MakeAny7Bet();
+
+        MakeAnyCrapsBet();
+
         // If tracking results, capture bankroll post bets
         if (m_bTrackResults) m_pcStrategyTracker->RecordBetsBeforeRoll(this, m_lBets);
     }
@@ -240,6 +244,10 @@ void Strategy::ResolveBets(const Table &cTable, const Dice &cDice)
         ResolveField(cDice);
 
         ResolveBig(cDice);
+
+        ResolveAny7(cDice);
+
+        ResolveAnyCraps(cDice);
 
         if (m_bOddsProgression)
         {
@@ -647,6 +655,36 @@ void Strategy::MakeBigBet()
         cBet.MakeBig8Bet(m_nWager);
         m_cMoney.Decrement(m_nWager);
         m_lBets.push_back(cBet);
+    }
+}
+
+void Strategy::MakeAny7Bet()
+{
+    // Check to see that current wager is not greather than bankroll
+    if (m_nWager <= m_cMoney.Bankroll())
+    {
+        if (m_bAny7BetAllowed)
+        {
+            Bet cBet;
+            cBet.MakeAny7Bet(m_nWager);
+            m_cMoney.Decrement(m_nWager);
+            m_lBets.push_back(cBet);
+        }
+    }
+}
+
+void Strategy::MakeAnyCrapsBet()
+{
+    // Check to see that current wager is not greather than bankroll
+    if (m_nWager <= m_cMoney.Bankroll())
+    {
+        if (m_bAnyCrapsBetAllowed)
+        {
+            Bet cBet;
+            cBet.MakeAnyCrapsBet(m_nWager);
+            m_cMoney.Decrement(m_nWager);
+            m_lBets.push_back(cBet);
+        }
     }
 }
 
@@ -1148,6 +1186,50 @@ void Strategy::ResolveBig(const Dice &cDice)
             }
         }
         else                                                    // Not a Big 6 or 8 Bet
+        {
+            it++;
+        }
+    }
+}
+
+void Strategy::ResolveAny7(const Dice &cDice)
+{
+    std::list<Bet>::iterator it = m_lBets.begin();
+    while(it != m_lBets.end())
+    {
+        if (it->IsAny7Bet())                                   // Any 7 Bet?
+        {
+            if (cDice.IsSeven())                                    // Any 7 Bet and Field Number Roll?
+            {
+                it->SetPoint(cDice.RollValue());                        // Set the bet point to last dice roll value to make CalculatePayoff work
+                m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
+            }
+
+            it = m_lBets.erase(it);                                 // Remove Bet
+        }
+        else                                                    // Not a Any 7 Bet
+        {
+            it++;
+        }
+    }
+}
+
+void Strategy::ResolveAnyCraps(const Dice &cDice)
+{
+    std::list<Bet>::iterator it = m_lBets.begin();
+    while(it != m_lBets.end())
+    {
+        if (it->IsAnyCrapsBet())                                   // Any Craps Bet?
+        {
+            if (cDice.IsCraps())                                    // Any Craps Bet and Field Number Roll?
+            {
+                it->SetPoint(cDice.RollValue());                        // Set the bet point to last dice roll value to make CalculatePayoff work
+                m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
+            }
+
+            it = m_lBets.erase(it);                                 // Remove Bet
+        }
+        else                                                    // Not a Any Craps Bet
         {
             it++;
         }

@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1415770736 source:/home/maddalone/CCPP/CrapSim/main.cpp
+1415841849 source:/home/maddalone/CCPP/CrapSim/main.cpp
 	<iostream>
 	<cassert>
 	<climits>
@@ -45,15 +45,15 @@
 1415595157 source:/home/maddalone/CCPP/CrapSim/src/Bet.cpp
 	"Bet.h"
 
-1415509904 /home/maddalone/CCPP/CrapSim/include/Bet.h
+1415852932 /home/maddalone/CCPP/CrapSim/include/Bet.h
 
-1415763503 source:/home/maddalone/CCPP/CrapSim/src/Strategy.cpp
+1415771225 source:/home/maddalone/CCPP/CrapSim/src/Strategy.cpp
 	"Strategy.h"
 	<fstream>
 	<iostream>
 	<iomanip>
 
-1415558152 /home/maddalone/CCPP/CrapSim/include/Strategy.h
+1415852901 /home/maddalone/CCPP/CrapSim/include/Strategy.h
 	<algorithm>
 	<cassert>
 	<climits>
@@ -121,11 +121,11 @@
 	<iostream>
 	"StrategyTracker.h"
 
-1415763249 source:/home/maddalone/CCPP/CrapSim/src/QualifiedShooter.cpp
+1415843542 source:/home/maddalone/CCPP/CrapSim/src/QualifiedShooter.cpp
 	<iostream>
 	"QualifiedShooter.h"
 
-1415763233 /home/maddalone/CCPP/CrapSim/include/QualifiedShooter.h
+1415843578 /home/maddalone/CCPP/CrapSim/include/QualifiedShooter.h
 	"Dice.h"
 	"Table.h"
 

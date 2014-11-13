@@ -37,17 +37,34 @@ enum class QualificationMethod
     QM_5COUNT,
     QM_AFTER_POINT_MADE,
     QM_AFTER_LOSING_FIELD_THREE_TIMES,
-    QM_AFTER_FIVE_NON_SEVEN_ROLLS
+    QM_AFTER_FIVE_NON_SEVEN_ROLLS,
+    QM_AFTER_N_LOSING_FIELD_ROLLS_IN_A_ROW,
+    QM_AFTER_N_NON_7_ROLLS_IN_A_ROW,
+    QM_AFTER_N_2_ROLLS_IN_A_ROW,
+    QM_AFTER_N_3_ROLLS_IN_A_ROW,
+    QM_AFTER_N_4_ROLLS_IN_A_ROW,
+    QM_AFTER_N_5_ROLLS_IN_A_ROW,
+    QM_AFTER_N_6_ROLLS_IN_A_ROW,
+    QM_AFTER_N_7_ROLLS_IN_A_ROW,
+    QM_AFTER_N_8_ROLLS_IN_A_ROW,
+    QM_AFTER_N_9_ROLLS_IN_A_ROW,
+    QM_AFTER_N_10_ROLLS_IN_A_ROW,
+    QM_AFTER_N_11_ROLLS_IN_A_ROW,
+    QM_AFTER_N_12_ROLLS_IN_A_ROW
 };
 
 class QualifiedShooter
 {
     public:
         QualifiedShooter();
+
         // Set and return the qualification method
         bool SetMethod(std::string sMethod);
         std::string Method();
-
+        // Set the count for the qualification method
+        void SetCount(int i)                    { m_nQualificationCount = i; }
+        // Set when the qualification method starts, usually with a new shooter
+        void SetStopWithShooter(bool b)         {m_bQualificationStopsWithShooter = b;}
         // Check whether we are qualifying a shooter
         bool QualifyingTheShooter() const       { return (m_ecQualificationMethod != QualificationMethod::QM_NO_METHOD); }
         // Check whether the shooter has been qualified
@@ -57,6 +74,8 @@ class QualifiedShooter
         // Set defaults
         QualificationMethod m_ecQualificationMethod = QualificationMethod::QM_NO_METHOD;
         bool m_bShooterQualified                    = false;
+        int  m_nQualificationCount                  = 0;
+        bool m_bQualificationStopsWithShooter       = true;
 
         // Map to associate the strings with the enum values
         std::map<std::string, QualificationMethod> m_mQualificationMethod;
@@ -72,6 +91,9 @@ class QualifiedShooter
         // The After Five Non Seven Rolls method
         bool MethodAfterFiveNon7Rolls(const Dice &cDice);
         int m_nNon7InARow = 0;
+
+        bool MethodAfterNXRolls(const Table &cTable, const Dice &cDice, int nNumber);
+        int m_nCounter = 0;
 };
 
 #endif // QUALIFIEDSHOOTER_H

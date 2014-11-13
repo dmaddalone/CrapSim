@@ -30,10 +30,6 @@
 #include "Simulation.h"
 #include "CDataFile.h"
 
-using std::cerr;
-using std::cout;
-using std::endl;
-
 void CreateStrategy(const std::string &sStrategy, CDataFile &cConfigFile, const int nAllInitialBankroll, const int nAllStandardWager, const float fAllSWM, const int nAllSignificantWinnings, Simulation &cSim)
 {
     // Read config file for parameters this Strategy
@@ -56,6 +52,8 @@ void CreateStrategy(const std::string &sStrategy, CDataFile &cConfigFile, const 
     int         nFieldBetUnits          = cConfigFile.GetInt("FieldBetUnits",sStrategy);
     bool        bBig6Bet                = cConfigFile.GetBool("Big6Bet", sStrategy);
     bool        bBig8Bet                = cConfigFile.GetBool("Big8Bet", sStrategy);
+    bool        bAny7Bet                = cConfigFile.GetBool("Any7Bet", sStrategy);
+    bool        bAnyCrapsBet            = cConfigFile.GetBool("AnyCrapsBet", sStrategy);
     float       fStandardOdds           = cConfigFile.GetFloat("StandardOdds", sStrategy);
     int         nSignificantWinnings    = cConfigFile.GetInt("SignificantWinnings", sStrategy);
     float       fSWM                    = cConfigFile.GetFloat("SWM", sStrategy);
@@ -77,8 +75,8 @@ void CreateStrategy(const std::string &sStrategy, CDataFile &cConfigFile, const 
     if (nStandardWager == INT_MIN) nStandardWager = nAllStandardWager;
     if (nStandardWager <= 0) // If InitialBankroll still not set, exit with error
     {
-        cerr << "ERROR (main): StandardWager not set: " << nStandardWager << endl;
-        cerr << "Exiting" << endl;
+        std::cerr << "ERROR (main): StandardWager not set: " << nStandardWager << std::endl;
+        std::cerr << "Exiting" << std::endl;
         exit(EXIT_FAILURE);
     }
 
@@ -99,8 +97,8 @@ void CreateStrategy(const std::string &sStrategy, CDataFile &cConfigFile, const 
         else if (sPredefined == "AGGRESSIVE")   cStrategy.SetAggressive();
         else  // Don't know what the Predefined parameter is.  Exit with error.
         {
-            cerr << "ERROR (main): Unknown Predefined setting: " << sPredefined << endl;
-            cerr << "Exiting" << endl;
+            std::cerr << "ERROR (main): Unknown Predefined setting: " << sPredefined << std::endl;
+            std::cerr << "Exiting" << std::endl;
             exit (EXIT_FAILURE);
         }
     }
@@ -150,6 +148,12 @@ void CreateStrategy(const std::string &sStrategy, CDataFile &cConfigFile, const 
     // Pass Big 8 Bet to Strategy; default is false
     cStrategy.SetBig8BetAllowed(bBig8Bet);
 
+    // Pass Any 7 Bet to Strategy; default is false
+    cStrategy.SetAny7BetAllowed(bAny7Bet);
+
+    // Pass Any Craps Bet to Strategy; default is false
+    cStrategy.SetAnyCrapsBetAllowed(bAnyCrapsBet);
+
     // If Standard Odds has been set, pass to Strategy
     if (fStandardOdds != FLT_MIN) cStrategy.SetStandardOdds(fStandardOdds);
 
@@ -166,7 +170,6 @@ void CreateStrategy(const std::string &sStrategy, CDataFile &cConfigFile, const 
     // If Significant Winngings Multiple has been set, pass to Strategy
     if (nSignificantWinnings != INT_MIN) cStrategy.SetSignificantWinnings(nSignificantWinnings);
 
-
     // And check for Odds Progression  type of Arithmetic or Geometric.  If neither is set, exit with error.
     if (bOddsProgression)
     {
@@ -181,8 +184,8 @@ void CreateStrategy(const std::string &sStrategy, CDataFile &cConfigFile, const 
         else if (sOddsProgressionMethod == "GEOMETRIC") cStrategy.SetOddsProgressionMethodGeometric();
         else
         {
-            cerr << "ERROR (main): Unknown OddsProgressionMethod setting: " << sOddsProgressionMethod << endl;
-            cerr << "Exiting" << endl;
+            std::cerr << "ERROR (main): Unknown OddsProgressionMethod setting: " << sOddsProgressionMethod << std::endl;
+            std::cerr << "Exiting" << std::endl;
             exit (EXIT_FAILURE);
         }
     }
@@ -193,7 +196,7 @@ void CreateStrategy(const std::string &sStrategy, CDataFile &cConfigFile, const 
 
 int CrapsSimulation(std::string sINIFile)
 {
-    cout << "Craps Simulation" << endl;
+    std::cout << "Craps Simulation" << std::endl;
 
     Simulation  cSim;
     Table       cTable(5, 5000);
@@ -201,8 +204,8 @@ int CrapsSimulation(std::string sINIFile)
     if (sINIFile.empty())
     {
         // TODO: Make a utility or expand into exception management
-        cerr << "ERROR (main): No configuration file." << endl;
-        cerr << "Exiting" << endl;
+        std::cerr << "ERROR (main): No configuration file." << std::endl;
+        std::cerr << "Exiting" << std::endl;
         exit (EXIT_FAILURE);
     }
 
@@ -223,8 +226,8 @@ int CrapsSimulation(std::string sINIFile)
 
     if (nNumberOfRuns <= 0)
     {
-        cerr << "ERROR (main): Number of simulation runs not set." << endl;
-        cerr << "Exiting" << endl;
+        std::cerr << "ERROR (main): Number of simulation runs not set." << std::endl;
+        std::cerr << "Exiting" << std::endl;
         exit (EXIT_FAILURE);
     }
 
@@ -235,8 +238,8 @@ int CrapsSimulation(std::string sINIFile)
     {
         if (!cTable.SetTableType(sTableType))
         {
-            cerr << "ERROR (main): Unknown Table Type: " << sTableType << endl;
-            cerr << "Exiting" << endl;
+            std::cerr << "ERROR (main): Unknown Table Type: " << sTableType << std::endl;
+            std::cerr << "Exiting" << std::endl;
             exit (EXIT_FAILURE);
         }
     }
@@ -249,17 +252,6 @@ int CrapsSimulation(std::string sINIFile)
         sStrategyName = "Strategy" + std::to_string(iii);
         if (cConfigFile.CheckSectionName(sStrategyName)) CreateStrategy(sStrategyName, cConfigFile, nDefaultInitialBankroll, nDefaultStandardWager, fDefaultSWM, nDefaultSignificantWinnings, cSim);
     }
-
-    //if (cConfigFile.CheckSectionName("Strategy1"))  CreateStrategy("Strategy1", cConfigFile, nDefaultInitialBankroll, nDefaultStandardWager, fDefaultSWM, nDefaultSignificantWinnings, cSim);
-    //if (cConfigFile.CheckSectionName("Strategy2"))  CreateStrategy("Strategy2", cConfigFile, nDefaultInitialBankroll, nDefaultStandardWager, fDefaultSWM, nDefaultSignificantWinnings, cSim);
-    //if (cConfigFile.CheckSectionName("Strategy3"))  CreateStrategy("Strategy3", cConfigFile, nDefaultInitialBankroll, nDefaultStandardWager, fDefaultSWM, nDefaultSignificantWinnings, cSim);
-    //if (cConfigFile.CheckSectionName("Strategy4"))  CreateStrategy("Strategy4", cConfigFile, nDefaultInitialBankroll, nDefaultStandardWager, fDefaultSWM, nDefaultSignificantWinnings, cSim);
-    //if (cConfigFile.CheckSectionName("Strategy5"))  CreateStrategy("Strategy5", cConfigFile, nDefaultInitialBankroll, nDefaultStandardWager, fDefaultSWM, nDefaultSignificantWinnings, cSim);
-    //if (cConfigFile.CheckSectionName("Strategy6"))  CreateStrategy("Strategy6", cConfigFile, nDefaultInitialBankroll, nDefaultStandardWager, fDefaultSWM, nDefaultSignificantWinnings, cSim);
-    //if (cConfigFile.CheckSectionName("Strategy7"))  CreateStrategy("Strategy7", cConfigFile, nDefaultInitialBankroll, nDefaultStandardWager, fDefaultSWM, nDefaultSignificantWinnings, cSim);
-    //if (cConfigFile.CheckSectionName("Strategy8"))  CreateStrategy("Strategy8", cConfigFile, nDefaultInitialBankroll, nDefaultStandardWager, fDefaultSWM, nDefaultSignificantWinnings, cSim);
-    //if (cConfigFile.CheckSectionName("Strategy9"))  CreateStrategy("Strategy9", cConfigFile, nDefaultInitialBankroll, nDefaultStandardWager, fDefaultSWM, nDefaultSignificantWinnings, cSim);
-    //if (cConfigFile.CheckSectionName("Strategy10")) CreateStrategy("Strategy10", cConfigFile, nDefaultInitialBankroll, nDefaultStandardWager, fDefaultSWM, nDefaultSignificantWinnings, cSim);
 
     // Stop CDataFile cConfigFile from Save() and writing out the file
     cConfigFile.Clear();
@@ -274,7 +266,7 @@ int main(int argc, char* argv[])
 {
     if (argc > 2)
     {
-        cerr << "Usage: CrapSim [FILE]" << endl;
+        std::cerr << "Usage: CrapSim [FILE]" << std::endl;
         exit (EXIT_FAILURE);
     }
 

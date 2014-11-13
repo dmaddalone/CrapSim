@@ -46,7 +46,9 @@ enum class BetType
     TYPE_COME_ODDS,
     TYPE_DONT_PASS_ODDS,
     TYPE_DONT_COME_ODDS,
-    TYPE_FIELD
+    TYPE_FIELD,
+    TYPE_ANY_7,
+    TYPE_ANY_CRAPS
 };
 
 class Bet
@@ -65,6 +67,8 @@ class Bet
         bool IsFieldBet() const                 { return (m_ecType == BetType::TYPE_FIELD); }
         bool IsBig6Bet() const                  { return (m_ecType == BetType::TYPE_BIG_6); }
         bool IsBig8Bet() const                  { return (m_ecType == BetType::TYPE_BIG_8); }
+        bool IsAny7Bet() const                  { return (m_ecType == BetType::TYPE_ANY_7); }
+        bool IsAnyCrapsBet() const              { return (m_ecType == BetType::TYPE_ANY_CRAPS); }
 
         // Set and return whether come odds are working on the come out
         bool ComeOddsAreWorking() const         { return (m_bComeOddsAreWorking); }
@@ -83,6 +87,8 @@ class Bet
         void MakeFieldBet(int w)                { m_ecType = BetType::TYPE_FIELD; m_nWager = w; }
         void MakeBig6Bet(int w)                 { m_ecType = BetType::TYPE_BIG_6; m_nWager = w; }
         void MakeBig8Bet(int w)                 { m_ecType = BetType::TYPE_BIG_8; m_nWager = w; }
+        void MakeAny7Bet(int w)                 { m_ecType = BetType::TYPE_ANY_7; m_nWager = w; }
+        void MakeAnyCrapsBet(int w)             { m_ecType = BetType::TYPE_ANY_CRAPS; m_nWager = w;}
 
         // Return the bet's wager amount
         int Wager() const                       { return (m_nWager); }

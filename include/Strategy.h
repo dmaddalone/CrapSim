@@ -78,6 +78,10 @@ class Strategy
         // Set Big 6 or 8 bet specifics
         void SetBig6BetAllowed(bool b)      { m_bBig6BetAllowed = b; }
         void SetBig8BetAllowed(bool b)      { m_bBig8BetAllowed = b; }
+        // Set Any 7 bet specifics
+        void SetAny7BetAllowed(bool b)      { m_bAny7BetAllowed = b; }
+        // Set Any Craps bet specifics
+        void SetAnyCrapsBetAllowed(bool b)  { m_bAnyCrapsBetAllowed = b; }
         // Set standard (default) odds for Pass and Don't Pass bets
         void SetStandardOdds(float f)       { assert( f >= 1.0); m_fStandardOdds = m_fOdds = f; }
         // Set significant winnings multiple and absolute figures (see Money.h)
@@ -125,6 +129,8 @@ class Strategy
         void MakeOddsBet(const Table &cTable);
         void MakeFieldBet();
         void MakeBigBet();
+        void MakeAny7Bet();
+        void MakeAnyCrapsBet();
         // Set wager to an amount that creates a full payoff
         int  OddsBetFullPayoffWager(const int  nWager, const int nPointNumber);
 
@@ -151,6 +157,8 @@ class Strategy
         void ResolvePlace(const Table &cTable, const Dice &cDice);
         void ResolveField(const Dice &cDice);
         void ResolveBig(const Dice &cDice);
+        void ResolveAny7(const Dice &cDice);
+        void ResolveAnyCraps(const Dice &cDice);
 
         // Check to see if a current bet covers 6 or 8
         bool SixOrEightCovered();
@@ -187,6 +195,8 @@ class Strategy
         int m_nPlaceBetUnits                = 1;
         int m_bBig6BetAllowed               = false;
         int m_bBig8BetAllowed               = false;
+        bool m_bAny7BetAllowed              = false;
+        bool m_bAnyCrapsBetAllowed          = false;
         int m_nStandardWager                = 0;
         int m_nWager                        = 0;
         bool m_bFullWager                   = false;

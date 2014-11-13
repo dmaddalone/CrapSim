@@ -147,6 +147,26 @@ int Bet::CalculatePayoff ()
                 default:
                     break;
             }
+        case BetType::TYPE_ANY_7:
+            switch (Point())
+            {
+                case 7:
+                    return (m_nWager * 4);          // 4:1
+                    break;
+                default:
+                    break;
+            }
+        case BetType::TYPE_ANY_CRAPS:
+            switch (Point())
+            {
+                case 2:
+                case 3:
+                case 12:
+                    return (m_nWager * 7);          // 7:1
+                    break;
+                default:
+                    break;
+            }
 
         default:
             break;

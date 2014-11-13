@@ -14,6 +14,17 @@ QualifiedShooter::QualifiedShooter()
     m_mQualificationMethod["AFTER_POINT_MADE"]                 = QualificationMethod::QM_AFTER_POINT_MADE;
     m_mQualificationMethod["AFTER_LOSING_FIELD_THREE_TIMES"]   = QualificationMethod::QM_AFTER_LOSING_FIELD_THREE_TIMES;
     m_mQualificationMethod["AFTER_FIVE_NON_SEVEN_ROLLS"]       = QualificationMethod::QM_AFTER_FIVE_NON_SEVEN_ROLLS;
+    m_mQualificationMethod["AFTER_N_2_ROLLS_IN_A_ROW"]         = QualificationMethod::QM_AFTER_N_2_ROLLS_IN_A_ROW;
+    m_mQualificationMethod["AFTER_N_3_ROLLS_IN_A_ROW"]         = QualificationMethod::QM_AFTER_N_3_ROLLS_IN_A_ROW;
+    m_mQualificationMethod["AFTER_N_4_ROLLS_IN_A_ROW"]         = QualificationMethod::QM_AFTER_N_4_ROLLS_IN_A_ROW;
+    m_mQualificationMethod["AFTER_N_5_ROLLS_IN_A_ROW"]         = QualificationMethod::QM_AFTER_N_5_ROLLS_IN_A_ROW;
+    m_mQualificationMethod["AFTER_N_6_ROLLS_IN_A_ROW"]         = QualificationMethod::QM_AFTER_N_6_ROLLS_IN_A_ROW;
+    m_mQualificationMethod["AFTER_N_7_ROLLS_IN_A_ROW"]         = QualificationMethod::QM_AFTER_N_7_ROLLS_IN_A_ROW;
+    m_mQualificationMethod["AFTER_N_8_ROLLS_IN_A_ROW"]         = QualificationMethod::QM_AFTER_N_8_ROLLS_IN_A_ROW;
+    m_mQualificationMethod["AFTER_N_9_ROLLS_IN_A_ROW"]         = QualificationMethod::QM_AFTER_N_9_ROLLS_IN_A_ROW;
+    m_mQualificationMethod["AFTER_N_10_ROLLS_IN_A_ROW"]        = QualificationMethod::QM_AFTER_N_10_ROLLS_IN_A_ROW;
+    m_mQualificationMethod["AFTER_N_11_ROLLS_IN_A_ROW"]        = QualificationMethod::QM_AFTER_N_11_ROLLS_IN_A_ROW;
+    m_mQualificationMethod["AFTER_N_12_ROLLS_IN_A_ROW"]        = QualificationMethod::QM_AFTER_N_12_ROLLS_IN_A_ROW;
 }
 
 /**
@@ -102,6 +113,36 @@ bool QualifiedShooter::ShooterQualified(const Table &cTable, const Dice &cDice)
             break;
         case QualificationMethod::QM_AFTER_FIVE_NON_SEVEN_ROLLS:
             return (MethodAfterFiveNon7Rolls(cDice));
+            break;
+        case QualificationMethod::QM_AFTER_N_2_ROLLS_IN_A_ROW:
+            return (MethodAfterNXRolls(cTable, cDice, 2));
+            break;
+        case QualificationMethod::QM_AFTER_N_3_ROLLS_IN_A_ROW:
+            return (MethodAfterNXRolls(cTable, cDice, 3));
+            break;
+        case QualificationMethod::QM_AFTER_N_4_ROLLS_IN_A_ROW:
+            return (MethodAfterNXRolls(cTable, cDice, 4));
+            break;
+        case QualificationMethod::QM_AFTER_N_5_ROLLS_IN_A_ROW:
+            return (MethodAfterNXRolls(cTable, cDice, 5));
+            break;
+        case QualificationMethod::QM_AFTER_N_6_ROLLS_IN_A_ROW:
+            return (MethodAfterNXRolls(cTable, cDice, 6));
+            break;
+        case QualificationMethod::QM_AFTER_N_8_ROLLS_IN_A_ROW:
+            return (MethodAfterNXRolls(cTable, cDice, 8));
+            break;
+        case QualificationMethod::QM_AFTER_N_9_ROLLS_IN_A_ROW:
+            return (MethodAfterNXRolls(cTable, cDice, 9));
+            break;
+        case QualificationMethod::QM_AFTER_N_10_ROLLS_IN_A_ROW:
+            return (MethodAfterNXRolls(cTable, cDice, 10));
+            break;
+        case QualificationMethod::QM_AFTER_N_11_ROLLS_IN_A_ROW:
+            return (MethodAfterNXRolls(cTable, cDice, 11));
+            break;
+        case QualificationMethod::QM_AFTER_N_12_ROLLS_IN_A_ROW:
+            return (MethodAfterNXRolls(cTable, cDice, 12));
             break;
         default:
             break;
@@ -308,7 +349,73 @@ bool QualifiedShooter::MethodAfterFiveNon7Rolls(const Dice &cDice)
 
     if (m_nNon7InARow >= 5) m_bShooterQualified = true;
 
-    std::cout << "\tm_nNon7InARow=" << m_nNon7InARow;
+    return (m_bShooterQualified);
+}
+
+/**
+  * Begin betting after N number of X values are rolled in a roll.  Works for
+  * all values except 7.
+  *
+  * Method:
+  * 1) If a X value is rolled, begin counting.
+  * 2) If N number of X values are rolled in a row, the shooter is qualified.
+  *
+  * Qualification Methiod uses the m_bQualificationStopsWithShooter flag.  If
+  * true, shooter is qualified until she sevens out.  If false, this is a
+  * one-time betting qualification event.
+  *
+  * \param cTable The Table.
+  * \param cDice The Dice.
+  *
+  * \return True if the shooter has qualified, false otherwise.
+  */
+
+bool QualifiedShooter::MethodAfterNXRolls(const Table &cTable, const Dice &cDice, int nNumber)
+{
+    m_bShooterQualified = false;
+
+    // If a new shooter on the come out, reset counter.
+    if (cTable.NewShooter() && cTable.IsComingOutRoll())
+    {
+        m_nCounter = 0;
+    }
+
+    // If number hit, count it.
+    if (cDice.RollValue() == nNumber)
+    {
+        m_nCounter++;
+    }
+    // Else if not the number AND shooter sevens out, reset counter
+    else if (cDice.IsSeven() && cTable.Point() != 0)
+    {
+        m_nCounter = 0;
+    }
+    // Else if not the number AND haven't reached qualification count, reset counter
+    else if (m_nCounter < m_nQualificationCount)
+    {
+        m_nCounter = 0;
+    }
+
+    // If qualifying shooter
+    if (m_bQualificationStopsWithShooter)
+    {
+        // If counter meets or exceeds qualification count, shooter is qualified
+        if (m_nCounter >= m_nQualificationCount)
+        {
+            m_bShooterQualified = true;
+        }
+    }
+    // Else if one time qualification
+    else
+    {
+        // If counter meets qualification count, qualify the shooter,
+        // but reset the counter
+        if (m_nCounter == m_nQualificationCount)
+        {
+            m_bShooterQualified = true;
+            m_nCounter = 0;
+        }
+    }
 
     return (m_bShooterQualified);
 }
