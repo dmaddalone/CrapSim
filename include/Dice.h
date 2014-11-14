@@ -52,10 +52,13 @@ class Dice
         // Set of Craps specific dice value checks
         bool  IsCraps() const                  { return ((m_nRollValue == 2) || (m_nRollValue == 3) || (m_nRollValue == 12)); }
         bool  IsNatural() const                { return ((m_nRollValue == 7) || (m_nRollValue == 11)); }
+        bool  IsTwo() const                    { return (m_nRollValue == 2); }
+        bool  IsThree() const                    { return (m_nRollValue == 3); }
         bool  IsSix() const                    { return (m_nRollValue == 6); }
         bool  IsSeven() const                  { return (m_nRollValue == 7); }
         bool  IsEight() const                  { return (m_nRollValue == 8); }
         bool  IsEleven() const                 { return (m_nRollValue == 11); }
+        bool  IsTweleve() const                { return (m_nRollValue == 12); }
         bool  IsBar() const                    { return (m_nRollValue == 12); }
         bool  IsField() const                  { return (std::count(m_anFieldNumbers.begin(), m_anFieldNumbers.end(), m_nRollValue)) ? true : false; }
         bool  IsAPointNumber() const           { return (std::count(m_anPointNumbers.begin(), m_anPointNumbers.end(), m_nRollValue)) ? true : false; }

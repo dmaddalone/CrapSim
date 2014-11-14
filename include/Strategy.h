@@ -129,8 +129,7 @@ class Strategy
         void MakeOddsBet(const Table &cTable);
         void MakeFieldBet();
         void MakeBigBet();
-        void MakeAny7Bet();
-        void MakeAnyCrapsBet();
+        void MakeOneRollBets();
         // Set wager to an amount that creates a full payoff
         int  OddsBetFullPayoffWager(const int  nWager, const int nPointNumber);
 
@@ -157,14 +156,12 @@ class Strategy
         void ResolvePlace(const Table &cTable, const Dice &cDice);
         void ResolveField(const Dice &cDice);
         void ResolveBig(const Dice &cDice);
-        void ResolveAny7(const Dice &cDice);
-        void ResolveAnyCraps(const Dice &cDice);
+        void ResolveOneRollBets(const Dice &cDice);
 
         // Check to see if a current bet covers 6 or 8
         bool SixOrEightCovered();
         // Checks to see if the odds progression method is Arithmetic
         bool IsArithmeticOddsProgression() { return (m_ecOddsProgressionMethod == OddsProgressionMethod::ARITHMETIC); }
-
 
         std::string m_sName;
         std::string m_sDescription;
@@ -197,6 +194,10 @@ class Strategy
         int m_bBig8BetAllowed               = false;
         bool m_bAny7BetAllowed              = false;
         bool m_bAnyCrapsBetAllowed          = false;
+        bool m_bCraps2BetAllowed            = false;
+        bool m_bCraps3BetAllowed            = false;
+        bool m_bYo11BetAllowed              = false;
+        bool m_bCraps12BetAllowed           = false;
         int m_nStandardWager                = 0;
         int m_nWager                        = 0;
         bool m_bFullWager                   = false;
@@ -207,7 +208,7 @@ class Strategy
         OddsProgressionMethod m_ecOddsProgressionMethod = OddsProgressionMethod::ARITHMETIC;
         int m_nPreferredPlaceBet            = 8;
 
-        // Set counters to zero
+        // Set counters to zero or defaults
         int m_nTimesStrategyRun             = 0;
         int m_nTimesStrategyWon             = 0;
         int m_nTimesStrategyLost            = 0;

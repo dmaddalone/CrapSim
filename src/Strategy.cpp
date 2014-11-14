@@ -65,9 +65,9 @@ Strategy::~Strategy()
   * Set an Elementary Strategy.
   *
   * As described in "Beat the Craps Table" by Martin Jensen.
-  * Make Pass bets and take single odds.
-  * Take double odds after winning twice original wager and odds.
-  * After losing, go back to single odds.
+  * -Make Pass bets and take single odds.
+  * -Take double odds after winning twice original wager and odds.
+  * -After losing, go back to single odds.
   */
 
 void Strategy::SetElementary()
@@ -87,11 +87,11 @@ void Strategy::SetElementary()
   * Set a Conservative Strategy.
   *
   * As described in "Beat the Craps Table" by Martin Jensen.
-  * Make Pass bets and one Come bet and take single odds.
-  * Take double odds after winning twice original wager and odds for both
-  * Pass and Come bets.
-  * Increase odds incrementally as winnings increase.
-  * After losing, go back to single odds.
+  * -Make Pass bets and one Come bet and take single odds.
+  * -Take double odds after winning twice original wager and odds for both
+  *  Pass and Come bets.
+  * -Increase odds incrementally as winnings increase.
+  * -After losing, go back to single odds.
   */
 
 void Strategy::SetConservative()
@@ -111,11 +111,11 @@ void Strategy::SetConservative()
   * Set a Conventional Strategy.
   *
   * As described in "Beat the Craps Table" by Martin Jensen.
-  * Make Pass bets and two Come bets and take single odds.
-  * Take double odds after winning twice original wager and odds for both
-  * Pass and Come bets.
-  * Increase odds incrementally as winnings increase.
-  * After losing, go back to single odds.
+  * -Make Pass bets and two Come bets and take single odds.
+  * -Take double odds after winning twice original wager and odds for both
+  *  Pass and Come bets.
+  * -Increase odds incrementally as winnings increase.
+  * -After losing, go back to single odds.
   */
 
 void Strategy::SetConventional()
@@ -136,11 +136,11 @@ void Strategy::SetConventional()
   *
   * As described in "Beat the Craps Table" by Martin Jensen, this strategy
   * extends the Conventional Strategyout to four bets.
-  * Make Pass bets and two Come bets and take double odds.
-  * Make a Place bet after the previous bets are made, on a 6 or 8.  If 6 and 8
+  * -Make Pass bets and two Come bets and take double odds.
+  * -Make a Place bet after the previous bets are made, on a 6 or 8.  If 6 and 8
   * are already covered, make a third Come bet.
-  * Increase odds incrementally as winnings increase.
-  * After losing, go back to double odds.
+  * -Increase odds incrementally as winnings increase.
+  * -After losing, go back to double odds.
   */
 
 void Strategy::SetAggressive()
@@ -207,9 +207,7 @@ void Strategy::MakeBets(const Table &cTable)
 
         MakeBigBet();
 
-        MakeAny7Bet();
-
-        MakeAnyCrapsBet();
+        MakeOneRollBets();
 
         // If tracking results, capture bankroll post bets
         if (m_bTrackResults) m_pcStrategyTracker->RecordBetsBeforeRoll(this, m_lBets);
@@ -245,9 +243,7 @@ void Strategy::ResolveBets(const Table &cTable, const Dice &cDice)
 
         ResolveBig(cDice);
 
-        ResolveAny7(cDice);
-
-        ResolveAnyCraps(cDice);
+        ResolveOneRollBets(cDice);
 
         if (m_bOddsProgression)
         {
@@ -658,7 +654,7 @@ void Strategy::MakeBigBet()
     }
 }
 
-void Strategy::MakeAny7Bet()
+void Strategy::MakeOneRollBets()
 {
     // Check to see that current wager is not greather than bankroll
     if (m_nWager <= m_cMoney.Bankroll())
@@ -671,17 +667,57 @@ void Strategy::MakeAny7Bet()
             m_lBets.push_back(cBet);
         }
     }
-}
 
-void Strategy::MakeAnyCrapsBet()
-{
-    // Check to see that current wager is not greather than bankroll
     if (m_nWager <= m_cMoney.Bankroll())
     {
         if (m_bAnyCrapsBetAllowed)
         {
             Bet cBet;
             cBet.MakeAnyCrapsBet(m_nWager);
+            m_cMoney.Decrement(m_nWager);
+            m_lBets.push_back(cBet);
+        }
+    }
+
+    if (m_nWager <= m_cMoney.Bankroll())
+    {
+        if (m_bCraps2BetAllowed)
+        {
+            Bet cBet;
+            cBet.MakeCraps2Bet(m_nWager);
+            m_cMoney.Decrement(m_nWager);
+            m_lBets.push_back(cBet);
+        }
+    }
+
+    if (m_nWager <= m_cMoney.Bankroll())
+    {
+        if (m_bCraps3BetAllowed)
+        {
+            Bet cBet;
+            cBet.MakeCraps3Bet(m_nWager);
+            m_cMoney.Decrement(m_nWager);
+            m_lBets.push_back(cBet);
+        }
+    }
+
+    if (m_nWager <= m_cMoney.Bankroll())
+    {
+        if (m_bYo11BetAllowed)
+        {
+            Bet cBet;
+            cBet.MakeYo11Bet(m_nWager);
+            m_cMoney.Decrement(m_nWager);
+            m_lBets.push_back(cBet);
+        }
+    }
+
+    if (m_nWager <= m_cMoney.Bankroll())
+    {
+        if (m_bCraps12BetAllowed)
+        {
+            Bet cBet;
+            cBet.MakeCraps12Bet(m_nWager);
             m_cMoney.Decrement(m_nWager);
             m_lBets.push_back(cBet);
         }
@@ -1192,7 +1228,7 @@ void Strategy::ResolveBig(const Dice &cDice)
     }
 }
 
-void Strategy::ResolveAny7(const Dice &cDice)
+void Strategy::ResolveOneRollBets(const Dice &cDice)
 {
     std::list<Bet>::iterator it = m_lBets.begin();
     while(it != m_lBets.end())
@@ -1207,34 +1243,77 @@ void Strategy::ResolveAny7(const Dice &cDice)
 
             it = m_lBets.erase(it);                                 // Remove Bet
         }
-        else                                                    // Not a Any 7 Bet
-        {
-            it++;
-        }
-    }
-}
 
-void Strategy::ResolveAnyCraps(const Dice &cDice)
-{
-    std::list<Bet>::iterator it = m_lBets.begin();
-    while(it != m_lBets.end())
-    {
-        if (it->IsAnyCrapsBet())                                   // Any Craps Bet?
+        else if (it->IsAnyCrapsBet())                           // Any Craps Bet?
         {
-            if (cDice.IsCraps())                                    // Any Craps Bet and Field Number Roll?
+            if (cDice.IsCraps())
             {
-                it->SetPoint(cDice.RollValue());                        // Set the bet point to last dice roll value to make CalculatePayoff work
-                m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
+                it->SetPoint(cDice.RollValue());
+                m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
             }
 
-            it = m_lBets.erase(it);                                 // Remove Bet
+            it = m_lBets.erase(it);
         }
-        else                                                    // Not a Any Craps Bet
+
+        else if (it->IsCraps2Bet())                           // Craps 2 Bet?
+        {
+            if (cDice.IsTwo())
+            {
+                it->SetPoint(cDice.RollValue());
+                m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
+            }
+
+            it = m_lBets.erase(it);
+        }
+
+        else if (it->IsCraps3Bet())                           // Craps 3 Bet?
+        {
+            if (cDice.IsThree())
+            {
+                it->SetPoint(cDice.RollValue());
+                m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
+            }
+
+            it = m_lBets.erase(it);
+        }
+
+        else if (it->IsYo11Bet())                           // Yo 11 Bet?
+        {
+            if (cDice.IsEleven())
+            {
+                it->SetPoint(cDice.RollValue());
+                m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
+            }
+
+            it = m_lBets.erase(it);
+        }
+
+        else if (it->IsCraps12Bet())                           // Craps 12 Bet?
+        {
+            if (cDice.IsTweleve())
+            {
+                it->SetPoint(cDice.RollValue());
+                m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
+            }
+
+            it = m_lBets.erase(it);
+        }
+
+        else                                                    // Not a one roll bet
         {
             it++;
         }
     }
 }
+
+/**
+  * Check to see if Strategy is still playing.
+  *
+  * If Strategy has run out of money to wager, it stops playing.
+  * If Strategy has gained significant winnings, it stop playing.
+  *
+  *\return Whether the Stategy is still playing
+  */
 
 bool Strategy::StillPlaying() const
 {
@@ -1246,6 +1325,13 @@ bool Strategy::StillPlaying() const
 
     return (true);
 }
+
+/**
+  * Update statistcs on the last simluation run.
+  *
+  * Record the win or loss and the nuber of dice rolls.
+  *
+  */
 
 void Strategy::UpdateStatistics()
 {
@@ -1269,6 +1355,14 @@ void Strategy::UpdateStatistics()
     }
 }
 
+/**
+  * Resets the Strategy for a new simulation run.
+  *
+  * Sets to zero the counts.  Resets the standard wager and odds.
+  * Calls Money.Reset().
+  *
+  */
+
 void Strategy::Reset()
 {
     m_nNumberOfPassBetsMade  = 0;
@@ -1285,6 +1379,13 @@ void Strategy::Reset()
 
     m_cMoney.Reset();
 }
+
+/**
+  * Generates a muster of the strategy.
+  *
+  * Prints a listing of the Strategy's settings.
+  *
+  */
 
 void Strategy::Muster()
 {
@@ -1341,6 +1442,14 @@ void Strategy::Muster()
 
         std::cout << std::endl;
 }
+
+/**
+  * Report results of simulation.
+  *
+  * Presents details of the strategy's success, including win percentage
+  * and a average rolls to win or lose.
+  *
+  */
 
 void Strategy::Report()
 {

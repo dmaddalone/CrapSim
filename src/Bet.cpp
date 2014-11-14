@@ -138,6 +138,7 @@ int Bet::CalculatePayoff ()
                 default:
                     break;
             }
+
         case BetType::TYPE_BIG_8:
             switch (Point())
             {
@@ -147,6 +148,7 @@ int Bet::CalculatePayoff ()
                 default:
                     break;
             }
+
         case BetType::TYPE_ANY_7:
             switch (Point())
             {
@@ -156,6 +158,7 @@ int Bet::CalculatePayoff ()
                 default:
                     break;
             }
+
         case BetType::TYPE_ANY_CRAPS:
             switch (Point())
             {
@@ -163,6 +166,46 @@ int Bet::CalculatePayoff ()
                 case 3:
                 case 12:
                     return (m_nWager * 7);          // 7:1
+                    break;
+                default:
+                    break;
+            }
+
+        case BetType::TYPE_CRAPS_2:
+            switch (Point())
+            {
+                case 2:
+                    return (m_nWager * 30);         // 30:1
+                    break;
+                default:
+                    break;
+            }
+
+        case BetType::TYPE_CRAPS_3:
+            switch (Point())
+            {
+                case 3:
+                    return (m_nWager * 15);         // 15:1
+                    break;
+                default:
+                    break;
+            }
+
+        case BetType::TYPE_YO_11:
+            switch (Point())
+            {
+                case 11:
+                    return (m_nWager * 15);         // 15:1
+                    break;
+                default:
+                    break;
+            }
+
+        case BetType::TYPE_CRAPS_12:
+            switch (Point())
+            {
+                case 12:
+                    return (m_nWager * 30);         // 30:1
                     break;
                 default:
                     break;
