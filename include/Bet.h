@@ -71,19 +71,28 @@ class Bet
         bool IsDontComeBet() const              { return (m_ecType == BetType::TYPE_DONT_COME); }
         bool IsDontComeOddsBet() const          { return (m_ecType == BetType::TYPE_DONT_COME_ODDS); }
         bool IsPlaceBet() const                 { return (m_ecType == BetType::TYPE_PLACE); }
-        bool IsFieldBet() const                 { return (m_ecType == BetType::TYPE_FIELD); }
         bool IsBig6Bet() const                  { return (m_ecType == BetType::TYPE_BIG_6); }
         bool IsBig8Bet() const                  { return (m_ecType == BetType::TYPE_BIG_8); }
+        bool IsBigBet() const                   { return (IsBig6Bet() || IsBig8Bet()); }
         bool IsHard4() const                    { return (m_ecType == BetType::TYPE_HARD_4); }
         bool IsHard6() const                    { return (m_ecType == BetType::TYPE_HARD_6); }
         bool IsHard8() const                    { return (m_ecType == BetType::TYPE_HARD_8); }
         bool IsHard10() const                   { return (m_ecType == BetType::TYPE_HARD_10); }
+        bool IsFieldBet() const                 { return (m_ecType == BetType::TYPE_FIELD); }
         bool IsAny7Bet() const                  { return (m_ecType == BetType::TYPE_ANY_7); }
         bool IsAnyCrapsBet() const              { return (m_ecType == BetType::TYPE_ANY_CRAPS); }
         bool IsCraps2Bet() const                { return (m_ecType == BetType::TYPE_CRAPS_2); }
         bool IsCraps3Bet() const                { return (m_ecType == BetType::TYPE_CRAPS_3); }
         bool IsYo11Bet() const                  { return (m_ecType == BetType::TYPE_YO_11); }
         bool IsCraps12Bet() const               { return (m_ecType == BetType::TYPE_CRAPS_12); }
+        bool IsOneRollBet() const               { return (IsFieldBet() ||
+                                                            IsAny7Bet() ||
+                                                            IsAnyCrapsBet() ||
+                                                            IsCraps2Bet() ||
+                                                            IsCraps3Bet() ||
+                                                            IsYo11Bet() ||
+                                                            IsCraps12Bet()); }
+
 
         // Set and return whether come odds are working on the come out
         bool ComeOddsAreWorking() const         { return (m_bComeOddsAreWorking); }

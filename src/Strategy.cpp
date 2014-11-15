@@ -174,7 +174,6 @@ void Strategy::SetAggressive()
     if (m_sDescription.empty()) SetDescription("Pass and either: 1) three Comes or 2) two Comes and one Place, double odds to start");
 }
 
-
 /**
   * Check and correct a Strategy's settings to conform to the Table.
   *
@@ -185,7 +184,7 @@ void Strategy::SetAggressive()
   * An example: Strategy's standard wager must be less than or eaual to the
   * Table's minimum bet.
   *
-  * Ensure bet settings make sense.  An example: the numbe of Place bets made
+  * Ensure bet settings make sense.  An example: the number of Place bets made
   * at one time cannot exceed the number of total Place bets.
   *
   *
@@ -194,8 +193,6 @@ void Strategy::SetAggressive()
 
 void Strategy::SanityCheck(const Table &cTable)
 {
-    std::cout << "Sanity-checking the Strategies." << std::endl;
-
     // Ensure that Strategy's standard wager is no less than Table minimum and no more than Table maximum
     if (m_nStandardWager < cTable.MinimumBet())
     {
@@ -221,16 +218,14 @@ void Strategy::SanityCheck(const Table &cTable)
         m_nNumberOfPlaceBetsMadeAtOnce = 1;
     }
 
-    std::cout << "Sanity-check complete." << std::endl;
-
     // TODO: if not bets selected, discard strategy
 }
 
 /**
   * Make Bets.
   *
-  * Call each bet type.
-  * If tracking results, call StrategyTracker.
+  * Call each bet type.  MakeXXXBet create and push a Bet onto the bets
+  * container. If tracking results, call StrategyTracker.
   *
   *\param cTable The Table.
   */
@@ -264,10 +259,10 @@ void Strategy::MakeBets(const Table &cTable)
 /**
   * Resolve Bets.
   *
-  * Call each bet type.
-  * If tracking results, call StrategyTracker.
-  * If Odds Progression is set, compare before and after bankroll
-  * and adjust accordingly.
+  * Check to see if the Strategy is sill playing.  If so, Loop through all bets
+  * and call each bet type. If the bet is resolved, remove the bet from the
+  * bets container.If tracking results, call StrategyTracker. If Odds
+  * Progression is set, compare before and after bankroll and adjust accordingly.
   *
   *\param cTable The Table.
   *\param cDice The Dice.
@@ -283,26 +278,36 @@ void Strategy::ResolveBets(const Table &cTable, const Dice &cDice)
         // Increment number of rolls
         m_nNumberOfRolls++;
 
+        bool bBetResolved;
         // Resolve all bets
-        ResolvePass(cDice);
-        ResolvePassOdds(cTable, cDice);
+        std::list<Bet>::iterator it = m_lBets.begin();
+        while(it != m_lBets.end())
+        {
+            bBetResolved = false;
 
-        ResolveCome(cDice);
-        ResolveComeOdds(cTable, cDice);
+            if (it->IsPassBet())         bBetResolved = ResolvePass(it, cDice) || bBetResolved;
+            if (it->IsPassOddsBet())     bBetResolved = ResolvePassOdds(it, cTable, cDice) || bBetResolved;
 
-        ResolveDontPass(cDice);
-        ResolveDontPassOdds(cTable, cDice);
+            if (it->IsComeBet())         bBetResolved = ResolveCome(it, cDice) || bBetResolved;
+            if (it->IsComeOddsBet())     bBetResolved = ResolveComeOdds(it, cTable, cDice) || bBetResolved;
 
-        ResolveDontCome(cDice);
-        ResolveDontComeOdds(cDice);
+            if (it->IsDontPassBet())     bBetResolved = ResolveDontPass(it, cDice) || bBetResolved;
+            if (it->IsDontPassOddsBet()) bBetResolved = ResolveDontPassOdds(it, cTable, cDice) || bBetResolved;
 
-        ResolvePlace(cTable, cDice);
+            if (it->IsDontComeBet())     bBetResolved = ResolveDontCome(it, cDice) || bBetResolved;
+            if (it->IsDontComeOddsBet()) bBetResolved = ResolveDontComeOdds(it, cDice) || bBetResolved;
 
-        //ResolveField(cDice);
+            if (it->IsPlaceBet())        bBetResolved = ResolvePlace(it, cTable, cDice) || bBetResolved;
 
-        ResolveBig(cDice);
+            if (it->IsBigBet())          bBetResolved = ResolveBig(it, cDice) || bBetResolved;
 
-        ResolveOneRollBets(cDice);
+            if (it->IsOneRollBet())      bBetResolved = ResolveOneRollBets(it, cDice) || bBetResolved;
+
+            if (bBetResolved)
+                it = m_lBets.erase(it);  // Remove Bet
+            else
+                it++;
+        }
 
         if (m_bOddsProgression)
         {
@@ -323,7 +328,7 @@ void Strategy::ResolveBets(const Table &cTable, const Dice &cDice)
 /**
   * Make a Pass Bet.
   *
-  * If Table is coming out, make a Pass bet.
+  * If Table is coming out, make a Pass bet and add it to bets container.
   *
   * INI File:
   * PassBet=1
@@ -352,7 +357,7 @@ void Strategy::MakePassBet(const Table &cTable)
 /**
   * Make a Don't Pass Bet.
   *
-  * If Table is coming out, make a Don't Pass bet.
+  * If Table is coming out, make a Don't Pass bet and add it to bets container.
   *
   * INI File:
   * DontPassBet=1
@@ -381,7 +386,8 @@ void Strategy::MakeDontPassBet(const Table &cTable)
 /**
   * Make a Come Bet.
   *
-  * If Table is not coming out, make a Don't Pass bet.
+  * If Table is not coming out, make a Don't Pass bet and add it to bets
+  * container.
   *
   * INI File:
   * ComeBets=[0-6]
@@ -408,9 +414,10 @@ void Strategy::MakeComeBet(const Table &cTable)
 }
 
 /**
-  * Make a Don't ome Bet.
+  * Make a Don't Come Bet.
   *
-  * If Table is not coming out, make a Don't Come bet.
+  * If Table is not coming out, make a Don't Come bet and add it to bets
+  * container.
   *
   * INI File:
   * DontComeBets=[0-6]
@@ -440,7 +447,7 @@ void Strategy::MakeDontComeBet(const Table &cTable)
   * Make an Odds Bet.
   *
   * Loop through the bets.  If a bet may have an odds bet and it has not yet
-  * been made, make it.
+  * been made, make it and add it to bets container.
   *
   * INI File:
   * StandardOdds=[0-9]+\.[0-9]
@@ -613,7 +620,7 @@ int Strategy::OddsBetFullPayoffWager(const int nWager, const int nPointNumber)
 /**
   * Make a Place Bets.
   *
-  * Make Place bets.
+  * Check conditions for making a Place bet.  If right, Make a Place bet.
   *
   * INI File:
   * PlaceBets=[0-6]
@@ -676,7 +683,7 @@ void Strategy::MakePlaceBets(const Table &cTable)
 /**
   * Make a Place Bet.
   *
-  * Make a Place bet.
+  * Make a Place bet and add it to bets container.
   *
   * INI File:
   * PlaceBetUnits=[1-infinity]
@@ -794,7 +801,7 @@ bool Strategy::SixOrEightCovered()
 /**
   * Make a Field Bet.
   *
-  * Make a Field Bet.
+  * Make a Field Bet and add it to bets container.
   *
   * INI File:
   * FieldBet=true|false
@@ -824,7 +831,7 @@ void Strategy::MakeFieldBet()
 /**
   * Make a Big Bet.
   *
-  * Make a Big 6 and/or 8 Bet.
+  * Make a Big 6 and/or 8 Bet and add it to bets container.
   *
   * INI File:
   * Big6Bet=true|false
@@ -856,7 +863,7 @@ void Strategy::MakeBigBet()
   * Make One Roll Bets.
   *
   * Make one roll bets: Field, Any 7, Any Craps, Craps 2, Craps 3, Yo 11, and
-  * Craps 12.
+  * Craps 12. Add it to bets container.
   *
   * INI File:
   * FieldBet=true|false
@@ -966,57 +973,45 @@ void Strategy::MakeOneRollBets()
   *\param cDice The Dice.
   */
 
-void Strategy::ResolvePass(const Dice &cDice)
+bool Strategy::ResolvePass(std::list<Bet>::iterator &it, const Dice &cDice)
 {
-    std::list<Bet>::iterator it = m_lBets.begin();
-    while(it != m_lBets.end())
-    {
-        if (it->IsPassBet())                                    // Pass Bet?
-        {
-            if (it->OnTheComeOut())                                 // Pass Bet On the Come Out?
-            {
-                if (cDice.IsCraps())                                    // Pass Bet On the Come Out and a Craps Roll?
-                {
-                    m_nNumberOfPassBetsMade--;
-                    it = m_lBets.erase(it);                                 // Remove Bet
+    bool bBetResolved = false;
 
-                }
-                else if (cDice.IsNatural())                             // PassBet One the Come Out and a Natural Roll?
-                {
-                    m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
-                    m_nNumberOfPassBetsMade--;
-                    it = m_lBets.erase(it);                                 // Remove Bet
-                }
-                else                                                    // Pass Bet on the Come Out = Set Point
-                {
-                    it->SetPoint(cDice.RollValue());                        // Set Point
-                    it++;
-                }
-            }
-            else                                                    // Pass Bet, but not on the Come Out
-            {
-                if (cDice.IsSeven())                                    // Pass Bet, but not on the Come Out and Seven Roll?
-                {
-                    m_nNumberOfPassBetsMade--;
-                    it = m_lBets.erase(it);                                 // Remove Bet
-                }
-                else if (it->Point() == cDice.RollValue())              // Pass Bet, but not on the Come Out and Hit the Point?
-                {
-                    m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
-                    m_nNumberOfPassBetsMade--;
-                    it = m_lBets.erase(it);                                 // Remove Bet
-                }
-                else                                                    // Pass Bet, but not on the Come Out = no impact
-                {
-                    it++;
-                }
-            }
-        }
-        else // Not a Pass Bet
+    if (it->OnTheComeOut())                                 // Pass Bet On the Come Out?
+    {
+        if (cDice.IsCraps())                                    // Pass Bet On the Come Out and a Craps Roll?
         {
-            it++;
+            m_nNumberOfPassBetsMade--;
+            bBetResolved = true;                                // Bet resolved
+        }
+        else if (cDice.IsNatural())                             // PassBet One the Come Out and a Natural Roll?
+        {
+            m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
+            m_nNumberOfPassBetsMade--;
+            bBetResolved = true;                                // Bet resolved
+        }
+        else                                                    // Pass Bet on the Come Out = Set Point
+        {
+            it->SetPoint(cDice.RollValue());                        // Set Point
         }
     }
+    else                                                    // Pass Bet, but not on the Come Out
+    {
+        if (cDice.IsSeven())                                    // Pass Bet, but not on the Come Out and Seven Roll?
+        {
+            m_nNumberOfPassBetsMade--;
+            bBetResolved = true;                                // Bet resolved
+        }
+        else if (it->Point() == cDice.RollValue())              // Pass Bet, but not on the Come Out and Hit the Point?
+        {
+            m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
+            m_nNumberOfPassBetsMade--;
+            //it = m_lBets.erase(it);                                 // Remove Bet
+            bBetResolved = true;                                // Bet resolved
+        }
+    }
+
+    return (bBetResolved);
 }
 
 /**
@@ -1028,63 +1023,48 @@ void Strategy::ResolvePass(const Dice &cDice)
   *\param cDice The Dice.
   */
 
-void Strategy::ResolveDontPass(const Dice &cDice)
+bool Strategy::ResolveDontPass(std::list<Bet>::iterator &it, const Dice &cDice)
 {
-    std::list<Bet>::iterator it = m_lBets.begin();
-    while(it != m_lBets.end())
+    bool bBetResolved = false;
+
+    if (it->OnTheComeOut())                                 // Dont Pass Bet On the Come Out?
     {
-        if (it->IsDontPassBet())                                    // Dont Pass Bet?
+        if (cDice.IsCraps())                                    // Dont Pass Bet On the Come Out and a Craps Roll?
         {
-            if (it->OnTheComeOut())                                 // Dont Pass Bet On the Come Out?
+            if (!cDice.IsBar())                                     // Dont Pass Bet On the Come Out and a Craps Roll and it's not a bar dice roll
             {
-                if (cDice.IsCraps())                                    // Dont Pass Bet On the Come Out and a Craps Roll?
-                {
-                    if (!cDice.IsBar())                                     // Dont Pass Bet On the Come Out and a Craps Roll and it's not a bar dice roll
-                    {
-                        m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
-                        m_nNumberOfDontPassBetsMade--;
-                        it = m_lBets.erase(it);                                 // Remove Bet
-                    }
-                    else                                                    // Dont Pass Bet On the Come Out and a Craps Roll and it is a bar dice roll
-                    {
-                        it++;                                                   // Push
-                    }
-                }
-                else if (cDice.IsNatural())                             // Dont Pass Bet One the Come Out and a Natural Roll?
-                {
-                    m_nNumberOfDontPassBetsMade--;
-                    it = m_lBets.erase(it);                                 // Remove Bet
-                }
-                else                                                    // Dont Pass Bet on the Come Out = Set Point
-                {
-                    it->SetPoint(cDice.RollValue());                        // Set Point
-                    it++;
-                }
+                m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
+                m_nNumberOfDontPassBetsMade--;
+                bBetResolved = true;
             }
-            else                                                    // Dont Pass Bet, but not on the Come Out
-            {
-                if (cDice.IsSeven())                                    // Dont Pass Bet, but not on the Come Out and Seven Roll?
-                {
-                    m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
-                    m_nNumberOfDontPassBetsMade--;
-                    it = m_lBets.erase(it);                                 // Remove Bet
-                }
-                else if (it->Point() == cDice.RollValue())              // Dont Pass Bet, but not on the Come Out and Hit the Point?
-                {
-                    m_nNumberOfDontPassBetsMade--;
-                    it = m_lBets.erase(it);                                 // Remove Bet
-                }
-                else                                                    // Dont Pass Bet, but not on the Come Out and no impact
-                {
-                    it++;
-                }
-            }
+
         }
-        else // Not a Dont Pass Bet
+        else if (cDice.IsNatural())                             // Dont Pass Bet One the Come Out and a Natural Roll?
         {
-            it++;
+            m_nNumberOfDontPassBetsMade--;
+            bBetResolved = true;
+        }
+        else                                                    // Dont Pass Bet on the Come Out = Set Point
+        {
+            it->SetPoint(cDice.RollValue());                        // Set Point
         }
     }
+    else                                                    // Dont Pass Bet, but not on the Come Out
+    {
+        if (cDice.IsSeven())                                    // Dont Pass Bet, but not on the Come Out and Seven Roll?
+        {
+            m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
+            m_nNumberOfDontPassBetsMade--;
+            bBetResolved = true;
+        }
+        else if (it->Point() == cDice.RollValue())              // Dont Pass Bet, but not on the Come Out and Hit the Point?
+        {
+            m_nNumberOfDontPassBetsMade--;
+            bBetResolved = true;
+        }
+    }
+
+    return (bBetResolved);
 }
 
 /**
@@ -1096,57 +1076,44 @@ void Strategy::ResolveDontPass(const Dice &cDice)
   *\param cDice The Dice.
   */
 
-void Strategy::ResolveCome(const Dice &cDice)
+bool Strategy::ResolveCome(std::list<Bet>::iterator &it, const Dice &cDice)
 {
-    std::list<Bet>::iterator it = m_lBets.begin();
-    while(it != m_lBets.end())
-    {
-        if (it->IsComeBet())                                    // Come Bet?
-        {
-            if (it->OnTheComeOut())                                 // Come Bet On the Come Out?
-            {
-                if (cDice.IsCraps())                                    // Come Bet On the Come Out and a Craps Roll?
-                {
-                    m_nNumberOfComeBetsMade--;
-                    it = m_lBets.erase(it);                                 // Remove Bet
-                }
-                else if (cDice.IsNatural())                             // Come Bet On the Come Out and a Natural Roll?
-                {
-                    m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
-                    m_nNumberOfComeBetsMade--;
-                    it = m_lBets.erase(it);                                 // Remove Bet
+    bool bBetResolved = false;
 
-                }
-                else                                                    // Come Bet On the Come Out = Point Roll
-                {
-                    it->SetPoint(cDice.RollValue());                        // Set Point
-                    it++;
-                }
-            }
-            else                                                    // Come Bet, but not on the Come Out
-            {
-                if (cDice.IsSeven())                                    // Come Bet, but not on the Come Out and a Seven Roll?
-                {
-                    m_nNumberOfComeBetsMade--;
-                    it = m_lBets.erase(it);                                 // Remove Bet
-                }
-                else if (it->Point() == cDice.RollValue())           //  Come Bet, but not on the Come Out and Hit the Point?
-                {
-                    m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
-                    m_nNumberOfComeBetsMade--;
-                    it = m_lBets.erase(it);                                 // Remove Bet
-                }
-                else                                                //  Come Bet, but not on the Come Ouy, and no impact
-                {
-                    it++;
-                }
-            }
-        }
-        else                                                    // Not a Come Bet
+    if (it->OnTheComeOut())                                 // Come Bet On the Come Out?
+    {
+        if (cDice.IsCraps())                                    // Come Bet On the Come Out and a Craps Roll?
         {
-            it++;
+            m_nNumberOfComeBetsMade--;
+            bBetResolved = true;
+        }
+        else if (cDice.IsNatural())                             // Come Bet On the Come Out and a Natural Roll?
+        {
+            m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
+            m_nNumberOfComeBetsMade--;
+            bBetResolved = true;
+        }
+        else                                                    // Come Bet On the Come Out = Point Roll
+        {
+            it->SetPoint(cDice.RollValue());                        // Set Point
         }
     }
+    else                                                    // Come Bet, but not on the Come Out
+    {
+        if (cDice.IsSeven())                                    // Come Bet, but not on the Come Out and a Seven Roll?
+        {
+            m_nNumberOfComeBetsMade--;
+            bBetResolved = true;
+        }
+        else if (it->Point() == cDice.RollValue())           //  Come Bet, but not on the Come Out and Hit the Point?
+        {
+            m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
+            m_nNumberOfComeBetsMade--;
+            bBetResolved = true;
+        }
+    }
+
+    return (bBetResolved);
 }
 
 /**
@@ -1158,63 +1125,48 @@ void Strategy::ResolveCome(const Dice &cDice)
   *\param cDice The Dice.
   */
 
-void Strategy::ResolveDontCome(const Dice &cDice)
+bool Strategy::ResolveDontCome(std::list<Bet>::iterator &it, const Dice &cDice)
 {
-    std::list<Bet>::iterator it = m_lBets.begin();
-    while(it != m_lBets.end())
+    bool bBetResolved = false;
+
+    if (it->OnTheComeOut())                                 // Dont Come Bet On the Come Out?
     {
-        if (it->IsDontComeBet())                                    // Dont Come Bet?
+        if (cDice.IsCraps())                                    // Dont Come Bet On the Come Out and a Craps Roll?
         {
-            if (it->OnTheComeOut())                                 // Dont Come Bet On the Come Out?
+            if (!cDice.IsBar())                                     // It not a bar dice roll
             {
-                if (cDice.IsCraps())                                    // Dont Come Bet On the Come Out and a Craps Roll?
-                {
-                    if (!cDice.IsBar())                                     // It not a bar dice roll
-                    {
-                        m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
-                        m_nNumberOfDontComeBetsMade--;
-                        it = m_lBets.erase(it);                                 // Remove Bet
-                    }
-                    else
-                    {
-                        it++;
-                    }
-                }
-                else if (cDice.IsNatural())                             // Dont Come Bet On the Come Out and a Natural Roll?
-                {
-                    m_nNumberOfDontComeBetsMade--;
-                    it = m_lBets.erase(it);                                 // Remove Bet
-                }
-                else                                                    // Dont Come Bet On the Come Out = Point Roll
-                {
-                    it->SetPoint(cDice.RollValue());                        // Set Point
-                    it++;
-                }
-            }
-            else                                                    // Dont Come Bet, but not on the Come Out
-            {
-                if (cDice.IsSeven())                                    // Dont Come Bet, but not on the Come Out and a Seven Roll?
-                {
-                    m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
-                    m_nNumberOfDontComeBetsMade--;
-                    it = m_lBets.erase(it);                                 // Remove Bet
-                }
-                else if (it->Point() == cDice.RollValue())           //  Dont Come Bet, but not on the Come Out and Hit the Point?
-                {
-                    m_nNumberOfDontComeBetsMade--;
-                    it = m_lBets.erase(it);                                 // Remove Bet
-                }
-                else                                                //  Dont Come Bet, but not on the Come Ouy, and no impact
-                {
-                    it++;
-                }
+                m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
+                m_nNumberOfDontComeBetsMade--;
+                bBetResolved = true;
             }
         }
-        else                                                    // Not a Come Bet
+        else if (cDice.IsNatural())                             // Dont Come Bet On the Come Out and a Natural Roll?
         {
-            it++;
+            m_nNumberOfDontComeBetsMade--;
+            bBetResolved = true;
+        }
+        else                                                    // Dont Come Bet On the Come Out = Point Roll
+        {
+            it->SetPoint(cDice.RollValue());                        // Set Point
         }
     }
+    else                                                    // Dont Come Bet, but not on the Come Out
+    {
+        if (cDice.IsSeven())                                    // Dont Come Bet, but not on the Come Out and a Seven Roll?
+        {
+            m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
+            m_nNumberOfDontComeBetsMade--;
+            bBetResolved = true;
+        }
+        else if (it->Point() == cDice.RollValue())           //  Dont Come Bet, but not on the Come Out and Hit the Point?
+        {
+            m_nNumberOfDontComeBetsMade--;
+            bBetResolved = true;
+        }
+
+    }
+
+    return (bBetResolved);
 }
 
 /**
@@ -1227,34 +1179,23 @@ void Strategy::ResolveDontCome(const Dice &cDice)
   *\param cDice The Dice.
   */
 
-void Strategy::ResolvePassOdds(const Table &cTable, const Dice &cDice)
+bool Strategy::ResolvePassOdds(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice)
 {
-    std::list<Bet>::iterator it = m_lBets.begin();
-    while(it != m_lBets.end())
-    {
-        if (it->IsPassOddsBet())                                // Pass Odss Bet?
-        {
-            assert (cTable.IsComingOutRoll() == false);             // Test - There should not be a Pass Odds bet if this is coming out roll
+    bool bBetResolved = false;
 
-            if (cDice.IsSeven())                                    // Pass Odds Bets and a Seven Roll?
-            {
-                it = m_lBets.erase(it);                                 // Remove Bet
-            }
-            else if (it->Point() == cDice.RollValue())               // Pass Odds Bet and Hit the Point?
-            {
-                m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
-                it = m_lBets.erase(it);                                 // Remove Bet
-            }
-            else                                                     // Pass Odds Bet, but no impact
-            {
-                it++;
-            }
-        }
-        else                                                    // Not a Pass Odss Bet
-        {
-            it++;
-        }
+    assert (cTable.IsComingOutRoll() == false);             // Test - There should not be a Pass Odds bet if this is coming out roll
+
+    if (cDice.IsSeven())                                    // Pass Odds Bets and a Seven Roll?
+    {
+        bBetResolved = true;
     }
+    else if (it->Point() == cDice.RollValue())               // Pass Odds Bet and Hit the Point?
+    {
+        m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
+        bBetResolved = true;
+    }
+
+    return (bBetResolved);
 }
 
 /**
@@ -1267,34 +1208,23 @@ void Strategy::ResolvePassOdds(const Table &cTable, const Dice &cDice)
   *\param cDice The Dice.
   */
 
-void Strategy::ResolveDontPassOdds(const Table &cTable, const Dice &cDice)
+bool Strategy::ResolveDontPassOdds(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice)
 {
-    std::list<Bet>::iterator it = m_lBets.begin();
-    while(it != m_lBets.end())
-    {
-        if (it->IsDontPassOddsBet())                                // Dont Pass Odss Bet?
-        {
-            assert (cTable.IsComingOutRoll() == false);             // Test - There should not be a Pass Odds bet if this is coming out roll
+    bool bBetResolved = false;
 
-            if (cDice.IsSeven())                                    // Dont Pass Odds Bets and a Seven Roll?
-            {
-                m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
-                it = m_lBets.erase(it);                                 // Remove Bet
-            }
-            else if (it->Point() == cDice.RollValue())               // Dont Pass Odds Bet and Hit the Point?
-            {
-                it = m_lBets.erase(it);                                 // Remove Bet
-            }
-            else                                                     // Dont Pass Odds Bet, but no impact
-            {
-                it++;
-            }
-        }
-        else                                                    // Not a Dont Pass Odss Bet
-        {
-            it++;
-        }
+    assert (cTable.IsComingOutRoll() == false);             // Test - There should not be a Pass Odds bet if this is coming out roll
+
+    if (cDice.IsSeven())                                    // Dont Pass Odds Bets and a Seven Roll?
+    {
+        m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
+        bBetResolved = true;
     }
+    else if (it->Point() == cDice.RollValue())               // Dont Pass Odds Bet and Hit the Point?
+    {
+        bBetResolved = true;
+    }
+
+    return (bBetResolved);
 }
 
 /**
@@ -1303,80 +1233,63 @@ void Strategy::ResolveDontPassOdds(const Table &cTable, const Dice &cDice)
   * Loop through all bets looking for a Come Odds Bet.  Resolve based on
   * the state of the bet, the table, and the dice.
   *
+  * INI File:
+  * ComeOddsWorking=true|false
+  *
   *\param cTable The Table.
   *\param cDice The Dice.
   */
 
-void Strategy::ResolveComeOdds(const Table &cTable, const Dice &cDice)
+bool Strategy::ResolveComeOdds(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice)
 {
-    std::list<Bet>::iterator it = m_lBets.begin();
-    while(it != m_lBets.end())
+    bool bBetResolved = false;
+
+    if (cTable.IsComingOutRoll())                           // Come Odds Bet and Come Out Roll for the Table?
     {
-        if (it->IsComeOddsBet())                                // Come Odds Bet?
+        if (it->ComeOddsAreWorking())                           // Come Odds Bet, Come Out Roll for the Table, and are odds working on the Come Out Roll?
         {
-            if (cTable.IsComingOutRoll())                           // Come Odds Bet and Come Out Roll for the Table?
+            if (cDice.IsSeven())                                    // Come Odds Bet, Come Out Roll for the Table, and odss working, and a Seven Roll?
             {
-                if (it->ComeOddsAreWorking())                           // Come Odds Bet, Come Out Roll for the Table, and are odds working on the Come Out Roll?
-                {
-                    if (cDice.IsSeven())                                    // Come Odds Bet, Come Out Roll for the Table, and odss working, and a Seven Roll?
-                    {
-                        it = m_lBets.erase(it);                                 // Remove Bet
-                    }
-
-                    else if (it->Point() == cDice.RollValue())              // Come Odds Bet, Come Out Roll for the Table, and odss working, and Hit the Point?
-                    {
-                        m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
-                        it = m_lBets.erase(it);                                 // Remove Bet
-                    }
-                    else                                                    // Come Odds Bet, Come Out Roll for the Table, and odss working, and no impact
-                    {
-                        it++;
-                    }
-                }
-
-                else                                                    // Come Odds Bet, Come Out Roll for the Table, and odds are NOT working on the Come Out Roll?
-                {
-                    if (cDice.IsSeven())                                    // Come Odds Bet, Come Out Roll for the Table,  odds are NOT working on the Come Out Roll, and Seven Roll?
-                    {
-                        m_cMoney.Increment(it->Wager());                        // Return wager
-                        it = m_lBets.erase(it);                                 // Remove Bet
-                    }
-
-                    else if (it->Point() == cDice.RollValue())              // Come Odds Bet, Come Out Roll for the Table, odds are NOT working on the Come Out Roll, and Hit the Point?
-                    {
-                        m_cMoney.Increment(it->Wager());                        // Return wager
-                        it = m_lBets.erase(it);                                 // Remove Bet
-                    }
-                    else                                                    // Come Odds Bet, Come Out Roll for the Table, odds are NOT working on the Come Out Roll, and no impact
-                    {
-                        it++;
-                    }
-                }
+                bBetResolved = true;
             }
 
-            else                                                    // Come Odds Bet, but not on Come Out Roll for the Table
+            else if (it->Point() == cDice.RollValue())              // Come Odds Bet, Come Out Roll for the Table, and odss working, and Hit the Point?
             {
-                if (cDice.IsSeven())                                    // Come Odds Bet, but not on Come Out Roll for the Table, and a Seven Roll?
-                {
-                    it = m_lBets.erase(it);                                 // Remove Bet
-                }
-
-                else if (it->Point() == cDice.RollValue())              // Come Odds Bet, but not on Come Out Roll for the Table, and Hit the Point?
-                {
-                    m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
-                    it = m_lBets.erase(it);                                 // Remove Bet
-                }
-                else                                                    // Come Odds Bet, but not on Come Out Roll for the Table, and no impact
-                {
-                    it++;
-                }
+                m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
+                bBetResolved = true;
             }
         }
-        else                                                    // Not a Come Odds Bet
+
+        else                                                    // Come Odds Bet, Come Out Roll for the Table, and odds are NOT working on the Come Out Roll?
         {
-            it++;
+            if (cDice.IsSeven())                                    // Come Odds Bet, Come Out Roll for the Table,  odds are NOT working on the Come Out Roll, and Seven Roll?
+            {
+                m_cMoney.Increment(it->Wager());                        // Return wager
+                bBetResolved = true;
+            }
+            else if (it->Point() == cDice.RollValue())              // Come Odds Bet, Come Out Roll for the Table, odds are NOT working on the Come Out Roll, and Hit the Point?
+            {
+                m_cMoney.Increment(it->Wager());                        // Return wager
+                bBetResolved = true;
+            }
         }
     }
+
+    else                                                    // Come Odds Bet, but not on Come Out Roll for the Table
+    {
+        if (cDice.IsSeven())                                    // Come Odds Bet, but not on Come Out Roll for the Table, and a Seven Roll?
+        {
+            bBetResolved = true;
+        }
+
+        else if (it->Point() == cDice.RollValue())              // Come Odds Bet, but not on Come Out Roll for the Table, and Hit the Point?
+        {
+            m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
+            bBetResolved = true;
+        }
+    }
+
+    return(bBetResolved);
 }
 
 /**
@@ -1388,33 +1301,22 @@ void Strategy::ResolveComeOdds(const Table &cTable, const Dice &cDice)
   *\param cDice The Dice.
   */
 
-void Strategy::ResolveDontComeOdds(const Dice &cDice)
+bool Strategy::ResolveDontComeOdds(std::list<Bet>::iterator &it, const Dice &cDice)
 {
-    std::list<Bet>::iterator it = m_lBets.begin();
-    while(it != m_lBets.end())
-    {
-        if (it->IsDontComeOddsBet())                                // Dont Come Odds Bet?
-        {
-            if (cDice.IsSeven())                                        // Dont Come Odds Bet and a Seven Roll?
-            {
-                it = m_lBets.erase(it);                                     // Remove Bet
-            }
+    bool bBetResolved = false;
 
-            else if (it->Point() == cDice.RollValue())                  // Dont Come Odds Bet and Hit the Point?
-            {
-                m_cMoney.Increment(it->Wager() + it->CalculatePayoff());    // Payoff
-                it = m_lBets.erase(it);                                     // Remove Bet
-            }
-            else                                                        // Dont Come Odds Bet and no impact
-            {
-                it++;
-            }
-        }
-        else                                                        // Not a Dont Come Odds Bet
-        {
-            it++;
-        }
+    if (cDice.IsSeven())                                        // Dont Come Odds Bet and a Seven Roll?
+    {
+        bBetResolved = true;
     }
+
+    else if (it->Point() == cDice.RollValue())                  // Dont Come Odds Bet and Hit the Point?
+    {
+        m_cMoney.Increment(it->Wager() + it->CalculatePayoff());    // Payoff
+        bBetResolved = true;
+    }
+
+    return (bBetResolved);
 }
 
 /**
@@ -1427,50 +1329,33 @@ void Strategy::ResolveDontComeOdds(const Dice &cDice)
   *\param cDice The Dice.
   */
 
-void Strategy::ResolvePlace(const Table &cTable, const Dice &cDice)
+bool Strategy::ResolvePlace(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice)
 {
-    std::list<Bet>::iterator it = m_lBets.begin();
-    while(it != m_lBets.end())
+    bool bBetResolved = false;
+
+    if (!cTable.IsComingOutRoll())                          // Place Bets and not a come out roll for the table (Place bets are turned off on the come out roll)
     {
-        if (it->IsPlaceBet())                                   // Place Bet?
+        if (cDice.IsSeven())                                    // Place Bet and not a come out roll and a Seven Roll?
         {
-            if (!cTable.IsComingOutRoll())                          // Place Bets and not a come out roll for th etable (Place bets are turned off on the come out roll)
-            {
-                if (cDice.IsSeven())                                    // Place Bet and not a come out roll and a Seven Roll?
-                {
-                    // Set Place bet number to false (bet not made)
-                    m_mPlaceBets[it->Point()] = false;
-                    // Decrement the number of Place bets made
-                    m_nNumberOfPlaceBetsMade--;
-                    // Remove bet
-                    it = m_lBets.erase(it);                                 // Remove Bet
-                }
-                else if (it->Point() == cDice.RollValue())              // Place Bet and not a come out roll and Hit the Point?
-                {
-                    // Gather winnings
-                    m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
-                    // Set Place bet number to false (bet not made)
-                    m_mPlaceBets[it->Point()] = false;
-                    // Decrement the number of Place bets made
-                    m_nNumberOfPlaceBetsMade--;
-                    // Remove bet
-                    it = m_lBets.erase(it);                                 // Remove Bet
-                }
-                else                                                    // Place Bet and not a come out roll and no impact?
-                {
-                    it++;
-                }
-            }
-            else                                                    // Place Bets and a come out roll for the table
-            {
-                it++;
-            }
+            // Set Place bet number to false (bet not made)
+            m_mPlaceBets[it->Point()] = false;
+            // Decrement the number of Place bets made
+            m_nNumberOfPlaceBetsMade--;
+            bBetResolved = true;
         }
-        else                                                    // Not a Place Bet
+        else if (it->Point() == cDice.RollValue())              // Place Bet and not a come out roll and Hit the Point?
         {
-            it++;
+            // Gather winnings
+            m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
+            // Set Place bet number to false (bet not made)
+            m_mPlaceBets[it->Point()] = false;
+            // Decrement the number of Place bets made
+            m_nNumberOfPlaceBetsMade--;
+            bBetResolved = true;
         }
     }
+
+    return (bBetResolved);
 }
 
 /**
@@ -1482,55 +1367,41 @@ void Strategy::ResolvePlace(const Table &cTable, const Dice &cDice)
   *\param cDice The Dice.
   */
 
-void Strategy::ResolveBig(const Dice &cDice)
+bool Strategy::ResolveBig(std::list<Bet>::iterator &it, const Dice &cDice)
 {
-    std::list<Bet>::iterator it = m_lBets.begin();
-    while (it != m_lBets.end())
+    bool bBetResolved = false;
+
+    if (it->IsBig6Bet())                                        // Big 6 Bet?
     {
-        if (it->IsBig6Bet())                                        // Big 6 Bet?
+        if (cDice.IsSeven())                                        // Big 6 Bet and seven roll?
         {
-            if (cDice.IsSeven())                                        // Big 6 Bet and seven roll?
-            {
-                it = m_lBets.erase(it);                                     // Remove Bet
-            }
-
-            else if (cDice.IsSix())                                     // Big 6 Bet and a six roll?
-            {
-                it->SetPoint(cDice.RollValue());                            // Set the bet point to last dice roll value to make CalculatePayoff work
-                m_cMoney.Increment(it->Wager() + it->CalculatePayoff());    // Payoff
-                it = m_lBets.erase(it);                                     // Remove Bet
-            }
-
-            else
-            {
-                it++;                                                   // Big 6 Bet, but no impact
-            }
+            bBetResolved = true;
         }
 
-        else if (it->IsBig8Bet())                                   // Big 8 Bet?
+        else if (cDice.IsSix())                                     // Big 6 Bet and a six roll?
         {
-            if (cDice.IsSeven())                                        // Big 8 Bet and seven roll?
-            {
-                it = m_lBets.erase(it);                                     // Remove Bet
-            }
-
-            if (cDice.IsEight())                                    // Big 8 Bet and an eight roll?
-            {
-                it->SetPoint(cDice.RollValue());                            // Set the bet point to last dice roll value to make CalculatePayoff work
-                m_cMoney.Increment(it->Wager() + it->CalculatePayoff());    // Payoff
-                it = m_lBets.erase(it);                                     // Remove Bet
-            }
-
-            else
-            {
-                it++;                                               // Big 8 bet, but no impact
-            }
-        }
-        else                                                    // Not a Big 6 or 8 Bet
-        {
-            it++;
+            it->SetPoint(cDice.RollValue());                            // Set the bet point to last dice roll value to make CalculatePayoff work
+            m_cMoney.Increment(it->Wager() + it->CalculatePayoff());    // Payoff
+            bBetResolved = true;
         }
     }
+
+    else if (it->IsBig8Bet())                                   // Big 8 Bet?
+    {
+        if (cDice.IsSeven())                                        // Big 8 Bet and seven roll?
+        {
+            bBetResolved = true;
+        }
+
+        if (cDice.IsEight())                                    // Big 8 Bet and an eight roll?
+        {
+            it->SetPoint(cDice.RollValue());                            // Set the bet point to last dice roll value to make CalculatePayoff work
+            m_cMoney.Increment(it->Wager() + it->CalculatePayoff());    // Payoff
+            bBetResolved = true;
+        }
+    }
+
+    return(bBetResolved);
 }
 
 /**
@@ -1542,93 +1413,81 @@ void Strategy::ResolveBig(const Dice &cDice)
   *\param cDice The Dice.
   */
 
-void Strategy::ResolveOneRollBets(const Dice &cDice)
+bool Strategy::ResolveOneRollBets(std::list<Bet>::iterator &it, const Dice &cDice)
 {
-    std::list<Bet>::iterator it = m_lBets.begin();
-    while(it != m_lBets.end())
+    bool bBetResolved = false;
+
+    if (it->IsFieldBet())                                   // Field Bet?
     {
-        if (it->IsFieldBet())                                   // Field Bet?
+        if (cDice.IsField())                                    // Field Bet and Field Number Roll?
         {
-            if (cDice.IsField())                                    // Field Bet and Field Number Roll?
-            {
-                it->SetPoint(cDice.RollValue());                        // Set the bet point to last dice roll value to make CalculatePayoff work
-                m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
-            }
-
-            it = m_lBets.erase(it);                                 // Remove Bet
+            it->SetPoint(cDice.RollValue());                        // Set the bet point to last dice roll value to make CalculatePayoff work
+            m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
         }
-
-        else if (it->IsAny7Bet())                                   // Any 7 Bet?
-        {
-            if (cDice.IsSeven())                                    // Any 7 Bet and Field Number Roll?
-            {
-                it->SetPoint(cDice.RollValue());                        // Set the bet point to last dice roll value to make CalculatePayoff work
-                m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
-            }
-
-            it = m_lBets.erase(it);                                 // Remove Bet
-        }
-
-        else if (it->IsAnyCrapsBet())                           // Any Craps Bet?
-        {
-            if (cDice.IsCraps())
-            {
-                it->SetPoint(cDice.RollValue());
-                m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
-            }
-
-            it = m_lBets.erase(it);
-        }
-
-        else if (it->IsCraps2Bet())                           // Craps 2 Bet?
-        {
-            if (cDice.IsTwo())
-            {
-                it->SetPoint(cDice.RollValue());
-                m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
-            }
-
-            it = m_lBets.erase(it);
-        }
-
-        else if (it->IsCraps3Bet())                           // Craps 3 Bet?
-        {
-            if (cDice.IsThree())
-            {
-                it->SetPoint(cDice.RollValue());
-                m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
-            }
-
-            it = m_lBets.erase(it);
-        }
-
-        else if (it->IsYo11Bet())                           // Yo 11 Bet?
-        {
-            if (cDice.IsEleven())
-            {
-                it->SetPoint(cDice.RollValue());
-                m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
-            }
-
-            it = m_lBets.erase(it);
-        }
-
-        else if (it->IsCraps12Bet())                           // Craps 12 Bet?
-        {
-            if (cDice.IsTweleve())
-            {
-                it->SetPoint(cDice.RollValue());
-                m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
-            }
-
-            it = m_lBets.erase(it);
-        }
-
-        else                                                    // Not a one roll bet
-        {
-            it++;
-        }
+        bBetResolved = true;
     }
+
+    else if (it->IsAny7Bet())                                   // Any 7 Bet?
+    {
+        if (cDice.IsSeven())                                    // Any 7 Bet and Field Number Roll?
+        {
+            it->SetPoint(cDice.RollValue());                        // Set the bet point to last dice roll value to make CalculatePayoff work
+            m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
+        }
+        bBetResolved = true;
+    }
+
+    else if (it->IsAnyCrapsBet())                           // Any Craps Bet?
+    {
+        if (cDice.IsCraps())
+        {
+            it->SetPoint(cDice.RollValue());
+            m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
+        }
+        bBetResolved = true;
+    }
+
+    else if (it->IsCraps2Bet())                           // Craps 2 Bet?
+    {
+        if (cDice.IsTwo())
+        {
+            it->SetPoint(cDice.RollValue());
+            m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
+        }
+        bBetResolved = true;
+    }
+
+    else if (it->IsCraps3Bet())                           // Craps 3 Bet?
+    {
+        if (cDice.IsThree())
+        {
+            it->SetPoint(cDice.RollValue());
+            m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
+        }
+        bBetResolved = true;
+    }
+
+    else if (it->IsYo11Bet())                           // Yo 11 Bet?
+    {
+        if (cDice.IsEleven())
+        {
+            it->SetPoint(cDice.RollValue());
+            m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
+        }
+        bBetResolved = true;
+    }
+
+    else if (it->IsCraps12Bet())                           // Craps 12 Bet?
+    {
+        if (cDice.IsTweleve())
+        {
+            it->SetPoint(cDice.RollValue());
+            m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
+        }
+        bBetResolved = true;
+    }
+
+    return (bBetResolved);
 }
 
 /**

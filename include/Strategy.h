@@ -147,18 +147,18 @@ class Strategy
         int  PlaceBetNumber();
 
         // Resolve bets
-        void ResolvePass(const Dice &cDice);
-        void ResolvePassOdds(const Table &cTable, const Dice &cDice);
-        void ResolveDontPass(const Dice &cDice);
-        void ResolveDontPassOdds(const Table &cTable, const Dice &cDice);
-        void ResolveCome(const Dice &cDice);
-        void ResolveComeOdds(const Table &cTable, const Dice &cDice);
-        void ResolveDontCome(const Dice &cDice);
-        void ResolveDontComeOdds(const Dice &cDice);
-        void ResolvePlace(const Table &cTable, const Dice &cDice);
-        void ResolveField(const Dice &cDice);
-        void ResolveBig(const Dice &cDice);
-        void ResolveOneRollBets(const Dice &cDice);
+        //void ResolvePass(const Dice &cDice);
+        bool ResolvePass(std::list<Bet>::iterator &it, const Dice &cDice);
+        bool ResolvePassOdds(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice);
+        bool ResolveDontPass(std::list<Bet>::iterator &it, const Dice &cDice);
+        bool ResolveDontPassOdds(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice);
+        bool ResolveCome(std::list<Bet>::iterator &it, const Dice &cDice);
+        bool ResolveComeOdds(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice);
+        bool ResolveDontCome(std::list<Bet>::iterator &it, const Dice &cDice);
+        bool ResolveDontComeOdds(std::list<Bet>::iterator &it, const Dice &cDice);
+        bool ResolvePlace(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice);
+        bool ResolveBig(std::list<Bet>::iterator &it, const Dice &cDice);
+        bool ResolveOneRollBets(std::list<Bet>::iterator &it, const Dice &cDice);
 
         // Check to see if a current bet covers 6 or 8
         bool SixOrEightCovered();

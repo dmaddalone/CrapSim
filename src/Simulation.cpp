@@ -46,17 +46,18 @@ void Simulation::Run(int nNumberOfRuns, bool bMusterReport, bool bTally)
     cout << "Simulation" << endl;
     cout << "\tNumber of runs:\t" << nNumberOfRuns << endl;
 
-    // Write Muster
-    if (bMusterReport) Muster();
-
-    cout << "\nStarting Simulation" << endl;
-
     // Ensure that each Strategy conforms to the environment
+    std::cout << "Sanity-checking the Strategies." << std::endl;
     for (std::vector<Strategy>::iterator it = m_vStrategies.begin(); it != m_vStrategies.end(); it++)
     {
         it->SanityCheck(m_cTable);
     }
+    std::cout << "Sanity-check complete." << std::endl;
 
+    // Write Muster
+    if (bMusterReport) Muster();
+
+    cout << "\nStarting Simulation" << endl;
     for (int iii = 0; iii < nNumberOfRuns; iii++)
     {
         m_cTable.Reset();

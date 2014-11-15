@@ -71,6 +71,8 @@ void CreateStrategy(const std::string &sStrategy, CDataFile &cConfigFile, const 
 
     bool        bComeOddsWorking        = cConfigFile.GetBool("ComeOddsWorking", sStrategy);
 
+    // String version of OddsProgression used because Predefined Strategies define odds progression
+    std::string sOddsProgression        = cConfigFile.GetString("OddsProgression", sStrategy);
     bool        bOddsProgression        = cConfigFile.GetBool("OddsProgression", sStrategy);
     std::string sOddsProgressionMethod  = cConfigFile.GetString("OddsProgressionMethod", sStrategy);
 
@@ -197,23 +199,26 @@ void CreateStrategy(const std::string &sStrategy, CDataFile &cConfigFile, const 
     // If Significant Winngings Multiple has been set, pass to Strategy
     if (nSignificantWinnings != INT_MIN) cStrategy.SetSignificantWinnings(nSignificantWinnings);
 
-    // And check for Odds Progression  type of Arithmetic or Geometric.  If neither is set, exit with error.
-    if (bOddsProgression)
+    // If OddsProgression was set (checked using string) then updated settings
+    if (!sOddsProgression.empty())
     {
         // Pass Odds Progression to Strategy; default is false
         cStrategy.UseOddsProgression(bOddsProgression);
-
-        std::locale loc;
-        for (std::string::size_type iii = 0; iii < sOddsProgressionMethod.length(); iii++)
-            sOddsProgressionMethod[iii] = std::toupper(sOddsProgressionMethod[iii], loc);
-
-        if (sOddsProgressionMethod == "ARITHMETIC") cStrategy.SetOddsProgressionMethodArithmetic();
-        else if (sOddsProgressionMethod == "GEOMETRIC") cStrategy.SetOddsProgressionMethodGeometric();
-        else
+        // If Odds Progressione dused, check for Odds Progression type of Arithmetic or Geometric.  If neither is set, exit with error.
+        if (bOddsProgression)
         {
-            std::cerr << "ERROR (main): Unknown OddsProgressionMethod setting: " << sOddsProgressionMethod << std::endl;
-            std::cerr << "Exiting" << std::endl;
-            exit (EXIT_FAILURE);
+            std::locale loc;
+            for (std::string::size_type iii = 0; iii < sOddsProgressionMethod.length(); iii++)
+                sOddsProgressionMethod[iii] = std::toupper(sOddsProgressionMethod[iii], loc);
+
+            if (sOddsProgressionMethod == "ARITHMETIC") cStrategy.SetOddsProgressionMethodArithmetic();
+            else if (sOddsProgressionMethod == "GEOMETRIC") cStrategy.SetOddsProgressionMethodGeometric();
+            else
+            {
+                std::cerr << "ERROR (main): Unknown OddsProgressionMethod setting: " << sOddsProgressionMethod << std::endl;
+                std::cerr << "Exiting" << std::endl;
+                exit (EXIT_FAILURE);
+            }
         }
     }
 
