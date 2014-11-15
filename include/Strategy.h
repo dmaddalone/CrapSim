@@ -99,8 +99,14 @@ class Strategy
         void UseOddsProgression(bool b)     { m_bOddsProgression = b; }
         void IncreaseOdds()                 { if (IsArithmeticOddsProgression()) m_fOdds += 1; else m_fOdds *= 2; }
         void ResetOdds()                    { m_fOdds = m_fStandardOdds; }
-        void SetOddsProgressionMethodArithmetic() { m_ecOddsProgressionMethod = OddsProgressionMethod::ARITHMETIC; }
-        void SetOddsProgressionMethodGeometric()  { m_ecOddsProgressionMethod = OddsProgressionMethod::GEOMETRIC; }
+        bool SetOddsProgressionMethod(std::string sMethod);
+        //void SetOddsProgressionMethodArithmetic() { m_ecOddsProgressionMethod = OddsProgressionMethod::ARITHMETIC; }
+        //void SetOddsProgressionMethodGeometric()  { m_ecOddsProgressionMethod = OddsProgressionMethod::GEOMETRIC; }
+        // Qualified Shooter methods
+        bool SetQualifiedShooterMethod(std::string);
+        void SetQualifiedShooterMethodCount(int n) { m_cQualifiedShooter.SetCount(n); }
+        void QualifyTheShooter(const Table &cTable, const Dice &cDice) { m_cQualifiedShooter.QualifyTheShooter(cTable, cDice); }
+        bool ShooterQualified()             { return (m_cQualifiedShooter.ShooterQualified()); }
         // Used before simulations are run to ensure that Strategies fit to
         // Table settings
         void SanityCheck(const Table &cTable);

@@ -175,6 +175,53 @@ void Strategy::SetAggressive()
 }
 
 /**
+  * Set the odds progression method.
+  *
+  * Set the method to progress (increase) the odds taken.
+  *
+  * INI File:
+  * OddsProgression=true|false
+  * OddsProgressionMethod=ARITHMETIC|GEOMETRIC
+  *
+  *\param sOddsProgressionMethod The selected odds progression method.
+  *
+  *\return True if known method provided, false otherwise
+  */
+
+bool Strategy::SetOddsProgressionMethod(std::string sOddsProgressionMethod)
+{
+    bool bKnownMethod = true;
+
+    std::locale loc;
+    for (std::string::size_type iii = 0; iii < sOddsProgressionMethod.length(); iii++)
+        sOddsProgressionMethod[iii] = std::toupper(sOddsProgressionMethod[iii], loc);
+
+    if (sOddsProgressionMethod == "ARITHMETIC")     m_ecOddsProgressionMethod = OddsProgressionMethod::ARITHMETIC;
+    else if (sOddsProgressionMethod == "GEOMETRIC") m_ecOddsProgressionMethod = OddsProgressionMethod::GEOMETRIC;
+    else bKnownMethod = false;
+
+    return (bKnownMethod);
+}
+
+/**
+  * Set the qualified shooter method.
+  *
+  * Set the method to qualify the shooter.
+  *
+  * INI File:
+  * QualifiedShooterMethod=[a lot of chices]
+  *
+  *\param sQualifiedShooterMethod The selected shooter qualification method.
+  *
+  *\return True if known method provided, false otherwise
+  */
+
+bool Strategy::SetQualifiedShooterMethod(std::string sQualifiedShooterMethod)
+{
+    return (m_cQualifiedShooter.SetMethod(sQualifiedShooterMethod));
+}
+
+/**
   * Check and correct a Strategy's settings to conform to the Table.
   *
   * Check and correct non-fatal configuration items.
@@ -1614,6 +1661,8 @@ void Strategy::Muster()
 
         std::cout << std::setw(20) << std::right << "Odds Progression: "    << std::boolalpha << m_bOddsProgression     << std::endl;
         std::cout << std::setw(20) << std::right << "Odds Prog. Method: ";
+
+
         if (!m_bOddsProgression)
             std::cout << "n/a" << std::endl;
         else
@@ -1623,6 +1672,9 @@ void Strategy::Muster()
             else
                 std::cout << "Geometric" << std::endl;
         }
+
+        std::cout << std::setw(20) << std::right << "Qual. Sh. Method: "    << m_cQualifiedShooter.Method() << std::endl;
+        std::cout << std::setw(20) << std::right << "Qual. Sh. Method Ct: " << m_cQualifiedShooter.Count() << std::endl;
 
         std::cout << std::endl;
 }

@@ -29,19 +29,29 @@
 #include "Strategy.h"
 #include "Simulation.h"
 #include "CDataFile.h"
+#include "CrapSimVersion.h"
 
 void CreateStrategy(const std::string &sStrategy, CDataFile &cConfigFile, const int nAllInitialBankroll, const int nAllStandardWager, const float fAllSWM, const int nAllSignificantWinnings, Simulation &cSim)
 {
+    //
     // Read config file for parameters this Strategy
+    //
+
+    // Basic
     std::string sName                   = cConfigFile.GetString("Name", sStrategy);
     std::string sDescription            = cConfigFile.GetString("Description", sStrategy);
 
+    // Money
     int         nStandardWager          = cConfigFile.GetInt("StandardWager", sStrategy);
     bool        bFullWager              = cConfigFile.GetBool("FullWager", sStrategy);
     int         nInitialBankroll        = cConfigFile.GetInt("InitialBankroll", sStrategy);
+    int         nSignificantWinnings    = cConfigFile.GetInt("SignificantWinnings", sStrategy);
+    float       fSWM                    = cConfigFile.GetFloat("SWM", sStrategy);
 
+    // Predefined Strategies
     std::string sPredefined             = cConfigFile.GetString("Predefined", sStrategy);
 
+    // Types and numbers of bets allowed
     int         nPassBet                = cConfigFile.GetInt("PassBet", sStrategy);
     int         nDontPassBet            = cConfigFile.GetInt("DontPassBet", sStrategy);
     int         nComeBets               = cConfigFile.GetInt("ComeBets", sStrategy);
@@ -65,27 +75,27 @@ void CreateStrategy(const std::string &sStrategy, CDataFile &cConfigFile, const 
     bool        bYo11Bet                = cConfigFile.GetBool("Yo11Bet", sStrategy);
     bool        bCraps12Bet             = cConfigFile.GetBool("Craps12Bet", sStrategy);
 
+    // Odds settings
     float       fStandardOdds           = cConfigFile.GetFloat("StandardOdds", sStrategy);
-    int         nSignificantWinnings    = cConfigFile.GetInt("SignificantWinnings", sStrategy);
-    float       fSWM                    = cConfigFile.GetFloat("SWM", sStrategy);
-
     bool        bComeOddsWorking        = cConfigFile.GetBool("ComeOddsWorking", sStrategy);
-
-    // String version of OddsProgression used because Predefined Strategies define odds progression
-    std::string sOddsProgression        = cConfigFile.GetString("OddsProgression", sStrategy);
     bool        bOddsProgression        = cConfigFile.GetBool("OddsProgression", sStrategy);
     std::string sOddsProgressionMethod  = cConfigFile.GetString("OddsProgressionMethod", sStrategy);
+    // String version of OddsProgression boolean used because Predefined Strategies define odds progression
+    std::string sOddsProgression        = cConfigFile.GetString("OddsProgression", sStrategy);
 
+    // Shooter qualification methods
+    std::string sQualifiedShooterMethod = cConfigFile.GetString("QualifiedShooterMethod", sStrategy);
+    int         nQualifiedShooterMethodCount = cConfigFile.GetInt("QualifiedShooterMethodCount", sStrategy);
+
+    // Tracking results (used for debugging)
     bool        bTrackResults           = cConfigFile.GetBool("TrackResults", sStrategy);
+
+    //
+    // Set the Strategy's parameters
+    //
 
     // Set initial bankroll.  Use AllStrategies setting if individual strategy's InitialBankroll is not set.
     if (nInitialBankroll == INT_MIN) nInitialBankroll = nAllInitialBankroll;
-    //if (nInitialBankroll <= 0) // If InitialBankroll still not set, exit with error
-    //{
-    //    cerr << "ERROR: InitialBankroll not set: " << nInitialBankroll << endl;
-    //    cerr << "Exiting" << endl;
-    //    exit(EXIT_FAILURE);
-    //}
 
     // Set standard wager.  Use AllStrategies setting if individual strategy's StandardWager is not set.
     if (nStandardWager == INT_MIN) nStandardWager = nAllStandardWager;
@@ -119,11 +129,19 @@ void CreateStrategy(const std::string &sStrategy, CDataFile &cConfigFile, const 
         }
     }
 
-    // Pass choice to make Full Wagers to Strategy
-    cStrategy.SetFullWager(bFullWager);
-
     // If Name is blank, use the Strategy section name
     if (cStrategy.Name() == "") cStrategy.SetName(sStrategy);
+
+    // Pass choice to make Full Wagers to Strategy
+    cStrategy.SetFullWager(bFullWager);
+    // Set significant winnings multiple.  Use AllStrategies setting if individual strategy's SWM is not set.
+    if (fSWM == FLT_MIN) fSWM = fAllSWM;
+    // If Significant Winngings Multiple has been set, pass to Strategy
+    if (fSWM != FLT_MIN) cStrategy.SetSignificantWinningsMultiple(fSWM);
+    // Set significant winnings.  Use AllStrategies setting if individual strategy's Significant Winnings is not set.
+    if (nSignificantWinnings == INT_MIN) nSignificantWinnings = nAllSignificantWinnings;
+    // If Significant Winngings Multiple has been set, pass to Strategy
+    if (nSignificantWinnings != INT_MIN) cStrategy.SetSignificantWinnings(nSignificantWinnings);
 
     // If Pass Bet has been set, pass to Strategy
     if (nPassBet != INT_MIN) cStrategy.SetPassBet(nPassBet);
@@ -170,50 +188,25 @@ void CreateStrategy(const std::string &sStrategy, CDataFile &cConfigFile, const 
     cStrategy.SetYo11BetAllowed(bYo11Bet);
     // Pass Any Craps Bet to Strategy; default is false
     cStrategy.SetCraps12BetAllowed(bCraps12Bet);
-
     // Pass Big 6 Bet to Strategy; default is false
     cStrategy.SetBig6BetAllowed(bBig6Bet);
-
     // Pass Big 8 Bet to Strategy; default is false
     cStrategy.SetBig8BetAllowed(bBig8Bet);
 
-    // Pass Any 7 Bet to Strategy; default is false
-    cStrategy.SetAny7BetAllowed(bAny7Bet);
-
-    // Pass Any Craps Bet to Strategy; default is false
-    cStrategy.SetAnyCrapsBetAllowed(bAnyCrapsBet);
-
     // If Standard Odds has been set, pass to Strategy
     if (fStandardOdds != FLT_MIN) cStrategy.SetStandardOdds(fStandardOdds);
-
     // Pass choice to make odds working on a table come out roll to Strategy
     cStrategy.SetComeOddsWorking(bComeOddsWorking);
-
-    // Set significant winnings multiple.  Use AllStrategies setting if individual strategy's SWM is not set.
-    if (fSWM == FLT_MIN) fSWM = fAllSWM;
-    // If Significant Winngings Multiple has been set, pass to Strategy
-    if (fSWM != FLT_MIN) cStrategy.SetSignificantWinningsMultiple(fSWM);
-
-    // Set significant winnings.  Use AllStrategies setting if individual strategy's Significant Winnings is not set.
-    if (nSignificantWinnings == INT_MIN) nSignificantWinnings = nAllSignificantWinnings;
-    // If Significant Winngings Multiple has been set, pass to Strategy
-    if (nSignificantWinnings != INT_MIN) cStrategy.SetSignificantWinnings(nSignificantWinnings);
 
     // If OddsProgression was set (checked using string) then updated settings
     if (!sOddsProgression.empty())
     {
         // Pass Odds Progression to Strategy; default is false
         cStrategy.UseOddsProgression(bOddsProgression);
-        // If Odds Progressione dused, check for Odds Progression type of Arithmetic or Geometric.  If neither is set, exit with error.
+        // If Odds Progression is used, check for Odds Progression type of Arithmetic or Geometric.  If neither is set, exit with error.
         if (bOddsProgression)
         {
-            std::locale loc;
-            for (std::string::size_type iii = 0; iii < sOddsProgressionMethod.length(); iii++)
-                sOddsProgressionMethod[iii] = std::toupper(sOddsProgressionMethod[iii], loc);
-
-            if (sOddsProgressionMethod == "ARITHMETIC") cStrategy.SetOddsProgressionMethodArithmetic();
-            else if (sOddsProgressionMethod == "GEOMETRIC") cStrategy.SetOddsProgressionMethodGeometric();
-            else
+            if (!cStrategy.SetOddsProgressionMethod(sOddsProgressionMethod))
             {
                 std::cerr << "ERROR (main): Unknown OddsProgressionMethod setting: " << sOddsProgressionMethod << std::endl;
                 std::cerr << "Exiting" << std::endl;
@@ -222,13 +215,26 @@ void CreateStrategy(const std::string &sStrategy, CDataFile &cConfigFile, const 
         }
     }
 
+    if (!sQualifiedShooterMethod.empty())
+    {
+        // If Qualified Shooter Method is used, check for correct Qualified Shooter Method type.  If not set, exit with error.
+        if (!cStrategy.SetQualifiedShooterMethod(sQualifiedShooterMethod))
+        {
+            std::cerr << "ERROR (main): Unknown QualifiedShooterMethod setting: " << sQualifiedShooterMethod << std::endl;
+            std::cerr << "Exiting" << std::endl;
+            exit (EXIT_FAILURE);
+        }
+    }
+
+    if (nQualifiedShooterMethodCount != INT_MIN) cStrategy.SetQualifiedShooterMethodCount(nQualifiedShooterMethodCount);
+
     // Add Strategy to Simulation
     cSim.AddStrategy(cStrategy);
 }
 
 int CrapsSimulation(std::string sINIFile)
 {
-    std::cout << "Craps Simulation" << std::endl;
+    std::cout << "Craps Simulation version " << CrapSimVersion::SemanticVersion() << " " << CrapSimVersion::DateVersion() << std::endl;
 
     Simulation  cSim;
     Table       cTable(5, 5000);

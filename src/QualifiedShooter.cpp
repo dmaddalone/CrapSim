@@ -9,22 +9,21 @@
 
 QualifiedShooter::QualifiedShooter()
 {
-    m_mQualificationMethod["NO_METHOD"]                        = QualificationMethod::QM_NO_METHOD;
-    m_mQualificationMethod["5COUNT"]                           = QualificationMethod::QM_5COUNT;
-    m_mQualificationMethod["AFTER_POINT_MADE"]                 = QualificationMethod::QM_AFTER_POINT_MADE;
-    m_mQualificationMethod["AFTER_LOSING_FIELD_THREE_TIMES"]   = QualificationMethod::QM_AFTER_LOSING_FIELD_THREE_TIMES;
-    m_mQualificationMethod["AFTER_FIVE_NON_SEVEN_ROLLS"]       = QualificationMethod::QM_AFTER_FIVE_NON_SEVEN_ROLLS;
-    m_mQualificationMethod["AFTER_N_2_ROLLS_IN_A_ROW"]         = QualificationMethod::QM_AFTER_N_2_ROLLS_IN_A_ROW;
-    m_mQualificationMethod["AFTER_N_3_ROLLS_IN_A_ROW"]         = QualificationMethod::QM_AFTER_N_3_ROLLS_IN_A_ROW;
-    m_mQualificationMethod["AFTER_N_4_ROLLS_IN_A_ROW"]         = QualificationMethod::QM_AFTER_N_4_ROLLS_IN_A_ROW;
-    m_mQualificationMethod["AFTER_N_5_ROLLS_IN_A_ROW"]         = QualificationMethod::QM_AFTER_N_5_ROLLS_IN_A_ROW;
-    m_mQualificationMethod["AFTER_N_6_ROLLS_IN_A_ROW"]         = QualificationMethod::QM_AFTER_N_6_ROLLS_IN_A_ROW;
-    m_mQualificationMethod["AFTER_N_7_ROLLS_IN_A_ROW"]         = QualificationMethod::QM_AFTER_N_7_ROLLS_IN_A_ROW;
-    m_mQualificationMethod["AFTER_N_8_ROLLS_IN_A_ROW"]         = QualificationMethod::QM_AFTER_N_8_ROLLS_IN_A_ROW;
-    m_mQualificationMethod["AFTER_N_9_ROLLS_IN_A_ROW"]         = QualificationMethod::QM_AFTER_N_9_ROLLS_IN_A_ROW;
-    m_mQualificationMethod["AFTER_N_10_ROLLS_IN_A_ROW"]        = QualificationMethod::QM_AFTER_N_10_ROLLS_IN_A_ROW;
-    m_mQualificationMethod["AFTER_N_11_ROLLS_IN_A_ROW"]        = QualificationMethod::QM_AFTER_N_11_ROLLS_IN_A_ROW;
-    m_mQualificationMethod["AFTER_N_12_ROLLS_IN_A_ROW"]        = QualificationMethod::QM_AFTER_N_12_ROLLS_IN_A_ROW;
+    m_mQualificationMethod["NO_METHOD"]                               = QualificationMethod::QM_NO_METHOD;
+    m_mQualificationMethod["5COUNT"]                                  = QualificationMethod::QM_5COUNT;
+    m_mQualificationMethod["AFTER_POINT_MADE"]                        = QualificationMethod::QM_AFTER_POINT_MADE;
+    m_mQualificationMethod["AFTER_LOSING_FIELD_THREE_TIMES_IN_A_ROW"] = QualificationMethod::QM_AFTER_LOSING_FIELD_THREE_TIMES_IN_A_ROW;
+    m_mQualificationMethod["AFTER_FIVE_NON_SEVEN_ROLLS"]              = QualificationMethod::QM_AFTER_FIVE_NON_SEVEN_ROLLS;
+    m_mQualificationMethod["AFTER_N_2_ROLLS_IN_A_ROW"]                = QualificationMethod::QM_AFTER_N_2_ROLLS_IN_A_ROW;
+    m_mQualificationMethod["AFTER_N_3_ROLLS_IN_A_ROW"]                = QualificationMethod::QM_AFTER_N_3_ROLLS_IN_A_ROW;
+    m_mQualificationMethod["AFTER_N_4_ROLLS_IN_A_ROW"]                = QualificationMethod::QM_AFTER_N_4_ROLLS_IN_A_ROW;
+    m_mQualificationMethod["AFTER_N_5_ROLLS_IN_A_ROW"]                = QualificationMethod::QM_AFTER_N_5_ROLLS_IN_A_ROW;
+    m_mQualificationMethod["AFTER_N_6_ROLLS_IN_A_ROW"]                = QualificationMethod::QM_AFTER_N_6_ROLLS_IN_A_ROW;
+    m_mQualificationMethod["AFTER_N_8_ROLLS_IN_A_ROW"]                = QualificationMethod::QM_AFTER_N_8_ROLLS_IN_A_ROW;
+    m_mQualificationMethod["AFTER_N_9_ROLLS_IN_A_ROW"]                = QualificationMethod::QM_AFTER_N_9_ROLLS_IN_A_ROW;
+    m_mQualificationMethod["AFTER_N_10_ROLLS_IN_A_ROW"]               = QualificationMethod::QM_AFTER_N_10_ROLLS_IN_A_ROW;
+    m_mQualificationMethod["AFTER_N_11_ROLLS_IN_A_ROW"]               = QualificationMethod::QM_AFTER_N_11_ROLLS_IN_A_ROW;
+    m_mQualificationMethod["AFTER_N_12_ROLLS_IN_A_ROW"]               = QualificationMethod::QM_AFTER_N_12_ROLLS_IN_A_ROW;
 }
 
 /**
@@ -95,60 +94,75 @@ std::string QualifiedShooter::Method()
   * true.
   */
 
-bool QualifiedShooter::ShooterQualified(const Table &cTable, const Dice &cDice)
+//bool QualifiedShooter::QualifyTheShooter(const Table &cTable, const Dice &cDice)
+void QualifiedShooter::QualifyTheShooter(const Table &cTable, const Dice &cDice)
 {
     switch (m_ecQualificationMethod)
     {
         case QualificationMethod::QM_NO_METHOD:
-            return (true);
+            //return (m_bShooterQualified);
             break;
         case QualificationMethod::QM_5COUNT:
-            return (Method5Count(cTable, cDice));
+            //return (Method5Count(cTable, cDice));
+            Method5Count(cTable, cDice);
             break;
         case QualificationMethod::QM_AFTER_POINT_MADE:
-            return (MethodAfterPointMade(cTable, cDice));
+            //return (MethodAfterPointMade(cTable, cDice));
+            MethodAfterPointMade(cTable, cDice);
             break;
-        case QualificationMethod::QM_AFTER_LOSING_FIELD_THREE_TIMES:
-            return (MethodAfterLosingFieldThreeTimes(cTable, cDice));
+        case QualificationMethod::QM_AFTER_LOSING_FIELD_THREE_TIMES_IN_A_ROW:
+            //return (MethodAfterLosingFieldThreeTimesInARow(cTable, cDice));
+            MethodAfterLosingFieldThreeTimesInARow(cTable, cDice);
             break;
         case QualificationMethod::QM_AFTER_FIVE_NON_SEVEN_ROLLS:
-            return (MethodAfterFiveNon7Rolls(cDice));
+            //return (MethodAfterFiveNon7Rolls(cDice));
+            MethodAfterFiveNon7Rolls(cDice);
             break;
         case QualificationMethod::QM_AFTER_N_2_ROLLS_IN_A_ROW:
-            return (MethodAfterNXRolls(cTable, cDice, 2));
+            //return (MethodAfterNXRollsInARow(cTable, cDice, 2));
+            MethodAfterNXRollsInARow(cTable, cDice, 2);
             break;
         case QualificationMethod::QM_AFTER_N_3_ROLLS_IN_A_ROW:
-            return (MethodAfterNXRolls(cTable, cDice, 3));
+            //return (MethodAfterNXRollsInARow(cTable, cDice, 3));
+            MethodAfterNXRollsInARow(cTable, cDice, 3);
             break;
         case QualificationMethod::QM_AFTER_N_4_ROLLS_IN_A_ROW:
-            return (MethodAfterNXRolls(cTable, cDice, 4));
+            //return (MethodAfterNXRollsInARow(cTable, cDice, 4));
+            MethodAfterNXRollsInARow(cTable, cDice, 4);
             break;
         case QualificationMethod::QM_AFTER_N_5_ROLLS_IN_A_ROW:
-            return (MethodAfterNXRolls(cTable, cDice, 5));
+            //return (MethodAfterNXRollsInARow(cTable, cDice, 5));
+            MethodAfterNXRollsInARow(cTable, cDice, 5);
             break;
         case QualificationMethod::QM_AFTER_N_6_ROLLS_IN_A_ROW:
-            return (MethodAfterNXRolls(cTable, cDice, 6));
+            //return (MethodAfterNXRollsInARow(cTable, cDice, 6));
+            MethodAfterNXRollsInARow(cTable, cDice, 6);
             break;
         case QualificationMethod::QM_AFTER_N_8_ROLLS_IN_A_ROW:
-            return (MethodAfterNXRolls(cTable, cDice, 8));
+            //return (MethodAfterNXRollsInARow(cTable, cDice, 8));
+            MethodAfterNXRollsInARow(cTable, cDice, 8);
             break;
         case QualificationMethod::QM_AFTER_N_9_ROLLS_IN_A_ROW:
-            return (MethodAfterNXRolls(cTable, cDice, 9));
+            //return (MethodAfterNXRollsInARow(cTable, cDice, 9));
+            MethodAfterNXRollsInARow(cTable, cDice, 9);
             break;
         case QualificationMethod::QM_AFTER_N_10_ROLLS_IN_A_ROW:
-            return (MethodAfterNXRolls(cTable, cDice, 10));
+            //return (MethodAfterNXRollsInARow(cTable, cDice, 10));
+            MethodAfterNXRollsInARow(cTable, cDice, 10);
             break;
         case QualificationMethod::QM_AFTER_N_11_ROLLS_IN_A_ROW:
-            return (MethodAfterNXRolls(cTable, cDice, 11));
+            //return (MethodAfterNXRollsInARow(cTable, cDice, 11));
+            MethodAfterNXRollsInARow(cTable, cDice, 11);
             break;
         case QualificationMethod::QM_AFTER_N_12_ROLLS_IN_A_ROW:
-            return (MethodAfterNXRolls(cTable, cDice, 12));
+            //return (MethodAfterNXRollsInARow(cTable, cDice, 12));
+            MethodAfterNXRollsInARow(cTable, cDice, 12);
             break;
         default:
             break;
     }
 
-    return (true);
+    //return (true);
 }
 
 /**
@@ -251,7 +265,7 @@ bool QualifiedShooter::MethodAfterPointMade(const Table &cTable, const Dice &cDi
   * \return True if the shooter has qualified, false otherwise.
   */
 
-bool QualifiedShooter::MethodAfterLosingFieldThreeTimes(const Table &cTable, const Dice &cDice)
+bool QualifiedShooter::MethodAfterLosingFieldThreeTimesInARow(const Table &cTable, const Dice &cDice)
 {
     m_bShooterQualified = false;
 
@@ -370,7 +384,7 @@ bool QualifiedShooter::MethodAfterFiveNon7Rolls(const Dice &cDice)
   * \return True if the shooter has qualified, false otherwise.
   */
 
-bool QualifiedShooter::MethodAfterNXRolls(const Table &cTable, const Dice &cDice, int nNumber)
+bool QualifiedShooter::MethodAfterNXRollsInARow(const Table &cTable, const Dice &cDice, int nNumber)
 {
     m_bShooterQualified = false;
 

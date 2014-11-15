@@ -36,16 +36,16 @@ enum class QualificationMethod
     QM_NO_METHOD,
     QM_5COUNT,
     QM_AFTER_POINT_MADE,
-    QM_AFTER_LOSING_FIELD_THREE_TIMES,
+    QM_AFTER_LOSING_FIELD_THREE_TIMES_IN_A_ROW,
     QM_AFTER_FIVE_NON_SEVEN_ROLLS,
-    QM_AFTER_N_LOSING_FIELD_ROLLS_IN_A_ROW,
+    QM_AFTER_N_LOSING_FIELD_N_TIMES_IN_A_ROW, // TODO
     QM_AFTER_N_NON_7_ROLLS_IN_A_ROW,
     QM_AFTER_N_2_ROLLS_IN_A_ROW,
     QM_AFTER_N_3_ROLLS_IN_A_ROW,
     QM_AFTER_N_4_ROLLS_IN_A_ROW,
     QM_AFTER_N_5_ROLLS_IN_A_ROW,
     QM_AFTER_N_6_ROLLS_IN_A_ROW,
-    QM_AFTER_N_7_ROLLS_IN_A_ROW,
+    QM_AFTER_N_7_ROLLS_IN_A_ROW, //TODO
     QM_AFTER_N_8_ROLLS_IN_A_ROW,
     QM_AFTER_N_9_ROLLS_IN_A_ROW,
     QM_AFTER_N_10_ROLLS_IN_A_ROW,
@@ -62,19 +62,20 @@ class QualifiedShooter
         bool SetMethod(std::string sMethod);
         std::string Method();
         // Set the count for the qualification method
-        void SetCount(int i)                    { m_nQualificationCount = i; }
+        void SetCount(int i)                    { assert(i > 0); m_nQualificationCount = i; }
+        int Count() const                       { return (m_nQualificationCount); }
         // Set when the qualification method starts, usually with a new shooter
-        void SetStopWithShooter(bool b)         {m_bQualificationStopsWithShooter = b;}
-        // Check whether we are qualifying a shooter
-        bool QualifyingTheShooter() const       { return (m_ecQualificationMethod != QualificationMethod::QM_NO_METHOD); }
-        // Check whether the shooter has been qualified
-        bool ShooterQualified(const Table &cTable, const Dice &cDice);
+        void SetStopWithShooter(bool b)         { m_bQualificationStopsWithShooter = b; }
+        // Update the qualifications the shooter
+        void QualifyTheShooter(const Table &cTable, const Dice &cDice);
+        // Check if shooter has been qualified
+        bool ShooterQualified()                 { return (m_bShooterQualified); }
 
     private:
         // Set defaults
         QualificationMethod m_ecQualificationMethod = QualificationMethod::QM_NO_METHOD;
         bool m_bShooterQualified                    = false;
-        int  m_nQualificationCount                  = 0;
+        int  m_nQualificationCount                  = 1;
         bool m_bQualificationStopsWithShooter       = true;
 
         // Map to associate the strings with the enum values
@@ -86,13 +87,13 @@ class QualifiedShooter
         // The After Point Made method
         bool MethodAfterPointMade(const Table &cTable, const Dice &cDice);
         // The After Losing Field Three Times method
-        bool MethodAfterLosingFieldThreeTimes(const Table &cTable, const Dice &cDice);
+        bool MethodAfterLosingFieldThreeTimesInARow(const Table &cTable, const Dice &cDice);
         int m_nLosingFieldInARow = 0;
         // The After Five Non Seven Rolls method
         bool MethodAfterFiveNon7Rolls(const Dice &cDice);
         int m_nNon7InARow = 0;
-
-        bool MethodAfterNXRolls(const Table &cTable, const Dice &cDice, int nNumber);
+        // The After N (number) of X (value) rolls in a row
+        bool MethodAfterNXRollsInARow(const Table &cTable, const Dice &cDice, int nNumber);
         int m_nCounter = 0;
 };
 

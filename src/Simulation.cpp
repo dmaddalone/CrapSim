@@ -67,8 +67,8 @@ void Simulation::Run(int nNumberOfRuns, bool bMusterReport, bool bTally)
         {
             MakeBets();
             m_cDice.Roll();
-            // QualifyShooter;
             ResolveBets();
+            QualifyTheShooter();
             m_cTable.Update(m_cDice);
 
         }
@@ -83,19 +83,11 @@ void Simulation::Run(int nNumberOfRuns, bool bMusterReport, bool bTally)
     cout << endl;
 }
 
-//void Simulation::QualifyShooter()
-//{
-//    for (std::vector<Strategy>::iterator it = m_vStrategies.begin();it != m_vStrategies.end(); it++)
-//    {
-//        it->QualifyShooter(m_cTable, m_cDice);
-//    }
-//}
-
 void Simulation::MakeBets()
 {
     for (std::vector<Strategy>::iterator it = m_vStrategies.begin(); it != m_vStrategies.end(); it++)
     {
-        it->MakeBets(m_cTable);
+        if (it->ShooterQualified()) it->MakeBets(m_cTable);
     }
 }
 
@@ -104,6 +96,14 @@ void Simulation::ResolveBets()
     for (std::vector<Strategy>::iterator it = m_vStrategies.begin(); it != m_vStrategies.end(); it++)
     {
         it->ResolveBets(m_cTable, m_cDice);
+    }
+}
+
+void Simulation::QualifyTheShooter()
+{
+    for (std::vector<Strategy>::iterator it = m_vStrategies.begin();it != m_vStrategies.end(); it++)
+    {
+        it->QualifyTheShooter(m_cTable, m_cDice);
     }
 }
 
