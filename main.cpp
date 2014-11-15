@@ -35,31 +35,45 @@ void CreateStrategy(const std::string &sStrategy, CDataFile &cConfigFile, const 
     // Read config file for parameters this Strategy
     std::string sName                   = cConfigFile.GetString("Name", sStrategy);
     std::string sDescription            = cConfigFile.GetString("Description", sStrategy);
+
     int         nStandardWager          = cConfigFile.GetInt("StandardWager", sStrategy);
     bool        bFullWager              = cConfigFile.GetBool("FullWager", sStrategy);
     int         nInitialBankroll        = cConfigFile.GetInt("InitialBankroll", sStrategy);
+
     std::string sPredefined             = cConfigFile.GetString("Predefined", sStrategy);
+
     int         nPassBet                = cConfigFile.GetInt("PassBet", sStrategy);
     int         nDontPassBet            = cConfigFile.GetInt("DontPassBet", sStrategy);
     int         nComeBets               = cConfigFile.GetInt("ComeBets", sStrategy);
     int         nDontComeBets           = cConfigFile.GetInt("DontComeBets", sStrategy);
+
     int         nPlaceBets              = cConfigFile.GetInt("PlaceBets", sStrategy);
     int         nPlaceBetsMadeAtOnce    = cConfigFile.GetInt("PlaceBetsMadeAtOnce", sStrategy);
     bool        bPlaceAfterCome         = cConfigFile.GetBool("PlaceAfterCome", sStrategy);
     int         nPlacePreferred         = cConfigFile.GetInt("PlacePreferred");
     int         nPlaceBetUnits          = cConfigFile.GetInt("PlaceBetUnits",sStrategy);
+
     bool        bFieldBet               = cConfigFile.GetBool("FieldBet", sStrategy);
     int         nFieldBetUnits          = cConfigFile.GetInt("FieldBetUnits",sStrategy);
+
     bool        bBig6Bet                = cConfigFile.GetBool("Big6Bet", sStrategy);
     bool        bBig8Bet                = cConfigFile.GetBool("Big8Bet", sStrategy);
     bool        bAny7Bet                = cConfigFile.GetBool("Any7Bet", sStrategy);
     bool        bAnyCrapsBet            = cConfigFile.GetBool("AnyCrapsBet", sStrategy);
+    bool        bCraps2Bet              = cConfigFile.GetBool("Craps2Bet", sStrategy);
+    bool        bCraps3Bet              = cConfigFile.GetBool("Craps3Bet", sStrategy);
+    bool        bYo11Bet                = cConfigFile.GetBool("Yo11Bet", sStrategy);
+    bool        bCraps12Bet             = cConfigFile.GetBool("Craps12Bet", sStrategy);
+
     float       fStandardOdds           = cConfigFile.GetFloat("StandardOdds", sStrategy);
     int         nSignificantWinnings    = cConfigFile.GetInt("SignificantWinnings", sStrategy);
     float       fSWM                    = cConfigFile.GetFloat("SWM", sStrategy);
+
     bool        bComeOddsWorking        = cConfigFile.GetBool("ComeOddsWorking", sStrategy);
+
     bool        bOddsProgression        = cConfigFile.GetBool("OddsProgression", sStrategy);
     std::string sOddsProgressionMethod  = cConfigFile.GetString("OddsProgressionMethod", sStrategy);
+
     bool        bTrackResults           = cConfigFile.GetBool("TrackResults", sStrategy);
 
     // Set initial bankroll.  Use AllStrategies setting if individual strategy's InitialBankroll is not set.
@@ -141,6 +155,19 @@ void CreateStrategy(const std::string &sStrategy, CDataFile &cConfigFile, const 
 
     // If the number of bet units for Place bets has been set, pass to Strategy
     if (nFieldBetUnits != INT_MIN) cStrategy.SetFieldBetUnits(nFieldBetUnits);
+
+    // Pass Any 7 Bet to Strategy; default is false
+    cStrategy.SetAny7BetAllowed(bAny7Bet);
+    // Pass Any Craps Bet to Strategy; default is false
+    cStrategy.SetAnyCrapsBetAllowed(bAnyCrapsBet);
+    // Pass Any Craps Bet to Strategy; default is false
+    cStrategy.SetCraps2BetAllowed(bCraps2Bet);
+    // Pass Any Craps Bet to Strategy; default is false
+    cStrategy.SetCraps3BetAllowed(bCraps3Bet);
+    // Pass Any Craps Bet to Strategy; default is false
+    cStrategy.SetYo11BetAllowed(bYo11Bet);
+    // Pass Any Craps Bet to Strategy; default is false
+    cStrategy.SetCraps12BetAllowed(bCraps12Bet);
 
     // Pass Big 6 Bet to Strategy; default is false
     cStrategy.SetBig6BetAllowed(bBig6Bet);

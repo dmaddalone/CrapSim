@@ -52,7 +52,7 @@ void Simulation::Run(int nNumberOfRuns, bool bMusterReport, bool bTally)
     cout << "\nStarting Simulation" << endl;
 
     // Ensure that each Strategy conforms to the environment
-    for (std::vector<Strategy>::iterator it = m_vStrategies.begin();it != m_vStrategies.end(); it++)
+    for (std::vector<Strategy>::iterator it = m_vStrategies.begin(); it != m_vStrategies.end(); it++)
     {
         it->SanityCheck(m_cTable);
     }
@@ -70,7 +70,8 @@ void Simulation::Run(int nNumberOfRuns, bool bMusterReport, bool bTally)
             ResolveBets();
             m_cTable.Update(m_cDice);
 
-        } while (PlayersStillLeft());
+        }
+        while (PlayersStillLeft());
 
         UpdateStatisticsAndReset();
 
@@ -91,7 +92,7 @@ void Simulation::Run(int nNumberOfRuns, bool bMusterReport, bool bTally)
 
 void Simulation::MakeBets()
 {
-    for (std::vector<Strategy>::iterator it = m_vStrategies.begin();it != m_vStrategies.end(); it++)
+    for (std::vector<Strategy>::iterator it = m_vStrategies.begin(); it != m_vStrategies.end(); it++)
     {
         it->MakeBets(m_cTable);
     }
@@ -99,7 +100,7 @@ void Simulation::MakeBets()
 
 void Simulation::ResolveBets()
 {
-    for (std::vector<Strategy>::iterator it = m_vStrategies.begin();it != m_vStrategies.end(); it++)
+    for (std::vector<Strategy>::iterator it = m_vStrategies.begin(); it != m_vStrategies.end(); it++)
     {
         it->ResolveBets(m_cTable, m_cDice);
     }
@@ -109,7 +110,7 @@ bool Simulation::PlayersStillLeft()
 {
     bool bPlayerStillLeft = false;
 
-    for (std::vector<Strategy>::iterator it = m_vStrategies.begin();it != m_vStrategies.end(); it++)
+    for (std::vector<Strategy>::iterator it = m_vStrategies.begin(); it != m_vStrategies.end(); it++)
     {
         bPlayerStillLeft = it->StillPlaying() || bPlayerStillLeft;
     }
@@ -119,7 +120,7 @@ bool Simulation::PlayersStillLeft()
 
 void Simulation::UpdateStatisticsAndReset()
 {
-    for (std::vector<Strategy>::iterator it = m_vStrategies.begin();it != m_vStrategies.end(); it++)
+    for (std::vector<Strategy>::iterator it = m_vStrategies.begin(); it != m_vStrategies.end(); it++)
     {
         it->UpdateStatistics();
         it->Reset();
@@ -130,7 +131,7 @@ void Simulation::Muster()
 {
     std::cout << "Muster" << endl;
 
-    for (std::vector<Strategy>::iterator it = m_vStrategies.begin();it != m_vStrategies.end(); it++)
+    for (std::vector<Strategy>::iterator it = m_vStrategies.begin(); it != m_vStrategies.end(); it++)
     {
         it->Muster();
     }
@@ -139,23 +140,23 @@ void Simulation::Muster()
 void Simulation::Report()
 {
     std::cout << std::setw(78) << std::right << "Rolls to Win " <<
-                 std::setw(18) << std::right << "Rolls to Lose" <<
-                 std::endl;
+              std::setw(18) << std::right << "Rolls to Lose" <<
+              std::endl;
 
     std::cout << std::setw(40) << std::right << "Name " <<
-                 std::setw(6)  << std::left << "Plays" <<
-                 std::setw(5)  << std::left << "Wins" <<
-                 std::setw(7)  << std::left << "Losses" <<
-                 std::setw(6)  << std::left << "Win %" <<
-                 std::setw(5)  << std::right << "Avg" <<
-                 std::setw(5)  << std::right << "Min" <<
-                 std::setw(7)  << std::right << "Max" <<
-                 std::setw(5)  << std::right << "Avg" <<
-                 std::setw(5)  << std::right << "Min" <<
-                 std::setw(7)  << std::right << "Max" <<
-                 std::endl;
+              std::setw(6)  << std::left << "Plays" <<
+              std::setw(5)  << std::left << "Wins" <<
+              std::setw(7)  << std::left << "Losses" <<
+              std::setw(6)  << std::left << "Win %" <<
+              std::setw(5)  << std::right << "Avg" <<
+              std::setw(5)  << std::right << "Min" <<
+              std::setw(7)  << std::right << "Max" <<
+              std::setw(5)  << std::right << "Avg" <<
+              std::setw(5)  << std::right << "Min" <<
+              std::setw(7)  << std::right << "Max" <<
+              std::endl;
 
-    for (std::vector<Strategy>::iterator it = m_vStrategies.begin();it != m_vStrategies.end(); it++)
+    for (std::vector<Strategy>::iterator it = m_vStrategies.begin(); it != m_vStrategies.end(); it++)
     {
         it->Report();
     }

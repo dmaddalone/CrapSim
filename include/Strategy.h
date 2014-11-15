@@ -35,6 +35,7 @@
 #include "Table.h"
 #include "Bet.h"
 #include "Money.h"
+#include "QualifiedShooter.h"
 class StrategyTracker;
 #include "StrategyTracker.h"
 
@@ -72,17 +73,18 @@ class Strategy
         void SetPlaceAfterCome(bool b)      { m_bPlaceAfterCome = b; }
         void SetPlacePreferred(int i)       { assert ((i == 4) || (i == 5) || (i ==6) || (i == 8) ||(i == 9) || (i == 10)); m_nPreferredPlaceBet = i; }
         void SetPlaceBetUnits(int i)        { assert (i >= 1); m_nPlaceBetUnits = i; }
-        // Set Field bet specifics
+        // Set one roll bet specifics
         void SetFieldBetAllowed(bool b)     { m_bFieldBetsAllowed = b; }
         void SetFieldBetUnits(int i)        { assert (i >= 1); m_nFieldBetUnits = i; }
+        void SetAny7BetAllowed(bool b)      { m_bAny7BetAllowed = b; }
+        void SetAnyCrapsBetAllowed(bool b)  { m_bAnyCrapsBetAllowed = b; }
+        void SetCraps2BetAllowed(bool b)    { m_bCraps2BetAllowed = b; }
+        void SetCraps3BetAllowed(bool b)    { m_bCraps3BetAllowed = b; }
+        void SetYo11BetAllowed(bool b)      { m_bYo11BetAllowed = b; }
+        void SetCraps12BetAllowed(bool b)   { m_bCraps12BetAllowed = b; }
         // Set Big 6 or 8 bet specifics
         void SetBig6BetAllowed(bool b)      { m_bBig6BetAllowed = b; }
         void SetBig8BetAllowed(bool b)      { m_bBig8BetAllowed = b; }
-        // Set Any 7 bet specifics
-        void SetAny7BetAllowed(bool b)      { m_bAny7BetAllowed = b; }
-        // Set Any Craps bet specifics
-        void SetAnyCrapsBetAllowed(bool b)  { m_bAnyCrapsBetAllowed = b; }
-        // Set standard (default) odds for Pass and Don't Pass bets
         void SetStandardOdds(float f)       { assert( f >= 1.0); m_fStandardOdds = m_fOdds = f; }
         // Set significant winnings multiple and absolute figures (see Money.h)
         void SetSignificantWinningsMultiple(float f) { m_cMoney.SetSignificantWinningsMultiple(f); }
@@ -162,12 +164,15 @@ class Strategy
         bool SixOrEightCovered();
         // Checks to see if the odds progression method is Arithmetic
         bool IsArithmeticOddsProgression() { return (m_ecOddsProgressionMethod == OddsProgressionMethod::ARITHMETIC); }
-
+        // Name and description
         std::string m_sName;
         std::string m_sDescription;
 
         // Money class to track bankroll
         Money m_cMoney;
+
+        // QualifiedShooter class to track qualified shooters
+        QualifiedShooter m_cQualifiedShooter;
 
         // StrategyTracker class to provide detailed (roll-by-roll) records of
         // a Strategy.  Used for debugging.  Recommend to a use in conjunction
@@ -179,8 +184,7 @@ class Strategy
         int m_nNumberOfComeBetsAllowed      = 0;
         int m_nNumberOfDontPassBetsAllowed  = 0;
         int m_nNumberOfDontComeBetsAllowed  = 0;
-        bool m_bFieldBetsAllowed            = false;
-        int m_nFieldBetUnits                = 1;
+
         int m_nNumberOfPassBetsMade         = 0;
         int m_nNumberOfComeBetsMade         = 0;
         int m_nNumberOfDontPassBetsMade     = 0;
@@ -192,6 +196,8 @@ class Strategy
         int m_nPlaceBetUnits                = 1;
         int m_bBig6BetAllowed               = false;
         int m_bBig8BetAllowed               = false;
+        bool m_bFieldBetsAllowed            = false;
+        int m_nFieldBetUnits                = 1;
         bool m_bAny7BetAllowed              = false;
         bool m_bAnyCrapsBetAllowed          = false;
         bool m_bCraps2BetAllowed            = false;
