@@ -62,8 +62,6 @@ class Dice
         bool  IsBar() const                    { return (m_nRollValue == 12); }
         bool  IsField() const                  { return (std::count(m_anFieldNumbers.begin(), m_anFieldNumbers.end(), m_nRollValue)) ? true : false; }
         bool  IsAPointNumber() const           { return (std::count(m_anPointNumbers.begin(), m_anPointNumbers.end(), m_nRollValue)) ? true : false; }
-        // Return the number of rolls in a row that are not Field numbers
-        int   NumberOfNonFieldInARow() const   { return (m_nNumberOfNonFieldInARow); }
         // Return the number times a value has been rolled
         int   RollValueCount(int i) const      { return (m_pnDiceRollValues[i - 1]); }
         // Return the total number of rolls

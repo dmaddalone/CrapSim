@@ -54,7 +54,6 @@ Dice::Dice(const Dice& cSource) : m_lDice(cSource.m_lDice)
 {
     m_nTotalDiceRolls         = cSource.m_nTotalDiceRolls;
     m_nRollValue              = cSource.m_nRollValue;
-    m_nNumberOfNonFieldInARow = cSource.m_nNumberOfNonFieldInARow;
 
     if (cSource.m_pnDiceRollValues)
     {
@@ -85,7 +84,6 @@ Dice& Dice::operator=(const Dice& cSource)
 
     m_nTotalDiceRolls         = cSource.m_nTotalDiceRolls;
     m_nRollValue              = cSource.m_nRollValue;
-    m_nNumberOfNonFieldInARow = cSource.m_nNumberOfNonFieldInARow;
 
     delete[] m_pnDiceRollValues;
 
@@ -142,16 +140,6 @@ int Dice::Roll()
 
     // Increment the total number of throws
     m_nTotalDiceRolls++;
-
-    // Record number of non Field numbers thrown in a row
-    if (!IsField())
-    {
-        m_nNumberOfNonFieldInARow++;
-    }
-    else
-    {
-        m_nNumberOfNonFieldInARow = 0;
-    }
 
     return(m_nRollValue);
 }

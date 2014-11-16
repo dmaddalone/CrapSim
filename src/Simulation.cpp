@@ -89,7 +89,7 @@ void Simulation::Run(int nNumberOfRuns, bool bMusterReport, bool bTally)
         if ((iii+1) % 100 == 0) std::cout << "\rCompleted " << iii+1 << " out of " << nNumberOfRuns << " runs" << std::flush;
     }
 
-    cout << endl;
+    std::cout << std::endl;
 }
 
 /**

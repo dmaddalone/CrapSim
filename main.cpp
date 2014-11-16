@@ -31,7 +31,23 @@
 #include "CDataFile.h"
 #include "CrapSimVersion.h"
 
-void CreateStrategy(const std::string &sStrategy, CDataFile &cConfigFile, const int nAllInitialBankroll, const int nAllStandardWager, const float fAllSWM, const int nAllSignificantWinnings, Simulation &cSim)
+/**
+  * Create a Strategy.
+  *
+  * Construct the Simulation and the Table.  Read the configuration file for
+  * all non-Strategy configuration sections. Create strategies.  Run
+  * simulations.  Report.
+  *
+  *\param sStrategy Section name of strategy from the configuration file
+  *\param cConfigFile Configfile class containing key, value settings
+  *\param nDefaultInitBank Default initial bankroll
+  *\param nDefaultStdWager Default standard wager
+  *\param fDefaultSWM Default significant winnings multiple
+  *\param nDefaultSigWin Default significant winnings amount
+  *\param cSim The Simulation class
+  */
+
+void CreateStrategy(const std::string sStrategy, CDataFile &cConfigFile, const int nDefaultInitBank, const int nDefaultStdWager, const float fDefaultSWM, const int nDefaultSigWin, Simulation &cSim)
 {
     //
     // Read config file for parameters this Strategy
@@ -94,11 +110,11 @@ void CreateStrategy(const std::string &sStrategy, CDataFile &cConfigFile, const 
     // Set the Strategy's parameters
     //
 
-    // Set initial bankroll.  Use AllStrategies setting if individual strategy's InitialBankroll is not set.
-    if (nInitialBankroll == INT_MIN) nInitialBankroll = nAllInitialBankroll;
+    // Set initial bankroll.  Use DefaultStrategy setting if individual strategy's InitialBankroll is not set.
+    if (nInitialBankroll == INT_MIN) nInitialBankroll = nDefaultInitBank;
 
-    // Set standard wager.  Use AllStrategies setting if individual strategy's StandardWager is not set.
-    if (nStandardWager == INT_MIN) nStandardWager = nAllStandardWager;
+    // Set standard wager.  Use DefaultStrategy setting if individual strategy's StandardWager is not set.
+    if (nStandardWager == INT_MIN) nStandardWager = nDefaultStdWager;
     if (nStandardWager <= 0) // If InitialBankroll still not set, exit with error
     {
         std::cerr << "ERROR (main): StandardWager not set: " << nStandardWager << std::endl;
@@ -134,12 +150,12 @@ void CreateStrategy(const std::string &sStrategy, CDataFile &cConfigFile, const 
 
     // Pass choice to make Full Wagers to Strategy
     cStrategy.SetFullWager(bFullWager);
-    // Set significant winnings multiple.  Use AllStrategies setting if individual strategy's SWM is not set.
-    if (fSWM == FLT_MIN) fSWM = fAllSWM;
+    // Set significant winnings multiple.  Use DefaultStrategy setting if individual strategy's SWM is not set.
+    if (fSWM == FLT_MIN) fSWM = fDefaultSWM;
     // If Significant Winngings Multiple has been set, pass to Strategy
     if (fSWM != FLT_MIN) cStrategy.SetSignificantWinningsMultiple(fSWM);
-    // Set significant winnings.  Use AllStrategies setting if individual strategy's Significant Winnings is not set.
-    if (nSignificantWinnings == INT_MIN) nSignificantWinnings = nAllSignificantWinnings;
+    // Set significant winnings.  Use DefaultStrategy setting if individual strategy's Significant Winnings is not set.
+    if (nSignificantWinnings == INT_MIN) nSignificantWinnings = nDefaultSigWin;
     // If Significant Winngings Multiple has been set, pass to Strategy
     if (nSignificantWinnings != INT_MIN) cStrategy.SetSignificantWinnings(nSignificantWinnings);
 
@@ -239,6 +255,8 @@ void CreateStrategy(const std::string &sStrategy, CDataFile &cConfigFile, const 
   * all non-Strategy configuration sections. Create strategies.  Run
   * simulations.  Report.
   *
+  *\param sINIFile Name of the INI configuration file
+  *
   */
 
 int CrapsSimulation(std::string sINIFile)
@@ -262,18 +280,18 @@ int CrapsSimulation(std::string sINIFile)
     CDataFile cConfigFile(sINIFile);
 
     // Set non-Strategy configuration items.
-    std::string sTableType          = cConfigFile.GetString("Type", "Table");
-    int nMinimumWager               = cConfigFile.GetInt("MinimumWager", "Table");
-    int nMaximumWager               = cConfigFile.GetInt("MaximumWager", "Table");
+    std::string sTableType = cConfigFile.GetString("Type", "Table");
+    int nMinimumWager      = cConfigFile.GetInt("MinimumWager", "Table");
+    int nMaximumWager      = cConfigFile.GetInt("MaximumWager", "Table");
 
-    int nDefaultInitialBankroll     = cConfigFile.GetInt("InitialBankroll", "DefaultStrategy");
-    int nDefaultStandardWager       = cConfigFile.GetInt("StandardWager", "DefaultStrategy");
-    float fDefaultSWM               = cConfigFile.GetFloat("SWM", "DefaultStrategy");
-    int nDefaultSignificantWinnings = cConfigFile.GetInt("SignificantWinnings", "DefaultStrategy");
+    int nDefaultInitBank   = cConfigFile.GetInt("InitialBankroll", "DefaultStrategy");
+    int nDefaultStdWager   = cConfigFile.GetInt("StandardWager", "DefaultStrategy");
+    float fDefaultSWM      = cConfigFile.GetFloat("SWM", "DefaultStrategy");
+    int nDefaultSigWin     = cConfigFile.GetInt("SignificantWinnings", "DefaultStrategy");
 
-    int nNumberOfRuns               = cConfigFile.GetInt("Runs", "Simulation");
-    bool bMusterReport              = cConfigFile.GetBool("Muster", "Simulation");
-    bool bTally                     = cConfigFile.GetBool("Tally", "Simulation");
+    int nNumberOfRuns      = cConfigFile.GetInt("Runs", "Simulation");
+    bool bMusterReport     = cConfigFile.GetBool("Muster", "Simulation");
+    bool bTally            = cConfigFile.GetBool("Tally", "Simulation");
 
     // No simulation runs, no simulation,
     if (nNumberOfRuns <= 0)
@@ -305,7 +323,8 @@ int CrapsSimulation(std::string sINIFile)
     for (int iii = 1; iii <= 24; iii++)
     {
         sStrategyName = "Strategy" + std::to_string(iii);
-        if (cConfigFile.CheckSectionName(sStrategyName)) CreateStrategy(sStrategyName, cConfigFile, nDefaultInitialBankroll, nDefaultStandardWager, fDefaultSWM, nDefaultSignificantWinnings, cSim);
+        if (cConfigFile.CheckSectionName(sStrategyName))
+            CreateStrategy(sStrategyName, cConfigFile, nDefaultInitBank, nDefaultStdWager, fDefaultSWM, nDefaultSigWin, cSim);
     }
 
     // Stop CDataFile cConfigFile from Save() and writing out the file
