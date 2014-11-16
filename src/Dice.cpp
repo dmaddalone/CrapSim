@@ -47,7 +47,6 @@ Dice::Dice(int nDice, int nFaces)
 /**
   * Copy constructor for Dice.
   *
-  *
   * \param cSource The source of the copy
   */
 
@@ -73,7 +72,6 @@ Dice::Dice(const Dice& cSource) : m_lDice(cSource.m_lDice)
 
 /**
   * Copy assignment constructor for Dice.
-  *
   *
   * \param cSource The source of the copy assignment
   */

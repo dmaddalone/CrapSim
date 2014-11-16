@@ -22,29 +22,40 @@
 #include <iostream>
 #include <iomanip>
 
-// TODO: get rid of these
-using std::cout;
-using std::endl;
-using std::flush;
+/**
+  * Construct the Simulatiom
+  *
+  */
 
 Simulation::Simulation() :
     m_cDice(2, 6),
     m_cTable(5, 5000)
 {}
 
+/**
+  * Run the simulatioms.
+  *
+  * Print configuration information, sanity check the Strategies, print a
+  * muster report, and execute the simulation.
+  *
+  *\param nNumberOfRuns Number of simulation runs to execute
+  *\param bMusterReport Flag to print muster report
+  *\param bTally Flag to print tally as simulation runs execute
+  */
+
 void Simulation::Run(int nNumberOfRuns, bool bMusterReport, bool bTally)
 {
-    cout << "Table" << endl;
-    cout << "\tType:\t\t" << m_cTable.TableType() << endl;
-    cout << "\tMinimum Wager:\t" << m_cTable.MinimumBet() << endl;
-    cout << "\tMaximum Wager:\t" << m_cTable.MaximumBet() << endl;
-    cout << "\tBar:\t\t" << m_cTable.Bar() << endl;
+    std::cout << "Table" << std::endl;
+    std::cout << "\tType:\t\t" << m_cTable.TableType() << std::endl;
+    std::cout << "\tMinimum Wager:\t" << m_cTable.MinimumBet() << std::endl;
+    std::cout << "\tMaximum Wager:\t" << m_cTable.MaximumBet() << std::endl;
+    std::cout << "\tBar:\t\t" << m_cTable.Bar() << std::endl;
 
-    cout << "Strategies" << endl;
-    cout << "\tNumber of strategies:\t" << m_vStrategies.size() << endl;
+    std::cout << "Strategies" << std::endl;
+    std::cout << "\tNumber of strategies:\t" << m_vStrategies.size() << std::endl;
 
-    cout << "Simulation" << endl;
-    cout << "\tNumber of runs:\t" << nNumberOfRuns << endl;
+    std::cout << "Simulation" << std::endl;
+    std::cout << "\tNumber of runs:\t" << nNumberOfRuns << std::endl;
 
     // Ensure that each Strategy conforms to the environment
     std::cout << "Sanity-checking the Strategies." << std::endl;
@@ -57,10 +68,9 @@ void Simulation::Run(int nNumberOfRuns, bool bMusterReport, bool bTally)
     // Write Muster
     if (bMusterReport) Muster();
 
-    cout << "\nStarting Simulation" << endl;
+    std::cout << "\nStarting Simulation" << std::endl;
     for (int iii = 0; iii < nNumberOfRuns; iii++)
     {
-        m_cTable.Reset();
         m_cTable.Reset();
 
         do
@@ -70,18 +80,25 @@ void Simulation::Run(int nNumberOfRuns, bool bMusterReport, bool bTally)
             ResolveBets();
             QualifyTheShooter();
             m_cTable.Update(m_cDice);
-
         }
         while (PlayersStillLeft());
 
         UpdateStatisticsAndReset();
 
         if (bTally)
-            if ((iii+1) % 100 == 0) cout << "\rCompleted " << iii+1 << " out of " << nNumberOfRuns << " runs" << flush;
+        if ((iii+1) % 100 == 0) std::cout << "\rCompleted " << iii+1 << " out of " << nNumberOfRuns << " runs" << std::flush;
     }
 
     cout << endl;
 }
+
+/**
+  * Make Bets.
+  *
+  * Loop through Strategies and direct them to make bets.  Bets are made if
+  * the shooter is qualified.
+  *
+  */
 
 void Simulation::MakeBets()
 {
@@ -91,6 +108,13 @@ void Simulation::MakeBets()
     }
 }
 
+/**
+  * Resolve Bets.
+  *
+  * Loop through Strategies and direct them to resolve bets.
+  *
+  */
+
 void Simulation::ResolveBets()
 {
     for (std::vector<Strategy>::iterator it = m_vStrategies.begin(); it != m_vStrategies.end(); it++)
@@ -99,6 +123,13 @@ void Simulation::ResolveBets()
     }
 }
 
+/**
+  * Qualifty The Shooter.
+  *
+  * Loop through Strategies and direct them to qualify the shooter.
+  *
+  */
+
 void Simulation::QualifyTheShooter()
 {
     for (std::vector<Strategy>::iterator it = m_vStrategies.begin();it != m_vStrategies.end(); it++)
@@ -106,6 +137,13 @@ void Simulation::QualifyTheShooter()
         it->QualifyTheShooter(m_cTable, m_cDice);
     }
 }
+
+/**
+  * Check to see if players (Strategies) are still playing.
+  *
+  * Loop through Strategies and check to see if they are still in the game.
+  *
+  */
 
 bool Simulation::PlayersStillLeft()
 {
@@ -119,6 +157,13 @@ bool Simulation::PlayersStillLeft()
     return (bPlayerStillLeft);
 }
 
+/**
+  * Update stats and reset for a new simulation run.
+  *
+  * Loop through Strategies, update stats and reset.
+  *
+  */
+
 void Simulation::UpdateStatisticsAndReset()
 {
     for (std::vector<Strategy>::iterator it = m_vStrategies.begin(); it != m_vStrategies.end(); it++)
@@ -128,15 +173,29 @@ void Simulation::UpdateStatisticsAndReset()
     }
 }
 
+/**
+  * Print muster report.
+  *
+  * Loop through Strateges and direct them to print a muster.
+  *
+  */
+
 void Simulation::Muster()
 {
-    std::cout << "Muster" << endl;
+    std::cout << "Muster" << std::endl;
 
     for (std::vector<Strategy>::iterator it = m_vStrategies.begin(); it != m_vStrategies.end(); it++)
     {
         it->Muster();
     }
 }
+
+/**
+  * Print end of simulation report.
+  *
+  * Print header for report. // TODO - remove header.
+  *
+  */
 
 void Simulation::Report()
 {

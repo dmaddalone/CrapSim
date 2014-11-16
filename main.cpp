@@ -232,13 +232,24 @@ void CreateStrategy(const std::string &sStrategy, CDataFile &cConfigFile, const 
     cSim.AddStrategy(cStrategy);
 }
 
+/**
+  * Simulation Driver.
+  *
+  * Construct the Simulation and the Table.  Read the configuration file for
+  * all non-Strategy configuration sections. Create strategies.  Run
+  * simulations.  Report.
+  *
+  */
+
 int CrapsSimulation(std::string sINIFile)
 {
     std::cout << "Craps Simulation version " << CrapSimVersion::SemanticVersion() << " " << CrapSimVersion::DateVersion() << std::endl;
 
+    // Construct Simualtion and Table
     Simulation  cSim;
     Table       cTable(5, 5000);
 
+    // No config file, no simulation.
     if (sINIFile.empty())
     {
         // TODO: Make a utility or expand into exception management
@@ -247,8 +258,10 @@ int CrapsSimulation(std::string sINIFile)
         exit (EXIT_FAILURE);
     }
 
+    // Open the configuration file and load the configuration.
     CDataFile cConfigFile(sINIFile);
 
+    // Set non-Strategy configuration items.
     std::string sTableType          = cConfigFile.GetString("Type", "Table");
     int nMinimumWager               = cConfigFile.GetInt("MinimumWager", "Table");
     int nMaximumWager               = cConfigFile.GetInt("MaximumWager", "Table");
@@ -262,6 +275,7 @@ int CrapsSimulation(std::string sINIFile)
     bool bMusterReport              = cConfigFile.GetBool("Muster", "Simulation");
     bool bTally                     = cConfigFile.GetBool("Tally", "Simulation");
 
+    // No simulation runs, no simulation,
     if (nNumberOfRuns <= 0)
     {
         std::cerr << "ERROR (main): Number of simulation runs not set." << std::endl;
@@ -269,6 +283,7 @@ int CrapsSimulation(std::string sINIFile)
         exit (EXIT_FAILURE);
     }
 
+    // Set Table attributes and add it to the Simulation.
     if (nMinimumWager != INT_MIN) cTable.SetMinimumBet(nMinimumWager);
     if (nMaximumWager != INT_MIN) cTable.SetMaximumBet(nMaximumWager);
 
@@ -284,6 +299,8 @@ int CrapsSimulation(std::string sINIFile)
 
     cSim.AddTable(cTable);
 
+    // Loop though possible Strategy sections (StrategyXX).  If it exists,
+    // call function to create it.
     std::string sStrategyName;
     for (int iii = 1; iii <= 24; iii++)
     {
@@ -294,11 +311,21 @@ int CrapsSimulation(std::string sINIFile)
     // Stop CDataFile cConfigFile from Save() and writing out the file
     cConfigFile.Clear();
 
+    // Run the Simulation.
     cSim.Run(nNumberOfRuns, bMusterReport, bTally);
+
+    // After action report.
     cSim.Report();
 
     return (0);
 }
+
+/**
+  * Main
+  *
+  * Check for a configuration file then call the CrapSimulation driver.
+  *
+  */
 
 int main(int argc, char* argv[])
 {
@@ -310,5 +337,3 @@ int main(int argc, char* argv[])
 
     return (CrapsSimulation(argv[1]));
 }
-
-

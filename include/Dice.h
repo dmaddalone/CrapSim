@@ -70,8 +70,6 @@ class Dice
         int   TotalRolls() const               { return (m_nTotalDiceRolls); }
         // Return the percentage of times a value is rolled
         float RollValuePercentage(int i) const { return ((float)RollValueCount(i) / TotalRolls() * 100); }
-        // Reset the table - meant to be called before a new Simulation run
-        void  Reset()                          { m_nRollValue = m_nNumberOfNonFieldInARow = 0; }
 
     private:
         // Container of dice
@@ -79,7 +77,6 @@ class Dice
         // Set counters to zero
         int  m_nTotalDiceRolls         = 0;
         int  m_nRollValue              = 0;
-        int  m_nNumberOfNonFieldInARow = 0;
 
         // Pointer / array to roll values
         int  *m_pnDiceRollValues;

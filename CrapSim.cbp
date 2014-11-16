@@ -39,6 +39,7 @@
 		<Unit filename="../CDataFile/include/CDataFile.h" />
 		<Unit filename="../CDataFile/src/CDataFile.cpp" />
 		<Unit filename="include/Bet.h" />
+		<Unit filename="include/CrapSimVersion.h" />
 		<Unit filename="include/Dice.h" />
 		<Unit filename="include/Die.h" />
 		<Unit filename="include/Money.h" />
