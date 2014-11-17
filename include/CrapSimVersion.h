@@ -6,7 +6,7 @@
 namespace CrapSimVersion{
 
 	//Date Version Types
-	static const std::string DATE {"15"};
+	static const std::string DATE {"16"};
 	static const std::string MONTH {"11"};
 	static const std::string YEAR {"2014"};
 	std::string DateVersion() {return (YEAR+MONTH+DATE); }
@@ -22,7 +22,7 @@ namespace CrapSimVersion{
 	//   tightly scoped bug fixes are the only code you're allowed to write
 	//   in this phase,
 	// Release
-	static const std::string STATUS {"Alpha"};
+	static const std::string STATUS {"Beta"};
 
 	//Semantic Versioning
 	// MAJOR version when you make incompatible changes,
@@ -30,7 +30,7 @@ namespace CrapSimVersion{
 	// PATCH version when you make backwards-compatible bug fixes.
 	static const int MAJOR = 0;
 	static const int MINOR = 6;
-	static const int PATCH = 3;
+	static const int PATCH = 4;
 	std::string SemanticVersion() { return (std::to_string(MAJOR) + "." + std::to_string(MINOR) + "." + std::to_string(PATCH)); }
 }
 

@@ -21,25 +21,30 @@
 
 // Setup random number generator, using Mersenne Twister 19937.  Assign it to
 // function rollDie().
-std::random_device   rdev{};
-std::mt19937         generator{rdev()};
-std::function<int()> rollDie;
+////std::random_device   rdev{};
+////std::mt19937         generator{rdev()};
+////std::function<int()> rollDie;
 
 /**
   * Construct a Die.
   *
   * Set the random number generator to a uniform distribution of 1..nFaces;
   * bind rollDie to the distribution and generator; set up array / pointer to
-  * nFaces number of values.
+  * nFaces number of values.  Using Mersenne Twister Engine, seeded with
+  * std::random_device.
   *
   * \param nFaces Specifices the number of faces of the die
   */
 
 Die::Die(int nFaces)
 {
-    std::uniform_int_distribution<int>   distribution(1, nFaces);
-    rollDie         = std::bind(distribution, std::ref(generator));
-    m_nFaces = nFaces;
+    ////std::uniform_int_distribution<int>   distribution(1, nFaces);
+    ////rollDie            = std::bind(distribution, std::ref(generator));
+    std::random_device rdev{};
+    std::mt19937 generator{rdev()};
+    std::uniform_int_distribution<int> distribution(1, nFaces);
+    rollDie            = std::bind(distribution, generator);
+    m_nFaces           = nFaces;
 	m_pnDieRollValues  = new int[m_nFaces]();
 }
 

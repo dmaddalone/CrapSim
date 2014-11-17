@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1416153023 source:/home/maddalone/CCPP/CrapSim/main.cpp
+1416153232 source:/home/maddalone/CCPP/CrapSim/main.cpp
 	<iostream>
 	<cassert>
 	<climits>
@@ -14,10 +14,10 @@
 	"CDataFile.h"
 	"CrapSimVersion.h"
 
-1415554008 source:/home/maddalone/CCPP/CrapSim/src/Die.cpp
+1416176054 source:/home/maddalone/CCPP/CrapSim/src/Die.cpp
 	"Die.h"
 
-1415555987 /home/maddalone/CCPP/CrapSim/include/Die.h
+1416172736 /home/maddalone/CCPP/CrapSim/include/Die.h
 	<random>
 	<functional>
 	<algorithm>
@@ -131,6 +131,6 @@
 	"Dice.h"
 	"Table.h"
 
-1416152069 /home/maddalone/CCPP/CrapSim/include/CrapSimVersion.h
+1416176570 /home/maddalone/CCPP/CrapSim/include/CrapSimVersion.h
 	<string>
 

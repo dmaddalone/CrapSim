@@ -64,6 +64,8 @@ class Die
         int m_nFaces            = 0;
         // Pointer / array to capture roll values
         int *m_pnDieRollValues;
+
+        std::function<int()> rollDie;
 };
 
 #endif // DIE_H
