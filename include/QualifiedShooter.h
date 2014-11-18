@@ -60,7 +60,7 @@ class QualifiedShooter
 
         // Set and return the qualification method
         bool SetMethod(std::string sMethod);
-        std::string Method();
+        std::string Method() const;
         // Set the count for the qualification method
         void SetCount(int i)                    { assert(i > 0); m_nQualificationCount = i; }
         int Count() const                       { return (m_nQualificationCount); }
@@ -69,12 +69,12 @@ class QualifiedShooter
         // Update the qualifications the shooter
         void QualifyTheShooter(const Table &cTable, const Dice &cDice);
         // Check if shooter has been qualified
-        bool ShooterQualified()                 { return (m_bShooterQualified); }
+        bool ShooterQualified() const           { return (m_bShooterQualified); }
 
     private:
         // Set defaults
         QualificationMethod m_ecQualificationMethod = QualificationMethod::QM_NO_METHOD;
-        bool m_bShooterQualified                    = false;
+        bool m_bShooterQualified                    = true;
         int  m_nQualificationCount                  = 1;
         bool m_bQualificationStopsWithShooter       = true;
 

@@ -76,6 +76,7 @@ void CreateStrategy(const std::string sStrategy, CDataFile &cConfigFile, const i
     int         nPlaceBets              = cConfigFile.GetInt("PlaceBets", sStrategy);
     int         nPlaceBetsMadeAtOnce    = cConfigFile.GetInt("PlaceBetsMadeAtOnce", sStrategy);
     bool        bPlaceAfterCome         = cConfigFile.GetBool("PlaceAfterCome", sStrategy);
+    std::string sPlaceAfterCome         = cConfigFile.GetString("PlaceAfterCome", sStrategy); // Needed for Predefined strategies
     int         nPlacePreferred         = cConfigFile.GetInt("PlacePreferred");
     int         nPlaceBetUnits          = cConfigFile.GetInt("PlaceBetUnits",sStrategy);
 
@@ -95,7 +96,7 @@ void CreateStrategy(const std::string sStrategy, CDataFile &cConfigFile, const i
     float       fStandardOdds           = cConfigFile.GetFloat("StandardOdds", sStrategy);
     bool        bComeOddsWorking        = cConfigFile.GetBool("ComeOddsWorking", sStrategy);
     bool        bOddsProgression        = cConfigFile.GetBool("OddsProgression", sStrategy);
-    std::string sOddsProgressionMethod  = cConfigFile.GetString("OddsProgressionMethod", sStrategy);
+    std::string sOddsProgressionMethod  = cConfigFile.GetString("OddsProgressionMethod", sStrategy);  // Needed for Predefined strategies
     // String version of OddsProgression boolean used because Predefined Strategies define odds progression
     std::string sOddsProgression        = cConfigFile.GetString("OddsProgression", sStrategy);
 
@@ -177,8 +178,12 @@ void CreateStrategy(const std::string sStrategy, CDataFile &cConfigFile, const i
     // If number of Place Bets has been set, pass to Strategy
     if (nPlaceBetsMadeAtOnce != INT_MIN) cStrategy.SetNumberOfPlaceBetsMadeAtOnce(nPlaceBetsMadeAtOnce);
 
-    // Pass choice to make Place bets only after Come bets to Strategy
-    cStrategy.SetPlaceAfterCome(bPlaceAfterCome);
+    // If PlaceAfterCome was set (checked using string) then updated settings
+    if (!sPlaceAfterCome.empty())
+    {
+        // Pass choice to make Place bets only after Come bets to Strategy
+        cStrategy.SetPlaceAfterCome(bPlaceAfterCome);
+    }
 
     // If preferred Place bet number has been set, pass to Strategy
     if (nPlacePreferred != INT_MIN) cStrategy.SetPlacePreferred(nPlacePreferred);

@@ -166,6 +166,7 @@ void Strategy::SetAggressive()
     m_nNumberOfPassBetsAllowed     = 1;
     m_nNumberOfComeBetsAllowed     = 2;
     m_nNumberOfPlaceBetsAllowed    = 1;
+    m_bPlaceAfterCome              = true;
     m_fStandardOdds                = 2.0;
     m_bOddsProgression             = true;
     m_ecOddsProgressionMethod      = OddsProgressionMethod::ARITHMETIC;
@@ -836,9 +837,9 @@ int Strategy::PlaceBetFullPayoffWager(const int nPlaceNumber)
 
 bool Strategy::SixOrEightCovered()
 {
-    for (std::list<Bet>::iterator it = m_lBets.begin();it != m_lBets.end(); it++)
+    for (const Bet &cBet : m_lBets)
     {
-        if ((it->Point() == 6) || (it->Point() == 8))
+        if ((cBet.Point() == 6) || (cBet.Point() == 8))
             return (true);
     }
 
@@ -1618,7 +1619,7 @@ void Strategy::Reset()
   *
   */
 
-void Strategy::Muster()
+void Strategy::Muster() const
 {
         std::cout << std::setw(20) << std::right << "Name: "                << Name()                                   << std::endl;
         std::cout << std::setw(20) << std::right << "Description: "         << Description()                            << std::endl;

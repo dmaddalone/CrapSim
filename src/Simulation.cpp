@@ -102,10 +102,15 @@ void Simulation::Run(int nNumberOfRuns, bool bMusterReport, bool bTally)
 
 void Simulation::MakeBets()
 {
-    for (std::vector<Strategy>::iterator it = m_vStrategies.begin(); it != m_vStrategies.end(); it++)
+    for (Strategy &cStrategy : m_vStrategies)
     {
-        if (it->ShooterQualified()) it->MakeBets(m_cTable);
+        if (cStrategy.ShooterQualified()) cStrategy.MakeBets(m_cTable);
     }
+
+    //for (std::vector<Strategy>::iterator it = m_vStrategies.begin(); it != m_vStrategies.end(); it++)
+    //{
+    //    if (it->ShooterQualified()) it->MakeBets(m_cTable);
+    //}
 }
 
 /**
@@ -117,10 +122,15 @@ void Simulation::MakeBets()
 
 void Simulation::ResolveBets()
 {
-    for (std::vector<Strategy>::iterator it = m_vStrategies.begin(); it != m_vStrategies.end(); it++)
+    for (Strategy &cStrategy : m_vStrategies)
     {
-        it->ResolveBets(m_cTable, m_cDice);
+        cStrategy.ResolveBets(m_cTable, m_cDice);
     }
+
+    //for (std::vector<Strategy>::iterator it = m_vStrategies.begin(); it != m_vStrategies.end(); it++)
+    //{
+    //    it->ResolveBets(m_cTable, m_cDice);
+    //}
 }
 
 /**
@@ -132,10 +142,15 @@ void Simulation::ResolveBets()
 
 void Simulation::QualifyTheShooter()
 {
-    for (std::vector<Strategy>::iterator it = m_vStrategies.begin();it != m_vStrategies.end(); it++)
+    for (Strategy &cStrategy : m_vStrategies)
     {
-        it->QualifyTheShooter(m_cTable, m_cDice);
+        cStrategy.QualifyTheShooter(m_cTable, m_cDice);
     }
+
+    //for (std::vector<Strategy>::iterator it = m_vStrategies.begin();it != m_vStrategies.end(); it++)
+    //{
+    //    it->QualifyTheShooter(m_cTable, m_cDice);
+    //}
 }
 
 /**
@@ -149,10 +164,15 @@ bool Simulation::PlayersStillLeft()
 {
     bool bPlayerStillLeft = false;
 
-    for (std::vector<Strategy>::iterator it = m_vStrategies.begin(); it != m_vStrategies.end(); it++)
+    for (const Strategy &cStrategy : m_vStrategies)
     {
-        bPlayerStillLeft = it->StillPlaying() || bPlayerStillLeft;
+        bPlayerStillLeft = cStrategy.StillPlaying() || bPlayerStillLeft;
     }
+
+    //for (std::vector<Strategy>::iterator it = m_vStrategies.begin(); it != m_vStrategies.end(); it++)
+    //{
+    //    bPlayerStillLeft = it->StillPlaying() || bPlayerStillLeft;
+    //}
 
     return (bPlayerStillLeft);
 }
@@ -166,11 +186,17 @@ bool Simulation::PlayersStillLeft()
 
 void Simulation::UpdateStatisticsAndReset()
 {
-    for (std::vector<Strategy>::iterator it = m_vStrategies.begin(); it != m_vStrategies.end(); it++)
+    for (Strategy &cStrategy : m_vStrategies)
     {
-        it->UpdateStatistics();
-        it->Reset();
+        cStrategy.UpdateStatistics();
+        cStrategy.Reset();
     }
+
+    //for (std::vector<Strategy>::iterator it = m_vStrategies.begin(); it != m_vStrategies.end(); it++)
+    //{
+    //    it->UpdateStatistics();
+    //    it->Reset();
+    //}
 }
 
 /**
@@ -184,10 +210,15 @@ void Simulation::Muster()
 {
     std::cout << "Muster" << std::endl;
 
-    for (std::vector<Strategy>::iterator it = m_vStrategies.begin(); it != m_vStrategies.end(); it++)
+    for (const Strategy &cStrategy : m_vStrategies)
     {
-        it->Muster();
+        cStrategy.Muster();
     }
+
+    //for (std::vector<Strategy>::iterator it = m_vStrategies.begin(); it != m_vStrategies.end(); it++)
+    //{
+    //    it->Muster();
+    //}
 }
 
 /**

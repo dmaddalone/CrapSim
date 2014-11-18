@@ -39,19 +39,24 @@ QualifiedShooter::QualifiedShooter()
 
 bool QualifiedShooter::SetMethod(std::string sMethod)
 {
-    if (sMethod.empty())
-        return (false);
+    bool bValidMethod = false;
 
-    std::locale loc;
-    for (std::string::size_type iii = 0; iii < sMethod.length(); iii++)
-        sMethod[iii] = std::toupper(sMethod[iii], loc);
+    if (!sMethod.empty())
+    {
+        std::locale loc;
+        for (std::string::size_type iii = 0; iii < sMethod.length(); iii++)
+            sMethod[iii] = std::toupper(sMethod[iii], loc);
 
-    std::map<std::string, QualificationMethod>::iterator it = m_mQualificationMethod.find(sMethod);
+        std::map<std::string, QualificationMethod>::iterator it = m_mQualificationMethod.find(sMethod);
 
-    if (it == m_mQualificationMethod.end()) return (false);
+        if (it != m_mQualificationMethod.end())
+        {
+            m_ecQualificationMethod = it->second;
+            bValidMethod = true;
+        }
+    }
 
-    m_ecQualificationMethod = it->second;
-    return (true);
+    return (bValidMethod);
 }
 
 /**
@@ -64,11 +69,11 @@ bool QualifiedShooter::SetMethod(std::string sMethod)
   * \return String representing the qualification method.
   */
 
-std::string QualifiedShooter::Method()
+std::string QualifiedShooter::Method() const
 {
     std::string sMethod("Unknown");
 
-    for (std::map<std::string, QualificationMethod>::iterator it = m_mQualificationMethod.begin(); it != m_mQualificationMethod.end(); it++)
+    for (std::map<std::string, QualificationMethod>::const_iterator it = m_mQualificationMethod.begin(); it != m_mQualificationMethod.end(); it++)
     {
         if (m_ecQualificationMethod == it->second)
         {
@@ -100,69 +105,53 @@ void QualifiedShooter::QualifyTheShooter(const Table &cTable, const Dice &cDice)
     switch (m_ecQualificationMethod)
     {
         case QualificationMethod::QM_NO_METHOD:
-            //return (m_bShooterQualified);
+            m_bShooterQualified = true;
             break;
         case QualificationMethod::QM_5COUNT:
-            //return (Method5Count(cTable, cDice));
             Method5Count(cTable, cDice);
             break;
         case QualificationMethod::QM_AFTER_POINT_MADE:
-            //return (MethodAfterPointMade(cTable, cDice));
             MethodAfterPointMade(cTable, cDice);
             break;
         case QualificationMethod::QM_AFTER_LOSING_FIELD_THREE_TIMES_IN_A_ROW:
-            //return (MethodAfterLosingFieldThreeTimesInARow(cTable, cDice));
             MethodAfterLosingFieldThreeTimesInARow(cTable, cDice);
             break;
         case QualificationMethod::QM_AFTER_FIVE_NON_SEVEN_ROLLS:
-            //return (MethodAfterFiveNon7Rolls(cDice));
             MethodAfterFiveNon7Rolls(cDice);
             break;
         case QualificationMethod::QM_AFTER_N_2_ROLLS_IN_A_ROW:
-            //return (MethodAfterNXRollsInARow(cTable, cDice, 2));
             MethodAfterNXRollsInARow(cTable, cDice, 2);
             break;
         case QualificationMethod::QM_AFTER_N_3_ROLLS_IN_A_ROW:
-            //return (MethodAfterNXRollsInARow(cTable, cDice, 3));
             MethodAfterNXRollsInARow(cTable, cDice, 3);
             break;
         case QualificationMethod::QM_AFTER_N_4_ROLLS_IN_A_ROW:
-            //return (MethodAfterNXRollsInARow(cTable, cDice, 4));
             MethodAfterNXRollsInARow(cTable, cDice, 4);
             break;
         case QualificationMethod::QM_AFTER_N_5_ROLLS_IN_A_ROW:
-            //return (MethodAfterNXRollsInARow(cTable, cDice, 5));
             MethodAfterNXRollsInARow(cTable, cDice, 5);
             break;
         case QualificationMethod::QM_AFTER_N_6_ROLLS_IN_A_ROW:
-            //return (MethodAfterNXRollsInARow(cTable, cDice, 6));
             MethodAfterNXRollsInARow(cTable, cDice, 6);
             break;
         case QualificationMethod::QM_AFTER_N_8_ROLLS_IN_A_ROW:
-            //return (MethodAfterNXRollsInARow(cTable, cDice, 8));
             MethodAfterNXRollsInARow(cTable, cDice, 8);
             break;
         case QualificationMethod::QM_AFTER_N_9_ROLLS_IN_A_ROW:
-            //return (MethodAfterNXRollsInARow(cTable, cDice, 9));
             MethodAfterNXRollsInARow(cTable, cDice, 9);
             break;
         case QualificationMethod::QM_AFTER_N_10_ROLLS_IN_A_ROW:
-            //return (MethodAfterNXRollsInARow(cTable, cDice, 10));
             MethodAfterNXRollsInARow(cTable, cDice, 10);
             break;
         case QualificationMethod::QM_AFTER_N_11_ROLLS_IN_A_ROW:
-            //return (MethodAfterNXRollsInARow(cTable, cDice, 11));
             MethodAfterNXRollsInARow(cTable, cDice, 11);
             break;
         case QualificationMethod::QM_AFTER_N_12_ROLLS_IN_A_ROW:
-            //return (MethodAfterNXRollsInARow(cTable, cDice, 12));
             MethodAfterNXRollsInARow(cTable, cDice, 12);
             break;
         default:
             break;
     }
-
-    //return (true);
 }
 
 /**

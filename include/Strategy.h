@@ -124,7 +124,7 @@ class Strategy
         // Used before a new simulation run
         void  Reset();
         // Report a Strategy's basic settings
-        void  Muster();
+        void  Muster() const;
         // Report summary of Strategy's results over the Simulation
         void  Report();
 
@@ -169,7 +169,7 @@ class Strategy
         // Check to see if a current bet covers 6 or 8
         bool SixOrEightCovered();
         // Checks to see if the odds progression method is Arithmetic
-        bool IsArithmeticOddsProgression() { return (m_ecOddsProgressionMethod == OddsProgressionMethod::ARITHMETIC); }
+        bool IsArithmeticOddsProgression() const { return (m_ecOddsProgressionMethod == OddsProgressionMethod::ARITHMETIC); }
         // Name and description
         std::string m_sName;
         std::string m_sDescription;
