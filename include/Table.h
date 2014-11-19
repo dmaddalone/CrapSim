@@ -26,7 +26,7 @@
 #ifndef TABLE_H
 #define TABLE_H
 
-#include <cassert>
+#include <stdexcept>
 #include <map>
 #include <string>
 #include <locale>
@@ -53,9 +53,9 @@ class Table
         Table(int nMin, int nMax);
 
         // Set and return the minimum and maximum bet wagers
-        void   SetMinimumBet(int b)     { assert (b > 0); m_nMinimumBet = b; }
+        void   SetMinimumBet(int i)     { if (i > 0) m_nMinimumBet = i; else throw std::domain_error("Table::SetMinimumBet"); }
         int    MinimumBet() const       { return (m_nMinimumBet); }
-        void   SetMaximumBet(int b)     { assert (b > 0); m_nMaximumBet = b; }
+        void   SetMaximumBet(int i)     { if (i > 0) m_nMaximumBet = i; else throw std::domain_error("Table::SetMaximumBet"); }
         int    MaximumBet() const       { return (m_nMaximumBet); }
         // Set and return the table point
         void   SetPoint(int p)          { m_bPuckOn = true; m_nPoint = p; }

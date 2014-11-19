@@ -48,8 +48,10 @@ Strategy::Strategy(std::string sName, std::string sDesc, int nInitiBank, int nSt
 
     m_cMoney.Initialize(nInitiBank);
 
-    assert(nStdWager > 0);
-    m_nStandardWager = m_nWager = nStdWager;
+    if (nStdWager > 0)
+        m_nStandardWager = m_nWager = nStdWager;
+    else
+        throw std::domain_error("Strategy::Strategy: standard wager <= 0");
 
     m_bTrackResults = bTrackResults;
     if (m_bTrackResults) m_pcStrategyTracker = new StrategyTracker(this);
@@ -309,7 +311,7 @@ void Strategy::MakeBets(const Table &cTable)
   *
   * Check to see if the Strategy is sill playing.  If so, Loop through all bets
   * and call each bet type. If the bet is resolved, remove the bet from the
-  * bets container.If tracking results, call StrategyTracker. If Odds
+  * bets container.  If tracking results, call StrategyTracker. If Odds
   * Progression is set, compare before and after bankroll and adjust accordingly.
   *
   *\param cTable The Table.
@@ -1231,7 +1233,8 @@ bool Strategy::ResolvePassOdds(std::list<Bet>::iterator &it, const Table &cTable
 {
     bool bBetResolved = false;
 
-    assert (cTable.IsComingOutRoll() == false);             // Test - There should not be a Pass Odds bet if this is coming out roll
+    if (cTable.IsComingOutRoll() == true)             // There should not be a Pass Odds bet if this is coming out roll
+        throw std::domain_error("Strategy::ResolvePassOdds: called when Table is coming out");
 
     if (cDice.IsSeven())                                    // Pass Odds Bets and a Seven Roll?
     {
@@ -1260,7 +1263,8 @@ bool Strategy::ResolveDontPassOdds(std::list<Bet>::iterator &it, const Table &cT
 {
     bool bBetResolved = false;
 
-    assert (cTable.IsComingOutRoll() == false);             // Test - There should not be a Pass Odds bet if this is coming out roll
+    if (cTable.IsComingOutRoll() == true)             // There should not be a Don't Pass Odds bet if this is coming out roll
+        throw std::domain_error("Strategy::ResolveDontPassOdds: called when Table is coming out");
 
     if (cDice.IsSeven())                                    // Dont Pass Odds Bets and a Seven Roll?
     {

@@ -18,7 +18,7 @@
 */
 
 #include <iostream>
-#include <cassert>
+#include <stdexcept>
 #include <climits>
 #include <cfloat>
 #include "Die.h"

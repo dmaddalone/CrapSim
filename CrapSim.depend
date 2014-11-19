@@ -1,7 +1,7 @@
 # depslib dependency file v1.0
-1416282285 source:/home/maddalone/CCPP/CrapSim/main.cpp
+1416368098 source:/home/maddalone/CCPP/CrapSim/main.cpp
 	<iostream>
-	<cassert>
+	<stdexcept>
 	<climits>
 	<cfloat>
 	"Die.h"
@@ -27,39 +27,40 @@
 	<iostream>
 	"Dice.h"
 
-1416152938 /home/maddalone/CCPP/CrapSim/include/Dice.h
+1416367436 /home/maddalone/CCPP/CrapSim/include/Dice.h
 	<algorithm>
 	<array>
 	<list>
 	"Die.h"
 
-1415760232 source:/home/maddalone/CCPP/CrapSim/src/Table.cpp
+1416368097 source:/home/maddalone/CCPP/CrapSim/src/Table.cpp
 	"Table.h"
 
-1415760232 /home/maddalone/CCPP/CrapSim/include/Table.h
-	<cassert>
+1416368991 /home/maddalone/CCPP/CrapSim/include/Table.h
+	<stdexcept>
 	<map>
 	<string>
 	<locale>
 	"Dice.h"
 
-1415936377 source:/home/maddalone/CCPP/CrapSim/src/Bet.cpp
+1416368991 source:/home/maddalone/CCPP/CrapSim/src/Bet.cpp
 	"Bet.h"
 
-1416068897 /home/maddalone/CCPP/CrapSim/include/Bet.h
+1416362285 /home/maddalone/CCPP/CrapSim/include/Bet.h
+	<stdexcept>
 
-1416284373 source:/home/maddalone/CCPP/CrapSim/src/Strategy.cpp
+1416368991 source:/home/maddalone/CCPP/CrapSim/src/Strategy.cpp
 	"Strategy.h"
 	<fstream>
 	<iostream>
 	<iomanip>
 
-1416284422 /home/maddalone/CCPP/CrapSim/include/Strategy.h
+1416368991 /home/maddalone/CCPP/CrapSim/include/Strategy.h
 	<algorithm>
-	<cassert>
 	<climits>
 	<string>
 	<list>
+	<stdexcept>
 	<vector>
 	"Table.h"
 	"Bet.h"
@@ -78,8 +79,8 @@
 	<iostream>
 	<iomanip>
 
-1415509904 /home/maddalone/CCPP/CrapSim/include/Money.h
-	<cassert>
+1416369004 /home/maddalone/CCPP/CrapSim/include/Money.h
+	<stdexcept>
 	<climits>
 	<iostream>
 
@@ -123,14 +124,15 @@
 	<iostream>
 	"StrategyTracker.h"
 
-1416284548 source:/home/maddalone/CCPP/CrapSim/src/QualifiedShooter.cpp
+1416368990 source:/home/maddalone/CCPP/CrapSim/src/QualifiedShooter.cpp
 	<iostream>
 	"QualifiedShooter.h"
 
-1416284503 /home/maddalone/CCPP/CrapSim/include/QualifiedShooter.h
+1416368991 /home/maddalone/CCPP/CrapSim/include/QualifiedShooter.h
+	<stdexcept>
 	"Dice.h"
 	"Table.h"
 
-1416281382 /home/maddalone/CCPP/CrapSim/include/CrapSimVersion.h
+1416367223 /home/maddalone/CCPP/CrapSim/include/CrapSimVersion.h
 	<string>
 

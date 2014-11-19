@@ -26,6 +26,8 @@
 #ifndef BET_H
 #define BET_H
 
+#include <stdexcept>
+
 // Used to identify the type of bet
 enum class BetType
 {

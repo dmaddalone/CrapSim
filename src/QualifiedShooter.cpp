@@ -150,6 +150,7 @@ void QualifiedShooter::QualifyTheShooter(const Table &cTable, const Dice &cDice)
             MethodAfterNXRollsInARow(cTable, cDice, 12);
             break;
         default:
+            throw std::domain_error("QualifiedShooter::QualifyTheShooter: unknown QualificationMethod");
             break;
     }
 }

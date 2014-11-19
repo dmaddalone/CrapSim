@@ -212,6 +212,7 @@ int Bet::CalculatePayoff ()
             }
 
         default:
+            throw std::domain_error("Bet::CalculatePayoff: unknown BetType");
             break;
     }
 

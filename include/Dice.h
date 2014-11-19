@@ -53,7 +53,7 @@ class Dice
         bool  IsCraps() const                  { return ((m_nRollValue == 2) || (m_nRollValue == 3) || (m_nRollValue == 12)); }
         bool  IsNatural() const                { return ((m_nRollValue == 7) || (m_nRollValue == 11)); }
         bool  IsTwo() const                    { return (m_nRollValue == 2); }
-        bool  IsThree() const                    { return (m_nRollValue == 3); }
+        bool  IsThree() const                  { return (m_nRollValue == 3); }
         bool  IsSix() const                    { return (m_nRollValue == 6); }
         bool  IsSeven() const                  { return (m_nRollValue == 7); }
         bool  IsEight() const                  { return (m_nRollValue == 8); }

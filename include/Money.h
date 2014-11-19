@@ -26,7 +26,7 @@
 #ifndef MONEY_H
 #define MONEY_H
 
-#include <cassert>
+#include <stdexcept>
 #include <climits>
 #include <iostream>
 
@@ -51,11 +51,11 @@ class Money
         // Return the significant winning multiple
         float SignificantWinningsMultiple() const    { return (m_fSignificantWinningsMultiple); }
         // Set the significant winning multiple
-        void SetSignificantWinningsMultiple(float f) { assert (f > 1.0); m_fSignificantWinningsMultiple = f; }
+        void SetSignificantWinningsMultiple(float f) { if (f >= 1.0) m_fSignificantWinningsMultiple = f; else throw std::domain_error("Money::SetSignificantWinningsMultiple"); }
         // Return the significant winnings absolute amount
         int SignificantWinnings() const              { return (m_nSignificantWinnings); }
         // Set the significant winnings absolute amount
-        void SetSignificantWinnings(int i)           { assert (i > 1); m_nSignificantWinnings = i; }
+        void SetSignificantWinnings(int i)           { if (i >= 1) m_nSignificantWinnings = i; else throw std::domain_error("Money::SetSignificantWinnings"); }
         // Return whether the significant winnings has been attained
         bool HasSignificantWinnings() const;
 

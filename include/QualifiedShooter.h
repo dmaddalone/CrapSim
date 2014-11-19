@@ -27,6 +27,7 @@
 #ifndef QUALIFIEDSHOOTER_H
 #define QUALIFIEDSHOOTER_H
 
+#include<stdexcept>
 #include "Dice.h"
 #include "Table.h"
 
@@ -62,7 +63,7 @@ class QualifiedShooter
         bool SetMethod(std::string sMethod);
         std::string Method() const;
         // Set the count for the qualification method
-        void SetCount(int i)                    { assert(i > 0); m_nQualificationCount = i; }
+        void SetCount(int i)                    { if (i >= 1) m_nQualificationCount = i; else throw std::domain_error("QualifiedShooter::SetCount"); }
         int Count() const                       { return (m_nQualificationCount); }
         // Set when the qualification method starts, usually with a new shooter
         void SetStopWithShooter(bool b)         { m_bQualificationStopsWithShooter = b; }

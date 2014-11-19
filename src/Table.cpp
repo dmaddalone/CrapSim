@@ -55,8 +55,8 @@ Table::Table(int nMin, int nMax)
 
 float Table::MaxOdds(int nPoint) const
 {
-    // TODO: replace with IsAPointNumber and an exit if not so
-    assert ((nPoint == 4) || (nPoint == 5) || (nPoint == 6) || (nPoint == 8) || (nPoint == 9) || (nPoint ==10));
+    if ((nPoint != 4) && (nPoint != 5) && (nPoint != 6) && (nPoint != 8) && (nPoint != 9) && (nPoint !=10))
+        throw std::domain_error("Table::MaxOdds: unknown point");
 
     switch (m_ecTableOdds)
     {
@@ -107,7 +107,7 @@ float Table::MaxOdds(int nPoint) const
             return (100.0);
             break;
         default:
-            return(1.0);
+            throw std::domain_error("Table::MaxOdds: unknown TableOdds");
             break;
     }
 
