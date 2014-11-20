@@ -86,7 +86,8 @@ void Simulation::Run(int nNumberOfRuns, bool bMusterReport, bool bTally)
         UpdateStatisticsAndReset();
 
         if (bTally)
-        if ((iii+1) % 100 == 0) std::cout << "\rCompleted " << iii+1 << " out of " << nNumberOfRuns << " runs" << std::flush;
+            if ((iii+1) % 100 == 0)
+                std::cout << "\rCompleted " << iii+1 << " out of " << nNumberOfRuns << " runs" << std::flush;
     }
 
     std::cout << std::endl;
@@ -104,13 +105,9 @@ void Simulation::MakeBets()
 {
     for (Strategy &cStrategy : m_vStrategies)
     {
-        if (cStrategy.ShooterQualified()) cStrategy.MakeBets(m_cTable);
+        cStrategy.MakeBets(m_cTable);
     }
 
-    //for (std::vector<Strategy>::iterator it = m_vStrategies.begin(); it != m_vStrategies.end(); it++)
-    //{
-    //    if (it->ShooterQualified()) it->MakeBets(m_cTable);
-    //}
 }
 
 /**
@@ -126,11 +123,6 @@ void Simulation::ResolveBets()
     {
         cStrategy.ResolveBets(m_cTable, m_cDice);
     }
-
-    //for (std::vector<Strategy>::iterator it = m_vStrategies.begin(); it != m_vStrategies.end(); it++)
-    //{
-    //    it->ResolveBets(m_cTable, m_cDice);
-    //}
 }
 
 /**
@@ -146,11 +138,6 @@ void Simulation::QualifyTheShooter()
     {
         cStrategy.QualifyTheShooter(m_cTable, m_cDice);
     }
-
-    //for (std::vector<Strategy>::iterator it = m_vStrategies.begin();it != m_vStrategies.end(); it++)
-    //{
-    //    it->QualifyTheShooter(m_cTable, m_cDice);
-    //}
 }
 
 /**
@@ -169,11 +156,6 @@ bool Simulation::PlayersStillLeft()
         bPlayerStillLeft = cStrategy.StillPlaying() || bPlayerStillLeft;
     }
 
-    //for (std::vector<Strategy>::iterator it = m_vStrategies.begin(); it != m_vStrategies.end(); it++)
-    //{
-    //    bPlayerStillLeft = it->StillPlaying() || bPlayerStillLeft;
-    //}
-
     return (bPlayerStillLeft);
 }
 
@@ -191,12 +173,6 @@ void Simulation::UpdateStatisticsAndReset()
         cStrategy.UpdateStatistics();
         cStrategy.Reset();
     }
-
-    //for (std::vector<Strategy>::iterator it = m_vStrategies.begin(); it != m_vStrategies.end(); it++)
-    //{
-    //    it->UpdateStatistics();
-    //    it->Reset();
-    //}
 }
 
 /**
@@ -214,11 +190,6 @@ void Simulation::Muster()
     {
         cStrategy.Muster();
     }
-
-    //for (std::vector<Strategy>::iterator it = m_vStrategies.begin(); it != m_vStrategies.end(); it++)
-    //{
-    //    it->Muster();
-    //}
 }
 
 /**

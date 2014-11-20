@@ -87,7 +87,7 @@ void Strategy::SetElementary()
     m_nNumberOfComeBetsAllowed     = 0;
     m_nNumberOfPlaceBetsAllowed    = 0;
     m_fStandardOdds                = 1.0;
-    m_bOddsProgression             = true;
+    //m_bOddsProgression             = true;
     m_ecOddsProgressionMethod      = OddsProgressionMethod::ARITHMETIC;
 
     if (m_sName.empty()) SetName("Elementary");
@@ -114,7 +114,6 @@ void Strategy::SetConservative()
     m_nNumberOfComeBetsAllowed     = 1;
     m_nNumberOfPlaceBetsAllowed    = 0;
     m_fStandardOdds                = 1.0;
-    m_bOddsProgression             = true;
     m_ecOddsProgressionMethod      = OddsProgressionMethod::ARITHMETIC;
 
     if (m_sName.empty()) SetName("Conservative");
@@ -141,7 +140,6 @@ void Strategy::SetConventional()
     m_nNumberOfComeBetsAllowed     = 2;
     m_nNumberOfPlaceBetsAllowed    = 0;
     m_fStandardOdds                = 1.0;
-    m_bOddsProgression             = true;
     m_ecOddsProgressionMethod      = OddsProgressionMethod::ARITHMETIC;
 
     if (m_sName.empty()) SetName("Conventional");
@@ -170,7 +168,6 @@ void Strategy::SetAggressive()
     m_nNumberOfPlaceBetsAllowed    = 1;
     m_bPlaceAfterCome              = true;
     m_fStandardOdds                = 2.0;
-    m_bOddsProgression             = true;
     m_ecOddsProgressionMethod      = OddsProgressionMethod::ARITHMETIC;
 
     if (m_sName.empty()) SetName("Aggressive");
@@ -183,27 +180,41 @@ void Strategy::SetAggressive()
   * Set the method to progress (increase) the odds taken.
   *
   * INI File:
-  * OddsProgression=true|false
   * OddsProgressionMethod=ARITHMETIC|GEOMETRIC
   *
   *\param sOddsProgressionMethod The selected odds progression method.
-  *
-  *\return True if known method provided, false otherwise
   */
 
-bool Strategy::SetOddsProgressionMethod(std::string sOddsProgressionMethod)
+void Strategy::SetOddsProgressionMethod(std::string sOddsProgressionMethod)
 {
-    bool bKnownMethod = true;
-
     std::locale loc;
     for (std::string::size_type iii = 0; iii < sOddsProgressionMethod.length(); iii++)
         sOddsProgressionMethod[iii] = std::toupper(sOddsProgressionMethod[iii], loc);
 
     if (sOddsProgressionMethod == "ARITHMETIC")     m_ecOddsProgressionMethod = OddsProgressionMethod::ARITHMETIC;
     else if (sOddsProgressionMethod == "GEOMETRIC") m_ecOddsProgressionMethod = OddsProgressionMethod::GEOMETRIC;
-    else bKnownMethod = false;
+    else throw std::domain_error("Strategy::SetOddsProgressionMethod");
+}
 
-    return (bKnownMethod);
+/**
+  * Set the wager on loss progression method.
+  *
+  * Set the method to progress (increase) the wager made on a lost bet.
+  *
+  * INI File:
+  * WagerOnLossProgression=Martingale
+  *
+  *\param sWagerProgressionMethod The selected wager on loss progression method.
+  */
+
+void Strategy::SetWagerProgressionOnLoss(std::string sWagerProgressionMethod)
+{
+    std::locale loc;
+    for (std::string::size_type iii = 0; iii < sWagerProgressionMethod.length(); iii++)
+        sWagerProgressionMethod[iii] = std::toupper(sWagerProgressionMethod[iii], loc);
+
+    if (sWagerProgressionMethod == "MARTINGALE") m_ecWagerProgressionOnLossMethod = WagerProgressionOnLossMethod::MARTINGALE;
+    else throw std::domain_error("Strategy::SetWagerProgressionOnLoss");
 }
 
 /**
@@ -219,9 +230,9 @@ bool Strategy::SetOddsProgressionMethod(std::string sOddsProgressionMethod)
   *\return True if known method provided, false otherwise
   */
 
-bool Strategy::SetQualifiedShooterMethod(std::string sQualifiedShooterMethod)
+void Strategy::SetQualifiedShooterMethod(std::string sQualifiedShooterMethod)
 {
-    return (m_cQualifiedShooter.SetMethod(sQualifiedShooterMethod));
+    m_cQualifiedShooter.SetMethod(sQualifiedShooterMethod);
 }
 
 /**
@@ -282,7 +293,7 @@ void Strategy::SanityCheck(const Table &cTable)
 
 void Strategy::MakeBets(const Table &cTable)
 {
-    if (StillPlaying())
+    if (StillPlaying() && ShooterQualified())
     {
         // If tracking results, start a new record, which updates bankroll, and update table stats
         if (m_bTrackResults) m_pcStrategyTracker->RecordNew(this, cTable);
@@ -359,7 +370,7 @@ void Strategy::ResolveBets(const Table &cTable, const Dice &cDice)
                 it++;
         }
 
-        if (m_bOddsProgression)
+        if (IsUsingOddsProgession())
         {
             // If using Odds Progression, and bankroll has increased, increase Odds
             if (m_cMoney.Bankroll() > nStartingBankroll)
@@ -367,6 +378,18 @@ void Strategy::ResolveBets(const Table &cTable, const Dice &cDice)
             // Else reset odds
             else
                 ResetOdds();
+        }
+
+        if (IsMartingaleWagerProgressionOnLoss())
+        {
+            if (m_cMoney.Bankroll() < nStartingBankroll)
+            {
+                IncreaseWagerOnLoss();
+            }
+            else
+            {
+                ResetWager();
+            }
         }
 
         // If tracking results, record ending bankroll and post results
@@ -513,105 +536,58 @@ void Strategy::MakeOddsBet(const Table &cTable)
 
     for (std::list<Bet>::iterator it = m_lBets.begin();it != m_lBets.end(); it++)
     {
-        // Pass Bet
-        if (it->IsPassBet())
+        // Pass Bet or Dont Pass Bet
+        if (it->IsPassBet() || it->IsDontPassBet() || it->IsComeBet() || it->IsDontComeBet())
         {
+            // Not on the come out for the bet
             if (!it->OnTheComeOut())
             {
-                if (!it->IsOddsBetMade())          // Pass Bet without Odds Bet?
-                {
-                    // Calculate maximum odds wager, based on Strategy and Table type
-                    int nWager = it->Wager() * std::min(cTable.MaxOdds(it->Point()), m_fOdds);
-
-                    // Check for Full Wager; if set, update nWager
-                    if (m_bFullWager) nWager = OddsBetFullPayoffWager(nWager, it->Point());
-
-                    Bet cBet;
-                    cBet.MakePassOddsBet(nWager, it->Point());
-
-                    it->SetOddsBetMade();
-
-                    m_cMoney.Decrement(nWager);
-                    m_lBets.push_back(cBet);
-                }
-            }
-        }
-
-        // Dont Pass Bet
-        if (it->IsDontPassBet())
-        {
-            if (!it->OnTheComeOut())
-            {
-                if (!it->IsOddsBetMade())          // Dont Pass Bet without Odds Bet?
+                // Bet without Odds Bet?
+                if (!it->IsOddsBetMade())
                 {
                     // Calculate maximum odds wager, based on Strategy and Table type
                     int nWager = it->Wager() * std::min(cTable.MaxOdds(it->Point()), m_fOdds);
                     // Check for Full Wager; if set, update nWager
                     if (m_bFullWager) nWager = OddsBetFullPayoffWager(nWager, it->Point());
 
+                    // Generate a new bet
                     Bet cBet;
-                    // First, create Bet as Pass Odds
-                    cBet.MakePassOddsBet(nWager, it->Point());
-                    // Second, calculate payoff and use as wager
-                    nWager = cBet.CalculatePayoff();
-                    // Third, change bet to Dont Pass Odds
-                    cBet.MakeDontPassOddsBet(nWager, it->Point());
 
-                    it->SetOddsBetMade();
+                    // Methods for Pass or DontpassBet
+                    if (it->IsPassBet() || it->IsDontPassBet())
+                    {
+                        // First, create Bet as Pass Odds
+                        cBet.MakePassOddsBet(nWager, it->Point());
 
-                    m_cMoney.Decrement(nWager);
-                    m_lBets.push_back(cBet);
-                }
-            }
-        }
+                        // Second, if this is a Don't Pass Odds Bet, calculate payoff and use as wager
+                        if (it->IsDontPassBet())
+                        {
+                            nWager = cBet.CalculatePayoff();
+                            // Third, change bet to Dont Pass Odds
+                            cBet.MakeDontPassOddsBet(nWager, it->Point());
+                        }
+                    }
+                    else // Is a ComeBet or a DontComeBet
+                    {
+                        // First, create Bet as Come Odds
+                        cBet.MakeComeOddsBet(nWager, it->Point());
 
-        // Come Bet
-        if (it->IsComeBet())
-        {
-            if (!it->OnTheComeOut())
-            {
-                if (!it->IsOddsBetMade())             // Come Bet without Odds Bet?
-                {
-                    // Calculate maximum odds wager, based on Strategy and Table type
-                    int nWager = it->Wager() * std::min(cTable.MaxOdds(it->Point()), m_fOdds);
-                    // Check for Full Wager; if set, update nWager
-                    if (m_bFullWager) nWager = OddsBetFullPayoffWager(nWager, it->Point());
+                        if (it->IsComeBet())
+                        {
+                            // Set whether odds are working for the Come Bet on the Table come out
+                            cBet.SetComeOddsAreWorking(m_bComeOddsWorking);
+                        }
 
-                    Bet cBet;
-                    cBet.MakeComeOddsBet(nWager, it->Point());
+                        else // Is a DontComeBet
+                        {
+                            // Second, calculate payoff and use as wager
+                            nWager = cBet.CalculatePayoff();
+                            // Third, change bet to Dont Pass Odds
+                            cBet.MakeDontComeOddsBet(nWager, it->Point());
+                        }
+                    }
 
-                    // Set whether odds are working for the Come Bet on the Table come out
-                    cBet.SetComeOddsAreWorking(m_bComeOddsWorking);
-
-                    it->SetOddsBetMade();
-
-                    m_cMoney.Decrement(nWager);
-                    m_lBets.push_back(cBet);
-                }
-            }
-
-        }
-
-        // Dont Come Bet
-        if (it->IsDontComeBet())
-        {
-            if (!it->OnTheComeOut())
-            {
-                if (!it->IsOddsBetMade())          // Dont Pass Bet without Odds Bet?
-                {
-                    // Calculate maximum odds wager, based on Strategy and Table type
-                    int nWager = it->Wager() * std::min(cTable.MaxOdds(it->Point()), m_fOdds);
-                    // Check for Full Wager; if set, update nWager
-                    if (m_bFullWager) nWager = OddsBetFullPayoffWager(nWager, it->Point());
-
-                    Bet cBet;
-                    // First, create Bet as Come Odds
-                    cBet.MakeComeOddsBet(nWager, it->Point());
-                    // Second, calculate payoff and use as wager
-                    nWager = cBet.CalculatePayoff();
-                    // Third, change bet to Dont Pass Odds
-                    cBet.MakeDontComeOddsBet(nWager, it->Point());
-
+                    // Indicate that original bet now has an Odds bet
                     it->SetOddsBetMade();
 
                     m_cMoney.Decrement(nWager);
@@ -1608,6 +1584,7 @@ void Strategy::Reset()
     m_nNumberOfDontComeBetsMade  = 0;
 
     m_nNumberOfPlaceBetsMade = 0;
+
     m_nNumberOfRolls         = 0;
 
     m_nWager = m_nStandardWager;
@@ -1664,18 +1641,25 @@ void Strategy::Muster() const
             std::cout << std::setw(20) << std::right << "Sig. Winnings: "       << "NOT USED"                           << std::endl;
         }
 
-        std::cout << std::setw(20) << std::right << "Odds Progression: "    << std::boolalpha << m_bOddsProgression     << std::endl;
         std::cout << std::setw(20) << std::right << "Odds Prog. Method: ";
 
-
-        if (!m_bOddsProgression)
-            std::cout << "n/a" << std::endl;
+        if (!IsUsingOddsProgession())
+            std::cout << "NOT USED" << std::endl;
         else
         {
             if (IsArithmeticOddsProgression())
                 std::cout << "Arithmetic" << std::endl;
             else
                 std::cout << "Geometric" << std::endl;
+        }
+
+        std::cout << std::setw(20) << std::right << "Wager On Loss Prog. Method: ";
+
+        if (!IsMartingaleWagerProgressionOnLoss())
+            std::cout << "NOT USED" << std::endl;
+        else
+        {
+            std::cout << "Martingale" << std::endl;
         }
 
         std::cout << std::setw(20) << std::right << "Qual. Sh. Method: "    << m_cQualifiedShooter.Method() << std::endl;

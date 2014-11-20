@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1416368098 source:/home/maddalone/CCPP/CrapSim/main.cpp
+1416452609 source:/home/maddalone/CCPP/CrapSim/main.cpp
 	<iostream>
 	<stdexcept>
 	<climits>
@@ -33,7 +33,7 @@
 	<list>
 	"Die.h"
 
-1416368097 source:/home/maddalone/CCPP/CrapSim/src/Table.cpp
+1416369143 source:/home/maddalone/CCPP/CrapSim/src/Table.cpp
 	"Table.h"
 
 1416368991 /home/maddalone/CCPP/CrapSim/include/Table.h
@@ -46,16 +46,16 @@
 1416368991 source:/home/maddalone/CCPP/CrapSim/src/Bet.cpp
 	"Bet.h"
 
-1416362285 /home/maddalone/CCPP/CrapSim/include/Bet.h
+1416449467 /home/maddalone/CCPP/CrapSim/include/Bet.h
 	<stdexcept>
 
-1416368991 source:/home/maddalone/CCPP/CrapSim/src/Strategy.cpp
+1416454447 source:/home/maddalone/CCPP/CrapSim/src/Strategy.cpp
 	"Strategy.h"
 	<fstream>
 	<iostream>
 	<iomanip>
 
-1416368991 /home/maddalone/CCPP/CrapSim/include/Strategy.h
+1416452514 /home/maddalone/CCPP/CrapSim/include/Strategy.h
 	<algorithm>
 	<climits>
 	<string>
@@ -74,7 +74,7 @@
 	"Strategy.h"
 	<vector>
 
-1416284315 source:/home/maddalone/CCPP/CrapSim/src/Simulation.cpp
+1416449226 source:/home/maddalone/CCPP/CrapSim/src/Simulation.cpp
 	"Simulation.h"
 	<iostream>
 	<iomanip>
@@ -103,7 +103,7 @@
 	<windows.h>
 	"CDataFile.h"
 
-1413426992 /home/maddalone/CCPP/CDataFile/include/CDataFile.h
+1416374415 /home/maddalone/CCPP/CDataFile/include/CDataFile.h
 	<vector>
 	<fstream>
 	<string>
@@ -124,15 +124,15 @@
 	<iostream>
 	"StrategyTracker.h"
 
-1416368990 source:/home/maddalone/CCPP/CrapSim/src/QualifiedShooter.cpp
+1416452486 source:/home/maddalone/CCPP/CrapSim/src/QualifiedShooter.cpp
 	<iostream>
 	"QualifiedShooter.h"
 
-1416368991 /home/maddalone/CCPP/CrapSim/include/QualifiedShooter.h
+1416452486 /home/maddalone/CCPP/CrapSim/include/QualifiedShooter.h
 	<stdexcept>
 	"Dice.h"
 	"Table.h"
 
-1416367223 /home/maddalone/CCPP/CrapSim/include/CrapSimVersion.h
+1416446665 /home/maddalone/CCPP/CrapSim/include/CrapSimVersion.h
 	<string>
 

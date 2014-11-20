@@ -37,26 +37,22 @@ QualifiedShooter::QualifiedShooter()
   * \return True if qualification method is known, false otherwise.
   */
 
-bool QualifiedShooter::SetMethod(std::string sMethod)
+void QualifiedShooter::SetMethod(std::string sMethod)
 {
-    bool bValidMethod = false;
+    std::locale loc;
+    for (std::string::size_type iii = 0; iii < sMethod.length(); iii++)
+        sMethod[iii] = std::toupper(sMethod[iii], loc);
 
-    if (!sMethod.empty())
+    std::map<std::string, QualificationMethod>::iterator it = m_mQualificationMethod.find(sMethod);
+
+    if (it != m_mQualificationMethod.end())
     {
-        std::locale loc;
-        for (std::string::size_type iii = 0; iii < sMethod.length(); iii++)
-            sMethod[iii] = std::toupper(sMethod[iii], loc);
-
-        std::map<std::string, QualificationMethod>::iterator it = m_mQualificationMethod.find(sMethod);
-
-        if (it != m_mQualificationMethod.end())
-        {
-            m_ecQualificationMethod = it->second;
-            bValidMethod = true;
-        }
+        m_ecQualificationMethod = it->second;
     }
-
-    return (bValidMethod);
+    else
+    {
+        throw std::domain_error("QualifiedShooter::SetMethod");
+    }
 }
 
 /**

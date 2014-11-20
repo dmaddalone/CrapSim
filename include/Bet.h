@@ -139,11 +139,11 @@ class Bet
 
     private:
         // Set bet defaults
-        BetType m_ecType = BetType::TYPE_NOBET;
-        int m_nWager               = 0;
-        int m_nPoint               = 0;
-        bool m_bOddsBetMade        = false;
-        bool m_bComeOddsAreWorking = false;
+        BetType m_ecType           {BetType::TYPE_NOBET};
+        int m_nWager               {0};
+        int m_nPoint               {0};
+        bool m_bOddsBetMade        {false};
+        bool m_bComeOddsAreWorking {false};
 };
 
 #endif // BET_H

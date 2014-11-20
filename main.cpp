@@ -95,10 +95,10 @@ void CreateStrategy(const std::string sStrategy, CDataFile &cConfigFile, const i
     // Odds settings
     float       fStandardOdds           = cConfigFile.GetFloat("StandardOdds", sStrategy);
     bool        bComeOddsWorking        = cConfigFile.GetBool("ComeOddsWorking", sStrategy);
-    bool        bOddsProgression        = cConfigFile.GetBool("OddsProgression", sStrategy);
-    std::string sOddsProgressionMethod  = cConfigFile.GetString("OddsProgressionMethod", sStrategy);  // Needed for Predefined strategies
-    // String version of OddsProgression boolean used because Predefined Strategies define odds progression
-    std::string sOddsProgression        = cConfigFile.GetString("OddsProgression", sStrategy);
+    std::string sOddsProgressionMethod  = cConfigFile.GetString("OddsProgressionMethod", sStrategy);
+
+    // Wager progression settings
+    std::string sWagerProgressionOnLossMethod = cConfigFile.GetString("WagerProgressionOnLossMethod", sStrategy);
 
     // Shooter qualification methods
     std::string sQualifiedShooterMethod = cConfigFile.GetString("QualifiedShooterMethod", sStrategy);
@@ -219,33 +219,14 @@ void CreateStrategy(const std::string sStrategy, CDataFile &cConfigFile, const i
     // Pass choice to make odds working on a table come out roll to Strategy
     cStrategy.SetComeOddsWorking(bComeOddsWorking);
 
-    // If OddsProgression was set (checked using string) then updated settings
-    if (!sOddsProgression.empty())
-    {
-        // Pass Odds Progression to Strategy; default is false
-        cStrategy.UseOddsProgression(bOddsProgression);
-        // If Odds Progression is used, check for Odds Progression type of Arithmetic or Geometric.  If neither is set, exit with error.
-        if (bOddsProgression)
-        {
-            if (!cStrategy.SetOddsProgressionMethod(sOddsProgressionMethod))
-            {
-                std::cerr << "ERROR (main): Unknown OddsProgressionMethod setting: " << sOddsProgressionMethod << std::endl;
-                std::cerr << "Exiting" << std::endl;
-                exit (EXIT_FAILURE);
-            }
-        }
-    }
+    // If OddsProgression was set then updated Strategy
+    if (!sOddsProgressionMethod.empty()) cStrategy.SetOddsProgressionMethod(sOddsProgressionMethod);
 
-    if (!sQualifiedShooterMethod.empty())
-    {
-        // If Qualified Shooter Method is used, check for correct Qualified Shooter Method type.  If not set, exit with error.
-        if (!cStrategy.SetQualifiedShooterMethod(sQualifiedShooterMethod))
-        {
-            std::cerr << "ERROR (main): Unknown QualifiedShooterMethod setting: " << sQualifiedShooterMethod << std::endl;
-            std::cerr << "Exiting" << std::endl;
-            exit (EXIT_FAILURE);
-        }
-    }
+    // If WagerProgressionOnLossMethod was set then update Strategy
+    if (!sWagerProgressionOnLossMethod.empty()) cStrategy.SetWagerProgressionOnLoss(sWagerProgressionOnLossMethod);
+
+    // If Qualified Shooter Method was set then update Strategy
+    if (!sQualifiedShooterMethod.empty()) cStrategy.SetQualifiedShooterMethod(sQualifiedShooterMethod);
 
     if (nQualifiedShooterMethodCount != INT_MIN) cStrategy.SetQualifiedShooterMethodCount(nQualifiedShooterMethodCount);
 

@@ -13,6 +13,9 @@
 				<Option compiler="gcc" />
 				<Option parameters="CrapSimSimple.ini" />
 				<Compiler>
+					<Add option="-std=c++11" />
+					<Add option="-Wextra" />
+					<Add option="-Wall" />
 					<Add option="-g" />
 					<Add directory="include" />
 					<Add directory="../CDataFile/include" />
@@ -25,7 +28,11 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
+					<Add option="-std=c++11" />
+					<Add option="-Wextra" />
+					<Add option="-Wall" />
 					<Add directory="include" />
+					<Add directory="../CDataFile/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -33,6 +40,8 @@
 			</Target>
 		</Build>
 		<Compiler>
+			<Add option="-std=c++11" />
+			<Add option="-Wextra" />
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>

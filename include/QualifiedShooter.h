@@ -60,7 +60,7 @@ class QualifiedShooter
         QualifiedShooter();
 
         // Set and return the qualification method
-        bool SetMethod(std::string sMethod);
+        void SetMethod(std::string sMethod);
         std::string Method() const;
         // Set the count for the qualification method
         void SetCount(int i)                    { if (i >= 1) m_nQualificationCount = i; else throw std::domain_error("QualifiedShooter::SetCount"); }

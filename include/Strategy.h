@@ -39,11 +39,19 @@
 class StrategyTracker;
 #include "StrategyTracker.h"
 
-// Used to identify the odds progression method
+// Odds progression method
 enum class OddsProgressionMethod
 {
+    NO_METHOD,
     ARITHMETIC,
     GEOMETRIC
+};
+
+// Wager progression on loss method
+enum class WagerProgressionOnLossMethod
+{
+    NO_METHOD,
+    MARTINGALE
 };
 
 class Strategy
@@ -95,20 +103,20 @@ class Strategy
         void SetConventional();
         void SetAggressive();
         // Odds methods
+        void SetOddsProgressionMethod(std::string sMethod);
         void SetComeOddsWorking(bool b)     { m_bComeOddsWorking = b; }
-        void UseOddsProgression(bool b)     { m_bOddsProgression = b; }
-        void IncreaseOdds()                 { if (IsArithmeticOddsProgression()) m_fOdds += 1; else m_fOdds *= 2; }
+        void IncreaseOdds()                 { if (IsArithmeticOddsProgression()) m_fOdds += 1; else if (IsGeometricOddsProgression()) m_fOdds *= 2; else throw std::domain_error("Strategy::IncreaseOdds"); }
         void ResetOdds()                    { m_fOdds = m_fStandardOdds; }
-        bool SetOddsProgressionMethod(std::string sMethod);
-        //void SetOddsProgressionMethodArithmetic() { m_ecOddsProgressionMethod = OddsProgressionMethod::ARITHMETIC; }
-        //void SetOddsProgressionMethodGeometric()  { m_ecOddsProgressionMethod = OddsProgressionMethod::GEOMETRIC; }
+        // Wager progression methods
+        void SetWagerProgressionOnLoss(std::string sMethod);
+        void IncreaseWagerOnLoss()          { if (IsMartingaleWagerProgressionOnLoss()) m_nWager *=2; else throw std::domain_error("Strategy::IncreaseWager"); }
+        void ResetWager()                   { m_nWager = m_nStandardWager; }
         // Qualified Shooter methods
-        bool SetQualifiedShooterMethod(std::string);
+        void SetQualifiedShooterMethod(std::string);
         void SetQualifiedShooterMethodCount(int n) { m_cQualifiedShooter.SetCount(n); }
         void QualifyTheShooter(const Table &cTable, const Dice &cDice) { m_cQualifiedShooter.QualifyTheShooter(cTable, cDice); }
         bool ShooterQualified()             { return (m_cQualifiedShooter.ShooterQualified()); }
-        // Used before simulations are run to ensure that Strategies fit to
-        // Table settings
+        // Used before simulations are run to ensure that Strategies fit to Table settings
         void SanityCheck(const Table &cTable);
 
         // Main drivers of the Strategy
@@ -153,7 +161,6 @@ class Strategy
         int  PlaceBetNumber();
 
         // Resolve bets
-        //void ResolvePass(const Dice &cDice);
         bool ResolvePass(std::list<Bet>::iterator &it, const Dice &cDice);
         bool ResolvePassOdds(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice);
         bool ResolveDontPass(std::list<Bet>::iterator &it, const Dice &cDice);
@@ -168,8 +175,12 @@ class Strategy
 
         // Check to see if a current bet covers 6 or 8
         bool SixOrEightCovered();
-        // Checks to see if the odds progression method is Arithmetic
+        // Checks for odds progression
+        bool IsUsingOddsProgession() const       {return (m_ecOddsProgressionMethod != OddsProgressionMethod::NO_METHOD); }
         bool IsArithmeticOddsProgression() const { return (m_ecOddsProgressionMethod == OddsProgressionMethod::ARITHMETIC); }
+        bool IsGeometricOddsProgression() const  { return (m_ecOddsProgressionMethod == OddsProgressionMethod::GEOMETRIC); }
+        // Checks for wager progressions
+        bool IsMartingaleWagerProgressionOnLoss() const { return (m_ecWagerProgressionOnLossMethod == WagerProgressionOnLossMethod::MARTINGALE); }
         // Name and description
         std::string m_sName;
         std::string m_sDescription;
@@ -216,8 +227,8 @@ class Strategy
         float m_fStandardOdds               = 1.0;
         float m_fOdds                       = 1.0;
         bool  m_bComeOddsWorking            = false;
-        bool  m_bOddsProgression            = false;
-        OddsProgressionMethod m_ecOddsProgressionMethod = OddsProgressionMethod::ARITHMETIC;
+        OddsProgressionMethod m_ecOddsProgressionMethod = OddsProgressionMethod::NO_METHOD;
+        WagerProgressionOnLossMethod m_ecWagerProgressionOnLossMethod = WagerProgressionOnLossMethod::NO_METHOD;
         int m_nPreferredPlaceBet            = 8;
 
         // Set counters to zero or defaults

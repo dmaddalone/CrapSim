@@ -1,64 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Debug" />
-	<File name="../CDataFile/include/CDataFile.h" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<ActiveTarget name="Release" />
+	<File name="include/Strategy.h" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="453" topLine="0" />
+			<Cursor1 position="4651" topLine="87" />
 		</Cursor>
 	</File>
 	<File name="main.cpp" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="8969" topLine="170" />
+			<Cursor1 position="15522" topLine="323" />
 		</Cursor>
 	</File>
-	<File name="include/Dice.h" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src/Money.cpp" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="2696" topLine="47" />
-		</Cursor>
-	</File>
-	<File name="src/Strategy.cpp" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="53383" topLine="1104" />
-		</Cursor>
-	</File>
-	<File name="include/Die.h" open="1" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2102" topLine="29" />
-		</Cursor>
-	</File>
-	<File name="src/QualifiedShooter.cpp" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3443" topLine="55" />
-		</Cursor>
-	</File>
-	<File name="include/Table.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2698" topLine="48" />
-		</Cursor>
-	</File>
-	<File name="src/Simulation.cpp" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="5469" topLine="124" />
-		</Cursor>
-	</File>
-	<File name="src/Dice.cpp" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3372" topLine="105" />
-		</Cursor>
-	</File>
-	<File name="include/QualifiedShooter.h" open="1" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1818" topLine="45" />
-		</Cursor>
-	</File>
-	<File name="include/Strategy.h" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="9029" topLine="160" />
-		</Cursor>
-	</File>
-	<File name="src/Die.cpp" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="913" topLine="20" />
+			<Cursor1 position="1172" topLine="20" />
 		</Cursor>
 	</File>
 	<File name="src/StrategyTracker.cpp" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -66,24 +21,39 @@
 			<Cursor1 position="0" topLine="81" />
 		</Cursor>
 	</File>
-	<File name="include/CrapSimVersion.h" open="1" top="1" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="include/Table.h" open="1" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1237" topLine="0" />
+			<Cursor1 position="1500" topLine="35" />
 		</Cursor>
 	</File>
-	<File name="include/Money.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src/Simulation.cpp" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="386" topLine="31" />
+			<Cursor1 position="5469" topLine="124" />
 		</Cursor>
 	</File>
-	<File name="../CDataFile/src/CDataFile.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="include/Money.h" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="2133" topLine="408" />
+			<Cursor1 position="2866" topLine="26" />
 		</Cursor>
 	</File>
-	<File name="include/Bet.h" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="include/Dice.h" open="1" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1445" topLine="64" />
+			<Cursor1 position="1883" topLine="48" />
+		</Cursor>
+	</File>
+	<File name="../CDataFile/include/CDataFile.h" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="453" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="src/Bet.cpp" open="1" top="0" tabpos="14" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="6045" topLine="177" />
+		</Cursor>
+	</File>
+	<File name="include/Die.h" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2102" topLine="27" />
 		</Cursor>
 	</File>
 	<File name="include/Simulation.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -91,14 +61,19 @@
 			<Cursor1 position="1868" topLine="29" />
 		</Cursor>
 	</File>
-	<File name="src/Money.cpp" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="include/CrapSimVersion.h" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1172" topLine="14" />
+			<Cursor1 position="1237" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="src/Table.cpp" open="0" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src/Strategy.cpp" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="0" topLine="12" />
+			<Cursor1 position="1668" topLine="33" />
+		</Cursor>
+	</File>
+	<File name="include/Bet.h" open="1" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1190" topLine="29" />
 		</Cursor>
 	</File>
 	<File name="include/StrategyTracker.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -106,9 +81,34 @@
 			<Cursor1 position="3749" topLine="76" />
 		</Cursor>
 	</File>
-	<File name="src/Bet.cpp" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="../CDataFile/src/CDataFile.cpp" open="1" top="1" tabpos="15" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="5911" topLine="146" />
+			<Cursor1 position="1528" topLine="39" />
+		</Cursor>
+	</File>
+	<File name="include/QualifiedShooter.h" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2039" topLine="48" />
+		</Cursor>
+	</File>
+	<File name="src/QualifiedShooter.cpp" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="6438" topLine="118" />
+		</Cursor>
+	</File>
+	<File name="src/Dice.cpp" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3031" topLine="101" />
+		</Cursor>
+	</File>
+	<File name="src/Table.cpp" open="1" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3460" topLine="106" />
+		</Cursor>
+	</File>
+	<File name="src/Die.cpp" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="913" topLine="20" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>
