@@ -1,3 +1,22 @@
+/*
+    Copyright 2014 Dom Maddalone
+
+    This file is part of CrapSim.
+
+    CrapSim is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    CrapSim is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with CrapSim.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include <iostream>
 #include "QualifiedShooter.h"
 
@@ -33,8 +52,6 @@ QualifiedShooter::QualifiedShooter()
   * The string is set in the map of strings and QualificationMethod types.
   *
   * \param sMethod The qualification method, e.g., 5COUNT, AFTER_POINT_MADE.
-  *
-  * \return True if qualification method is known, false otherwise.
   */
 
 void QualifiedShooter::SetMethod(std::string sMethod)
@@ -51,7 +68,7 @@ void QualifiedShooter::SetMethod(std::string sMethod)
     }
     else
     {
-        throw std::domain_error("QualifiedShooter::SetMethod");
+        throw std::domain_error("QualifiedShooter::SetMethod: unknown method");
     }
 }
 
@@ -59,7 +76,7 @@ void QualifiedShooter::SetMethod(std::string sMethod)
   * Return the qualification method for a shooter in string format.
   *
   * Loops the known qualification methods and compares to this Strategy's
-  * qualification emthod.  When found, return correspnding string. The
+  * qualification method.  When found, return correspnding string. The
   * string is set in the map of strings and QualificationMethod types.
   *
   * \return String representing the qualification method.
@@ -82,7 +99,7 @@ std::string QualifiedShooter::Method() const
 }
 
 /**
-  * Return the table type in string format.
+  * Qualify the shooter based on the qualification method.
   *
   * Depending on the set qualification method, calls the corresponding
   * qualification method.  The qualification methods are based  on the Table
@@ -91,11 +108,8 @@ std::string QualifiedShooter::Method() const
   * \param cTable The Table.
   * \param cDice The Dice.
   *
-  * \return True if the shooter has qualified, false otherwise.  Default is
-  * true.
   */
 
-//bool QualifiedShooter::QualifyTheShooter(const Table &cTable, const Dice &cDice)
 void QualifiedShooter::QualifyTheShooter(const Table &cTable, const Dice &cDice)
 {
     switch (m_ecQualificationMethod)

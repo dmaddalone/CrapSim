@@ -48,10 +48,7 @@ Strategy::Strategy(std::string sName, std::string sDesc, int nInitiBank, int nSt
 
     m_cMoney.Initialize(nInitiBank);
 
-    if (nStdWager > 0)
-        m_nStandardWager = m_nWager = nStdWager;
-    else
-        throw std::domain_error("Strategy::Strategy: standard wager <= 0");
+    m_cWager.Initialize(nStdWager);
 
     m_bTrackResults = bTrackResults;
     if (m_bTrackResults) m_pcStrategyTracker = new StrategyTracker(this);
@@ -87,7 +84,6 @@ void Strategy::SetElementary()
     m_nNumberOfComeBetsAllowed     = 0;
     m_nNumberOfPlaceBetsAllowed    = 0;
     m_fStandardOdds                = 1.0;
-    //m_bOddsProgression             = true;
     m_ecOddsProgressionMethod      = OddsProgressionMethod::ARITHMETIC;
 
     if (m_sName.empty()) SetName("Elementary");
@@ -197,27 +193,6 @@ void Strategy::SetOddsProgressionMethod(std::string sOddsProgressionMethod)
 }
 
 /**
-  * Set the wager on loss progression method.
-  *
-  * Set the method to progress (increase) the wager made on a lost bet.
-  *
-  * INI File:
-  * WagerOnLossProgression=Martingale
-  *
-  *\param sWagerProgressionMethod The selected wager on loss progression method.
-  */
-
-void Strategy::SetWagerProgressionOnLoss(std::string sWagerProgressionMethod)
-{
-    std::locale loc;
-    for (std::string::size_type iii = 0; iii < sWagerProgressionMethod.length(); iii++)
-        sWagerProgressionMethod[iii] = std::toupper(sWagerProgressionMethod[iii], loc);
-
-    if (sWagerProgressionMethod == "MARTINGALE") m_ecWagerProgressionOnLossMethod = WagerProgressionOnLossMethod::MARTINGALE;
-    else throw std::domain_error("Strategy::SetWagerProgressionOnLoss");
-}
-
-/**
   * Set the qualified shooter method.
   *
   * Set the method to qualify the shooter.
@@ -226,8 +201,6 @@ void Strategy::SetWagerProgressionOnLoss(std::string sWagerProgressionMethod)
   * QualifiedShooterMethod=[a lot of chices]
   *
   *\param sQualifiedShooterMethod The selected shooter qualification method.
-  *
-  *\return True if known method provided, false otherwise
   */
 
 void Strategy::SetQualifiedShooterMethod(std::string sQualifiedShooterMethod)
@@ -248,23 +221,29 @@ void Strategy::SetQualifiedShooterMethod(std::string sQualifiedShooterMethod)
   * Ensure bet settings make sense.  An example: the number of Place bets made
   * at one time cannot exceed the number of total Place bets.
   *
-  *
   *\param cTable The Table.
   */
 
 void Strategy::SanityCheck(const Table &cTable)
 {
-    // Ensure that Strategy's standard wager is no less than Table minimum and no more than Table maximum
-    if (m_nStandardWager < cTable.MinimumBet())
+    // Record Table minimum and maximum bet amounts
+    m_cWager.SetTableLimits(cTable.MinimumBet(), cTable.MaximumBet());
+
+    if (m_cWager.WagerProgressionMethodSet())
     {
-        std::cout << "\tChanging Strategy " << m_sName << ": standard wager to table minimum [" << m_nStandardWager << " to " << cTable.MinimumBet() << "]" << std::endl;
-        m_nStandardWager = m_nWager = cTable.MinimumBet();
+        if (m_nFieldBetUnits > 1)
+        {
+            std::cout << "\tChanging Strategy" << m_sName << ": disregard Field Bet Units and use Wager Progression Method" << std::endl;
+            m_nFieldBetUnits = 1;
+        }
+
+        if (m_nPlaceBetUnits > 1)
+        {
+            std::cout << "\tChanging Strategy" << m_sName << ": disregard Place Bet Units and use Wager Progression Method" << std::endl;
+            m_nPlaceBetUnits = 0;
+        }
     }
-    if (m_nStandardWager > cTable.MaximumBet())
-    {
-        std::cout << "\tChanging Strategy " << m_sName << ": standard wager to table minimum [" << m_nStandardWager << " to " << cTable.MaximumBet() << "]" << std::endl;
-        m_nStandardWager = m_nWager = cTable.MaximumBet();
-    }
+
     // Ensure that Strategy's number of place bets at once is less than or equal to the number of place bets allowed
     if (m_nNumberOfPlaceBetsMadeAtOnce > m_nNumberOfPlaceBetsAllowed)
     {
@@ -298,6 +277,9 @@ void Strategy::MakeBets(const Table &cTable)
         // If tracking results, start a new record, which updates bankroll, and update table stats
         if (m_bTrackResults) m_pcStrategyTracker->RecordNew(this, cTable);
 
+        // Mark beinning bankroll
+        m_cMoney.MarkBeforeBetting();
+
         MakePassBet(cTable);
         MakeComeBet(cTable);
 
@@ -311,6 +293,9 @@ void Strategy::MakeBets(const Table &cTable)
         MakeBigBet();
 
         MakeOneRollBets();
+
+        // Mark bankroll after making bets
+        m_cMoney.MarkAfterBetting();
 
         // If tracking results, capture bankroll post bets
         if (m_bTrackResults) m_pcStrategyTracker->RecordBetsBeforeRoll(this, m_lBets);
@@ -333,63 +318,57 @@ void Strategy::ResolveBets(const Table &cTable, const Dice &cDice)
 {
     if (StillPlaying())
     {
-        // Used for Odds Progression
-        int nStartingBankroll = m_cMoney.Bankroll();
-
         // Increment number of rolls
         m_nNumberOfRolls++;
 
-        bool bBetResolved;
         // Resolve all bets
         std::list<Bet>::iterator it = m_lBets.begin();
         while(it != m_lBets.end())
         {
-            bBetResolved = false;
+            if (it->IsPassBet())         ResolvePass(it, cDice);
+            if (it->IsPassOddsBet())     ResolvePassOdds(it, cTable, cDice);
 
-            if (it->IsPassBet())         bBetResolved = ResolvePass(it, cDice) || bBetResolved;
-            if (it->IsPassOddsBet())     bBetResolved = ResolvePassOdds(it, cTable, cDice) || bBetResolved;
+            if (it->IsComeBet())         ResolveCome(it, cDice);
+            if (it->IsComeOddsBet())     ResolveComeOdds(it, cTable, cDice);
 
-            if (it->IsComeBet())         bBetResolved = ResolveCome(it, cDice) || bBetResolved;
-            if (it->IsComeOddsBet())     bBetResolved = ResolveComeOdds(it, cTable, cDice) || bBetResolved;
+            if (it->IsDontPassBet())     ResolveDontPass(it, cDice);
+            if (it->IsDontPassOddsBet()) ResolveDontPassOdds(it, cTable, cDice);
 
-            if (it->IsDontPassBet())     bBetResolved = ResolveDontPass(it, cDice) || bBetResolved;
-            if (it->IsDontPassOddsBet()) bBetResolved = ResolveDontPassOdds(it, cTable, cDice) || bBetResolved;
+            if (it->IsDontComeBet())     ResolveDontCome(it, cDice);
+            if (it->IsDontComeOddsBet()) ResolveDontComeOdds(it, cDice);
 
-            if (it->IsDontComeBet())     bBetResolved = ResolveDontCome(it, cDice) || bBetResolved;
-            if (it->IsDontComeOddsBet()) bBetResolved = ResolveDontComeOdds(it, cDice) || bBetResolved;
+            if (it->IsPlaceBet())        ResolvePlace(it, cTable, cDice);
 
-            if (it->IsPlaceBet())        bBetResolved = ResolvePlace(it, cTable, cDice) || bBetResolved;
+            if (it->IsBigBet())          ResolveBig(it, cDice);
 
-            if (it->IsBigBet())          bBetResolved = ResolveBig(it, cDice) || bBetResolved;
+            if (it->IsOneRollBet())      ResolveOneRollBets(it, cDice);
 
-            if (it->IsOneRollBet())      bBetResolved = ResolveOneRollBets(it, cDice) || bBetResolved;
+            if (it->Pushed())
+                it->SetUnresolved();
 
-            if (bBetResolved)
-                it = m_lBets.erase(it);  // Remove Bet
+            if (it->Resolved())
+            {
+                // Update wager units for next bet based on this resolved bet
+                m_cWager.WagerUnits(it);
+                // Remove bet
+                it = m_lBets.erase(it);
+            }
             else
+            {
                 it++;
+            }
         }
 
+        // Mark ending bankroll
+        m_cMoney.MarkAfterResolvingBets();
+
+        // Check Odds Progression tactic
         if (IsUsingOddsProgession())
         {
-            // If using Odds Progression, and bankroll has increased, increase Odds
-            if (m_cMoney.Bankroll() > nStartingBankroll)
-                IncreaseOdds();
+            // If bankroll has increased, increase Odds
+            if (m_cMoney.GainAfterBetting()) IncreaseOdds();
             // Else reset odds
-            else
-                ResetOdds();
-        }
-
-        if (IsMartingaleWagerProgressionOnLoss())
-        {
-            if (m_cMoney.Bankroll() < nStartingBankroll)
-            {
-                IncreaseWagerOnLoss();
-            }
-            else
-            {
-                ResetWager();
-            }
+            else ResetOdds();
         }
 
         // If tracking results, record ending bankroll and post results
@@ -411,16 +390,17 @@ void Strategy::ResolveBets(const Table &cTable, const Dice &cDice)
 
 void Strategy::MakePassBet(const Table &cTable)
 {
-    // If money is not available to bet, do not make a bet
-    if (m_nWager > m_cMoney.Bankroll()) return;
-
     if (cTable.IsComingOutRoll())
     {
         if (m_nNumberOfPassBetsMade < m_nNumberOfPassBetsAllowed)
         {
+            // If money is not available to bet, do not make a bet
+            int nWager = m_cWager.BetWager(m_cMoney.Bankroll());
+            if (nWager < 1) return;
+
             Bet cBet;
-            cBet.MakePassBet(m_nWager);
-            m_cMoney.Decrement(m_nWager);
+            cBet.MakePassBet(nWager);
+            m_cMoney.Decrement(nWager);
             m_nNumberOfPassBetsMade++;
             m_lBets.push_back(cBet);
         }
@@ -440,16 +420,17 @@ void Strategy::MakePassBet(const Table &cTable)
 
 void Strategy::MakeDontPassBet(const Table &cTable)
 {
-    // If money is not available to bet, do not make a bet
-    if (m_nWager > m_cMoney.Bankroll()) return;
-
     if (cTable.IsComingOutRoll())
     {
         if (m_nNumberOfDontPassBetsMade < m_nNumberOfDontPassBetsAllowed)
         {
+            // If money is not available to bet, do not make a bet
+            int nWager = m_cWager.BetWager(m_cMoney.Bankroll());
+            if (nWager < 1) return;
+
             Bet cBet;
-            cBet.MakeDontPassBet(m_nWager);
-            m_cMoney.Decrement(m_nWager);
+            cBet.MakeDontPassBet(nWager);
+            m_cMoney.Decrement(nWager);
             m_nNumberOfDontPassBetsMade++;
             m_lBets.push_back(cBet);
         }
@@ -470,16 +451,17 @@ void Strategy::MakeDontPassBet(const Table &cTable)
 
 void Strategy::MakeComeBet(const Table &cTable)
 {
-    // If money is not available to bet, do not make a bet
-    if (m_nWager > m_cMoney.Bankroll()) return;
-
     if (!cTable.IsComingOutRoll())
     {
         if (m_nNumberOfComeBetsMade < m_nNumberOfComeBetsAllowed)
         {
+            // If money is not available to bet, do not make a bet
+            int nWager = m_cWager.BetWager(m_cMoney.Bankroll());
+            if (nWager < 1) return;
+
             Bet cBet;
-            cBet.MakeComeBet(m_nWager);
-            m_cMoney.Decrement(m_nWager);
+            cBet.MakeComeBet(nWager);
+            m_cMoney.Decrement(nWager);
             m_nNumberOfComeBetsMade++;
             m_lBets.push_back(cBet);
         }
@@ -500,16 +482,17 @@ void Strategy::MakeComeBet(const Table &cTable)
 
 void Strategy::MakeDontComeBet(const Table &cTable)
 {
-    // If money is not available to bet, do not make a bet
-    if (m_nWager > m_cMoney.Bankroll()) return;
-
     if (!cTable.IsComingOutRoll())
     {
         if (m_nNumberOfDontComeBetsMade < m_nNumberOfDontComeBetsAllowed)
         {
+            // If money is not available to bet, do not make a bet
+            int nWager = m_cWager.BetWager(m_cMoney.Bankroll());
+            if (nWager < 1) return;
+
             Bet cBet;
-            cBet.MakeDontComeBet(m_nWager);
-            m_cMoney.Decrement(m_nWager);
+            cBet.MakeDontComeBet(nWager);
+            m_cMoney.Decrement(nWager);
             m_nNumberOfDontComeBetsMade++;
             m_lBets.push_back(cBet);
         }
@@ -531,8 +514,8 @@ void Strategy::MakeDontComeBet(const Table &cTable)
 
 void Strategy::MakeOddsBet(const Table &cTable)
 {
-    // If money is not available to bet, do not make a bet
-    if (m_nWager > m_cMoney.Bankroll()) return;
+    // 0.0 Odds indicates no Odds Bets
+    if (m_fStandardOdds == 0.0) return;
 
     for (std::list<Bet>::iterator it = m_lBets.begin();it != m_lBets.end(); it++)
     {
@@ -546,9 +529,12 @@ void Strategy::MakeOddsBet(const Table &cTable)
                 if (!it->IsOddsBetMade())
                 {
                     // Calculate maximum odds wager, based on Strategy and Table type
-                    int nWager = it->Wager() * std::min(cTable.MaxOdds(it->Point()), m_fOdds);
-                    // Check for Full Wager; if set, update nWager
-                    if (m_bFullWager) nWager = OddsBetFullPayoffWager(nWager, it->Point());
+                    int nWager = m_cWager.OddsBetWager(m_cMoney.Bankroll(),
+                                                       it->Wager(),
+                                                       it->Point(),
+                                                       std::min(cTable.MaxOdds(it->Point()), m_fOdds)); // Odds to use
+                    // If no money, do not make bet
+                    if (nWager < 1) return;
 
                     // Generate a new bet
                     Bet cBet;
@@ -599,51 +585,6 @@ void Strategy::MakeOddsBet(const Table &cTable)
 }
 
 /**
-  * Calculate odd's bet full payoff wager.
-  *
-  * Ensure that the wager with the full payoff is made for an odds bet.
-  *
-  * INI File:
-  * FullWager=true|false
-  *
-  *\param cTable The Table.
-  */
-
-int Strategy::OddsBetFullPayoffWager(const int nWager, const int nPointNumber)
-{
-    int nModulo = 0;
-    int nMultiple = 0;
-
-    switch (nPointNumber)
-    {
-        case 4:
-        case 10:
-            nMultiple = 1;
-            break;
-        case 5:
-        case 9:
-            nMultiple = 2;
-            break;
-        case 6:
-        case 8:
-            nMultiple = 5;
-            break;
-        default:
-            break;
-    }
-
-    nModulo = nWager % nMultiple;
-    if (nModulo != 0)
-    {
-        int nNewWager = nWager - nModulo;
-        if (nNewWager < m_cMoney.Bankroll())
-            return (nNewWager);
-    }
-
-    return (nWager);
-}
-
-/**
   * Make a Place Bets.
   *
   * Check conditions for making a Place bet.  If right, Make a Place bet.
@@ -658,9 +599,6 @@ int Strategy::OddsBetFullPayoffWager(const int nWager, const int nPointNumber)
 
 void Strategy::MakePlaceBets(const Table &cTable)
 {
-    // If money is not available to bet, do not make a bet
-    if (m_nWager > m_cMoney.Bankroll()) return;
-
     // If we make Place bets only after Come bets are exhausted
     if (m_bPlaceAfterCome)
     {
@@ -670,12 +608,16 @@ void Strategy::MakePlaceBets(const Table &cTable)
             // If the table is not coming out and number of place bets made is less than number of allowed
             if (!cTable.IsComingOutRoll() && (m_nNumberOfPlaceBetsMade < m_nNumberOfPlaceBetsAllowed))
             {
-                // If 6 or 8 are already covered by a bet, make another come bet instead of a place bet
+                // If 6 or 8 are already covered by a bet, make another Come bet instead of a place bet
                 if (SixOrEightCovered())
                 {
+                    // If money is not available to bet, do not make a bet
+                    int nWager = m_cWager.BetWager(m_cMoney.Bankroll());
+                    if (nWager < 1) return;
+
                     Bet cBet;
-                    cBet.MakeComeBet(m_nWager);
-                    m_cMoney.Decrement(m_nWager);
+                    cBet.MakeComeBet(nWager);
+                    m_cMoney.Decrement(nWager);
                     m_nNumberOfComeBetsMade++;
                     m_lBets.push_back(cBet);
                 }
@@ -687,7 +629,8 @@ void Strategy::MakePlaceBets(const Table &cTable)
             }
         }
     }
-    // Else make place bets regardless of Come bets, but check table for coming out roll and the number of Place bets made is less than number allowed
+    // Else make place bets regardless of Come bets, but check table for coming
+    // out roll and the number of Place bets made is less than number allowed
     else if (!cTable.IsComingOutRoll())
     {
         // Count the number of Place bets made on this turn
@@ -699,7 +642,7 @@ void Strategy::MakePlaceBets(const Table &cTable)
             MakePlaceBet();
 
             nNumberOfPlaceBetsMadeThisTurn++;
-            // If number of Place bets made this turn equals number alloed at one time, break;
+            // If number of Place bets made this turn equals number allowed at one time, break;
             if (nNumberOfPlaceBetsMadeThisTurn == m_nNumberOfPlaceBetsMadeAtOnce)
                 break;
         }
@@ -717,18 +660,20 @@ void Strategy::MakePlaceBets(const Table &cTable)
 
 void Strategy::MakePlaceBet()
 {
-    // Set wager to number of Place bet units
-    int nWager = m_nWager * m_nPlaceBetUnits;
-    // If number of PLaceBet units is greater than the current bankroll, revert to one unit (which should have already been checked before calling this method.)
-    if (nWager > m_cMoney.Bankroll()) nWager = m_nWager;
-
-    Bet cBet;
     // Get Place bet number
     int nPlaceBetNumber = PlaceBetNumber();
+    // If Place bet number less than zero, all numbers taken
+    if (nPlaceBetNumber < 0) return;
+
+    // If money is not available to bet, do not make a bet
+    int nWager = m_cWager.PlaceBetUnitsWager(m_cMoney.Bankroll(),m_nPlaceBetUnits, nPlaceBetNumber);
+    if (nWager < 1) return;
+
+    Bet cBet;
+
     // Set Place bet number to true (bet  made)
     m_mPlaceBets[nPlaceBetNumber] = true;
-    // Check for Full Wager; if set, update nWager
-    if (m_bFullWager) nWager = PlaceBetFullPayoffWager(nPlaceBetNumber);
+
     // Make Place bet, with nWager (versus m_nWager)
     cBet.MakePlaceBet(nWager, nPlaceBetNumber);
     // Reduce bankroll by wager amounts
@@ -764,48 +709,6 @@ int Strategy::PlaceBetNumber()
 }
 
 /**
-  * Return full payoff wager for a Place bet.
-  *
-  * Based on the Place bet numberm return the full payoff wager.
-  *
-  *\param nPlaceNumber The Place number being bet on.
-  *
-  *\return The full payoff wager.
-  */
-
-int Strategy::PlaceBetFullPayoffWager(const int nPlaceNumber)
-{
-    int nModulo = 0;
-    int nMultiple = 0;
-
-    switch (nPlaceNumber)
-    {
-        case 4:
-        case 5:
-        case 9:
-        case 10:
-            nMultiple = 5;
-            break;
-        case 6:
-        case 8:
-            nMultiple = 6;
-            break;
-        default:
-            break;
-    }
-
-    nModulo = m_nWager % nMultiple;
-    if (nModulo != 0)
-    {
-        int nNewWager = m_nWager + nMultiple - nModulo;
-        if (nNewWager < m_cMoney.Bankroll())
-            return (nNewWager);
-    }
-
-    return (m_nWager);
-}
-
-/**
   * Is Six or Eight covered by a bet.
   *
   * Loop through the bets to see if six or eight are alredy covered by a bet.
@@ -825,36 +728,6 @@ bool Strategy::SixOrEightCovered()
 }
 
 /**
-  * Make a Field Bet.
-  *
-  * Make a Field Bet and add it to bets container.
-  *
-  * INI File:
-  * FieldBet=true|false
-  * FieldBetUnits=[1-infinity]
-  */
-
-void Strategy::MakeFieldBet()
-{
-    // Set wager to number of Field bet units
-    int nWager = m_nWager * m_nFieldBetUnits;
-    // If wager is greater than Bankroll, set wager to current wager
-    if (nWager > m_cMoney.Bankroll()) nWager = m_nWager;
-
-    // Check to see that current wager is not greather than bankroll
-    if (nWager <= m_cMoney.Bankroll())
-    {
-        if (m_bFieldBetsAllowed)
-        {
-            Bet cBet;
-            cBet.MakeFieldBet(nWager);
-            m_cMoney.Decrement(nWager);
-            m_lBets.push_back(cBet);
-        }
-    }
-}
-
-/**
   * Make a Big Bet.
   *
   * Make a Big 6 and/or 8 Bet and add it to bets container.
@@ -866,21 +739,28 @@ void Strategy::MakeFieldBet()
 
 void Strategy::MakeBigBet()
 {
-    if (m_nWager > m_cMoney.Bankroll()) return;
     if (m_bBig6BetAllowed)
     {
+        // If money is not available to bet, do not make a bet
+        int nWager = m_cWager.BetWager(m_cMoney.Bankroll());
+        if (nWager < 1) return;
+
         Bet cBet;
-        cBet.MakeBig6Bet(m_nWager);
-        m_cMoney.Decrement(m_nWager);
+        cBet.MakeBig6Bet(nWager);
+        m_cMoney.Decrement(nWager);
         m_lBets.push_back(cBet);
     }
 
-    if (m_nWager > m_cMoney.Bankroll()) return;
+
     if (m_bBig8BetAllowed)
     {
+        // If money is not available to bet, do not make a bet
+        int nWager = m_cWager.BetWager(m_cMoney.Bankroll());
+        if (nWager < 1) return;
+
         Bet cBet;
-        cBet.MakeBig8Bet(m_nWager);
-        m_cMoney.Decrement(m_nWager);
+        cBet.MakeBig8Bet(nWager);
+        m_cMoney.Decrement(nWager);
         m_lBets.push_back(cBet);
     }
 }
@@ -899,22 +779,24 @@ void Strategy::MakeBigBet()
   * Craps2Bet=true|false
   * Craps3Bet=true|false
   * Yo11Bet=true|false
-  * Craop12Bet=true|false
+  * Crap12Bet=true|false
   *
   */
 
 void Strategy::MakeOneRollBets()
 {
     // Field Bet
-    // Set wager to number of Field bet units
-    int nWager = m_nWager * m_nFieldBetUnits;
-    // If wager is greater than Bankroll, set wager to current wager
-    if (nWager > m_cMoney.Bankroll()) nWager = m_nWager;
-
-    // Check to see that current wager is not greather than bankroll
-    if (nWager <= m_cMoney.Bankroll())
+    if (m_bFieldBetsAllowed)
     {
-        if (m_bFieldBetsAllowed)
+        int nWager = 0;
+        // If FieldBetUnits is greater than 1, use the BetUnitsWager method
+        if (m_nFieldBetUnits > 1)
+            nWager = m_cWager.BetUnitsWager(m_cMoney.Bankroll(), m_nFieldBetUnits);
+        // Else use the BetWager method
+        else
+            nWager = m_cWager.BetWager(m_cMoney.Bankroll());
+
+        if (nWager >= 1)
         {
             Bet cBet;
             cBet.MakeFieldBet(nWager);
@@ -922,69 +804,81 @@ void Strategy::MakeOneRollBets()
             m_lBets.push_back(cBet);
         }
     }
+
     // Any 7 Bet
-    if (m_nWager <= m_cMoney.Bankroll())
+    if (m_bAny7BetAllowed)
     {
-        if (m_bAny7BetAllowed)
+        int nWager = m_cWager.BetWager(m_cMoney.Bankroll());
+        if (nWager >= 1)
         {
             Bet cBet;
-            cBet.MakeAny7Bet(m_nWager);
-            m_cMoney.Decrement(m_nWager);
+            cBet.MakeAny7Bet(nWager);
+            m_cMoney.Decrement(nWager);
             m_lBets.push_back(cBet);
         }
     }
+
     // Any Craps Bet
-    if (m_nWager <= m_cMoney.Bankroll())
+    if (m_bAnyCrapsBetAllowed)
     {
-        if (m_bAnyCrapsBetAllowed)
+        int nWager = m_cWager.BetWager(m_cMoney.Bankroll());
+        if (nWager >= 1)
         {
             Bet cBet;
-            cBet.MakeAnyCrapsBet(m_nWager);
-            m_cMoney.Decrement(m_nWager);
+            cBet.MakeAnyCrapsBet(nWager);
+            m_cMoney.Decrement(nWager);
             m_lBets.push_back(cBet);
         }
     }
+
     // Craps 2 Bet
-    if (m_nWager <= m_cMoney.Bankroll())
+    if (m_bCraps2BetAllowed)
     {
-        if (m_bCraps2BetAllowed)
+        int nWager = m_cWager.BetWager(m_cMoney.Bankroll());
+        if (nWager >= 1)
         {
             Bet cBet;
-            cBet.MakeCraps2Bet(m_nWager);
-            m_cMoney.Decrement(m_nWager);
+            cBet.MakeCraps2Bet(nWager);
+            m_cMoney.Decrement(nWager);
             m_lBets.push_back(cBet);
         }
     }
+
     // Craps 3 Bet
-    if (m_nWager <= m_cMoney.Bankroll())
+    if (m_bCraps3BetAllowed)
     {
-        if (m_bCraps3BetAllowed)
+        int nWager = m_cWager.BetWager(m_cMoney.Bankroll());
+        if (nWager >= 1)
         {
             Bet cBet;
-            cBet.MakeCraps3Bet(m_nWager);
-            m_cMoney.Decrement(m_nWager);
+            cBet.MakeCraps3Bet(nWager);
+            m_cMoney.Decrement(nWager);
             m_lBets.push_back(cBet);
         }
     }
+
     // Yo 11 Bet
-    if (m_nWager <= m_cMoney.Bankroll())
+    if (m_bYo11BetAllowed)
     {
-        if (m_bYo11BetAllowed)
+        int nWager = m_cWager.BetWager(m_cMoney.Bankroll());
+        if (nWager >= 1)
         {
             Bet cBet;
-            cBet.MakeYo11Bet(m_nWager);
-            m_cMoney.Decrement(m_nWager);
+            cBet.MakeYo11Bet(nWager);
+            m_cMoney.Decrement(nWager);
             m_lBets.push_back(cBet);
         }
     }
+
     // Craps 12 Bet
-    if (m_nWager <= m_cMoney.Bankroll())
+    if (m_bCraps12BetAllowed)
     {
-        if (m_bCraps12BetAllowed)
+        int nWager = m_cWager.BetWager(m_cMoney.Bankroll());
+        if (nWager >= 1)
         {
             Bet cBet;
-            cBet.MakeCraps12Bet(m_nWager);
-            m_cMoney.Decrement(m_nWager);
+            cBet.MakeCraps12Bet(nWager);
+            m_cMoney.Decrement(nWager);
             m_lBets.push_back(cBet);
         }
     }
@@ -999,22 +893,20 @@ void Strategy::MakeOneRollBets()
   *\param cDice The Dice.
   */
 
-bool Strategy::ResolvePass(std::list<Bet>::iterator &it, const Dice &cDice)
+void Strategy::ResolvePass(std::list<Bet>::iterator &it, const Dice &cDice)
 {
-    bool bBetResolved = false;
-
     if (it->OnTheComeOut())                                 // Pass Bet On the Come Out?
     {
         if (cDice.IsCraps())                                    // Pass Bet On the Come Out and a Craps Roll?
         {
             m_nNumberOfPassBetsMade--;
-            bBetResolved = true;                                // Bet resolved
+            it->SetLost();
         }
         else if (cDice.IsNatural())                             // PassBet One the Come Out and a Natural Roll?
         {
             m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
             m_nNumberOfPassBetsMade--;
-            bBetResolved = true;                                // Bet resolved
+            it->SetWon();
         }
         else                                                    // Pass Bet on the Come Out = Set Point
         {
@@ -1026,18 +918,15 @@ bool Strategy::ResolvePass(std::list<Bet>::iterator &it, const Dice &cDice)
         if (cDice.IsSeven())                                    // Pass Bet, but not on the Come Out and Seven Roll?
         {
             m_nNumberOfPassBetsMade--;
-            bBetResolved = true;                                // Bet resolved
+            it->SetLost();
         }
         else if (it->Point() == cDice.RollValue())              // Pass Bet, but not on the Come Out and Hit the Point?
         {
             m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
             m_nNumberOfPassBetsMade--;
-            //it = m_lBets.erase(it);                                 // Remove Bet
-            bBetResolved = true;                                // Bet resolved
+            it->SetWon();
         }
     }
-
-    return (bBetResolved);
 }
 
 /**
@@ -1049,10 +938,8 @@ bool Strategy::ResolvePass(std::list<Bet>::iterator &it, const Dice &cDice)
   *\param cDice The Dice.
   */
 
-bool Strategy::ResolveDontPass(std::list<Bet>::iterator &it, const Dice &cDice)
+void Strategy::ResolveDontPass(std::list<Bet>::iterator &it, const Dice &cDice)
 {
-    bool bBetResolved = false;
-
     if (it->OnTheComeOut())                                 // Dont Pass Bet On the Come Out?
     {
         if (cDice.IsCraps())                                    // Dont Pass Bet On the Come Out and a Craps Roll?
@@ -1061,14 +948,14 @@ bool Strategy::ResolveDontPass(std::list<Bet>::iterator &it, const Dice &cDice)
             {
                 m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
                 m_nNumberOfDontPassBetsMade--;
-                bBetResolved = true;
+                it->SetWon();
             }
 
         }
         else if (cDice.IsNatural())                             // Dont Pass Bet One the Come Out and a Natural Roll?
         {
             m_nNumberOfDontPassBetsMade--;
-            bBetResolved = true;
+            it->SetLost();
         }
         else                                                    // Dont Pass Bet on the Come Out = Set Point
         {
@@ -1081,16 +968,14 @@ bool Strategy::ResolveDontPass(std::list<Bet>::iterator &it, const Dice &cDice)
         {
             m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
             m_nNumberOfDontPassBetsMade--;
-            bBetResolved = true;
+            it->SetWon();
         }
         else if (it->Point() == cDice.RollValue())              // Dont Pass Bet, but not on the Come Out and Hit the Point?
         {
             m_nNumberOfDontPassBetsMade--;
-            bBetResolved = true;
+            it->SetLost();
         }
     }
-
-    return (bBetResolved);
 }
 
 /**
@@ -1102,22 +987,20 @@ bool Strategy::ResolveDontPass(std::list<Bet>::iterator &it, const Dice &cDice)
   *\param cDice The Dice.
   */
 
-bool Strategy::ResolveCome(std::list<Bet>::iterator &it, const Dice &cDice)
+void Strategy::ResolveCome(std::list<Bet>::iterator &it, const Dice &cDice)
 {
-    bool bBetResolved = false;
-
     if (it->OnTheComeOut())                                 // Come Bet On the Come Out?
     {
         if (cDice.IsCraps())                                    // Come Bet On the Come Out and a Craps Roll?
         {
             m_nNumberOfComeBetsMade--;
-            bBetResolved = true;
+            it->SetLost();
         }
         else if (cDice.IsNatural())                             // Come Bet On the Come Out and a Natural Roll?
         {
             m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
             m_nNumberOfComeBetsMade--;
-            bBetResolved = true;
+            it->SetWon();
         }
         else                                                    // Come Bet On the Come Out = Point Roll
         {
@@ -1129,17 +1012,15 @@ bool Strategy::ResolveCome(std::list<Bet>::iterator &it, const Dice &cDice)
         if (cDice.IsSeven())                                    // Come Bet, but not on the Come Out and a Seven Roll?
         {
             m_nNumberOfComeBetsMade--;
-            bBetResolved = true;
+            it->SetLost();
         }
         else if (it->Point() == cDice.RollValue())           //  Come Bet, but not on the Come Out and Hit the Point?
         {
             m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
             m_nNumberOfComeBetsMade--;
-            bBetResolved = true;
+            it->SetWon();
         }
     }
-
-    return (bBetResolved);
 }
 
 /**
@@ -1151,10 +1032,8 @@ bool Strategy::ResolveCome(std::list<Bet>::iterator &it, const Dice &cDice)
   *\param cDice The Dice.
   */
 
-bool Strategy::ResolveDontCome(std::list<Bet>::iterator &it, const Dice &cDice)
+void Strategy::ResolveDontCome(std::list<Bet>::iterator &it, const Dice &cDice)
 {
-    bool bBetResolved = false;
-
     if (it->OnTheComeOut())                                 // Dont Come Bet On the Come Out?
     {
         if (cDice.IsCraps())                                    // Dont Come Bet On the Come Out and a Craps Roll?
@@ -1163,13 +1042,13 @@ bool Strategy::ResolveDontCome(std::list<Bet>::iterator &it, const Dice &cDice)
             {
                 m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
                 m_nNumberOfDontComeBetsMade--;
-                bBetResolved = true;
+                it->SetWon();
             }
         }
         else if (cDice.IsNatural())                             // Dont Come Bet On the Come Out and a Natural Roll?
         {
             m_nNumberOfDontComeBetsMade--;
-            bBetResolved = true;
+            it->SetLost();
         }
         else                                                    // Dont Come Bet On the Come Out = Point Roll
         {
@@ -1182,17 +1061,14 @@ bool Strategy::ResolveDontCome(std::list<Bet>::iterator &it, const Dice &cDice)
         {
             m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
             m_nNumberOfDontComeBetsMade--;
-            bBetResolved = true;
+            it->SetWon();
         }
         else if (it->Point() == cDice.RollValue())           //  Dont Come Bet, but not on the Come Out and Hit the Point?
         {
             m_nNumberOfDontComeBetsMade--;
-            bBetResolved = true;
+            it->SetLost();
         }
-
     }
-
-    return (bBetResolved);
 }
 
 /**
@@ -1205,24 +1081,20 @@ bool Strategy::ResolveDontCome(std::list<Bet>::iterator &it, const Dice &cDice)
   *\param cDice The Dice.
   */
 
-bool Strategy::ResolvePassOdds(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice)
+void Strategy::ResolvePassOdds(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice)
 {
-    bool bBetResolved = false;
-
     if (cTable.IsComingOutRoll() == true)             // There should not be a Pass Odds bet if this is coming out roll
         throw std::domain_error("Strategy::ResolvePassOdds: called when Table is coming out");
 
     if (cDice.IsSeven())                                    // Pass Odds Bets and a Seven Roll?
     {
-        bBetResolved = true;
+        it->SetLost();
     }
     else if (it->Point() == cDice.RollValue())               // Pass Odds Bet and Hit the Point?
     {
         m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
-        bBetResolved = true;
+        it->SetWon();
     }
-
-    return (bBetResolved);
 }
 
 /**
@@ -1235,24 +1107,20 @@ bool Strategy::ResolvePassOdds(std::list<Bet>::iterator &it, const Table &cTable
   *\param cDice The Dice.
   */
 
-bool Strategy::ResolveDontPassOdds(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice)
+void Strategy::ResolveDontPassOdds(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice)
 {
-    bool bBetResolved = false;
-
     if (cTable.IsComingOutRoll() == true)             // There should not be a Don't Pass Odds bet if this is coming out roll
         throw std::domain_error("Strategy::ResolveDontPassOdds: called when Table is coming out");
 
     if (cDice.IsSeven())                                    // Dont Pass Odds Bets and a Seven Roll?
     {
         m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
-        bBetResolved = true;
+        it->SetWon();
     }
     else if (it->Point() == cDice.RollValue())               // Dont Pass Odds Bet and Hit the Point?
     {
-        bBetResolved = true;
+        it->SetLost();
     }
-
-    return (bBetResolved);
 }
 
 /**
@@ -1268,23 +1136,21 @@ bool Strategy::ResolveDontPassOdds(std::list<Bet>::iterator &it, const Table &cT
   *\param cDice The Dice.
   */
 
-bool Strategy::ResolveComeOdds(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice)
+void Strategy::ResolveComeOdds(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice)
 {
-    bool bBetResolved = false;
-
     if (cTable.IsComingOutRoll())                           // Come Odds Bet and Come Out Roll for the Table?
     {
         if (it->ComeOddsAreWorking())                           // Come Odds Bet, Come Out Roll for the Table, and are odds working on the Come Out Roll?
         {
             if (cDice.IsSeven())                                    // Come Odds Bet, Come Out Roll for the Table, and odss working, and a Seven Roll?
             {
-                bBetResolved = true;
+                it->SetLost();
             }
 
             else if (it->Point() == cDice.RollValue())              // Come Odds Bet, Come Out Roll for the Table, and odss working, and Hit the Point?
             {
                 m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
-                bBetResolved = true;
+                it->SetWon();
             }
         }
 
@@ -1293,12 +1159,12 @@ bool Strategy::ResolveComeOdds(std::list<Bet>::iterator &it, const Table &cTable
             if (cDice.IsSeven())                                    // Come Odds Bet, Come Out Roll for the Table,  odds are NOT working on the Come Out Roll, and Seven Roll?
             {
                 m_cMoney.Increment(it->Wager());                        // Return wager
-                bBetResolved = true;
+                it->SetReturned();
             }
             else if (it->Point() == cDice.RollValue())              // Come Odds Bet, Come Out Roll for the Table, odds are NOT working on the Come Out Roll, and Hit the Point?
             {
                 m_cMoney.Increment(it->Wager());                        // Return wager
-                bBetResolved = true;
+                it->SetReturned();
             }
         }
     }
@@ -1307,17 +1173,15 @@ bool Strategy::ResolveComeOdds(std::list<Bet>::iterator &it, const Table &cTable
     {
         if (cDice.IsSeven())                                    // Come Odds Bet, but not on Come Out Roll for the Table, and a Seven Roll?
         {
-            bBetResolved = true;
+            it->SetLost();
         }
 
         else if (it->Point() == cDice.RollValue())              // Come Odds Bet, but not on Come Out Roll for the Table, and Hit the Point?
         {
             m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
-            bBetResolved = true;
+            it->SetWon();
         }
     }
-
-    return(bBetResolved);
 }
 
 /**
@@ -1329,23 +1193,19 @@ bool Strategy::ResolveComeOdds(std::list<Bet>::iterator &it, const Table &cTable
   *\param cDice The Dice.
   */
 
-bool Strategy::ResolveDontComeOdds(std::list<Bet>::iterator &it, const Dice &cDice)
+void Strategy::ResolveDontComeOdds(std::list<Bet>::iterator &it, const Dice &cDice)
 {
-    bool bBetResolved = false;
-
     if (cDice.IsSeven())                                        // Dont Come Odds Bet and a Seven Roll?
     {
-        bBetResolved = true;
+        it->SetLost();
     }
 
     else if (it->Point() == cDice.RollValue())                  // Dont Come Odds Bet and Hit the Point?
     {
         m_cMoney.Increment(it->Wager() + it->CalculatePayoff());    // Payoff
-        bBetResolved = true;
+        it->SetWon();
     }
-
-    return (bBetResolved);
-}
+ }
 
 /**
   * Resolve Place Bets.
@@ -1357,10 +1217,8 @@ bool Strategy::ResolveDontComeOdds(std::list<Bet>::iterator &it, const Dice &cDi
   *\param cDice The Dice.
   */
 
-bool Strategy::ResolvePlace(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice)
+void Strategy::ResolvePlace(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice)
 {
-    bool bBetResolved = false;
-
     if (!cTable.IsComingOutRoll())                          // Place Bets and not a come out roll for the table (Place bets are turned off on the come out roll)
     {
         if (cDice.IsSeven())                                    // Place Bet and not a come out roll and a Seven Roll?
@@ -1369,7 +1227,7 @@ bool Strategy::ResolvePlace(std::list<Bet>::iterator &it, const Table &cTable, c
             m_mPlaceBets[it->Point()] = false;
             // Decrement the number of Place bets made
             m_nNumberOfPlaceBetsMade--;
-            bBetResolved = true;
+            it->SetLost();
         }
         else if (it->Point() == cDice.RollValue())              // Place Bet and not a come out roll and Hit the Point?
         {
@@ -1379,11 +1237,9 @@ bool Strategy::ResolvePlace(std::list<Bet>::iterator &it, const Table &cTable, c
             m_mPlaceBets[it->Point()] = false;
             // Decrement the number of Place bets made
             m_nNumberOfPlaceBetsMade--;
-            bBetResolved = true;
+            it->SetWon();
         }
     }
-
-    return (bBetResolved);
 }
 
 /**
@@ -1395,22 +1251,20 @@ bool Strategy::ResolvePlace(std::list<Bet>::iterator &it, const Table &cTable, c
   *\param cDice The Dice.
   */
 
-bool Strategy::ResolveBig(std::list<Bet>::iterator &it, const Dice &cDice)
+void Strategy::ResolveBig(std::list<Bet>::iterator &it, const Dice &cDice)
 {
-    bool bBetResolved = false;
-
     if (it->IsBig6Bet())                                        // Big 6 Bet?
     {
         if (cDice.IsSeven())                                        // Big 6 Bet and seven roll?
         {
-            bBetResolved = true;
+            it->SetLost();
         }
 
         else if (cDice.IsSix())                                     // Big 6 Bet and a six roll?
         {
             it->SetPoint(cDice.RollValue());                            // Set the bet point to last dice roll value to make CalculatePayoff work
             m_cMoney.Increment(it->Wager() + it->CalculatePayoff());    // Payoff
-            bBetResolved = true;
+            it->SetWon();
         }
     }
 
@@ -1418,18 +1272,16 @@ bool Strategy::ResolveBig(std::list<Bet>::iterator &it, const Dice &cDice)
     {
         if (cDice.IsSeven())                                        // Big 8 Bet and seven roll?
         {
-            bBetResolved = true;
+            it->SetLost();
         }
 
         if (cDice.IsEight())                                    // Big 8 Bet and an eight roll?
         {
             it->SetPoint(cDice.RollValue());                            // Set the bet point to last dice roll value to make CalculatePayoff work
             m_cMoney.Increment(it->Wager() + it->CalculatePayoff());    // Payoff
-            bBetResolved = true;
+            it->SetWon();
         }
     }
-
-    return(bBetResolved);
 }
 
 /**
@@ -1441,18 +1293,16 @@ bool Strategy::ResolveBig(std::list<Bet>::iterator &it, const Dice &cDice)
   *\param cDice The Dice.
   */
 
-bool Strategy::ResolveOneRollBets(std::list<Bet>::iterator &it, const Dice &cDice)
+void Strategy::ResolveOneRollBets(std::list<Bet>::iterator &it, const Dice &cDice)
 {
-    bool bBetResolved = false;
-
     if (it->IsFieldBet())                                   // Field Bet?
     {
         if (cDice.IsField())                                    // Field Bet and Field Number Roll?
         {
             it->SetPoint(cDice.RollValue());                        // Set the bet point to last dice roll value to make CalculatePayoff work
             m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
+            it->SetWon();
         }
-        bBetResolved = true;
     }
 
     else if (it->IsAny7Bet())                                   // Any 7 Bet?
@@ -1461,8 +1311,8 @@ bool Strategy::ResolveOneRollBets(std::list<Bet>::iterator &it, const Dice &cDic
         {
             it->SetPoint(cDice.RollValue());                        // Set the bet point to last dice roll value to make CalculatePayoff work
             m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
+            it->SetWon();
         }
-        bBetResolved = true;
     }
 
     else if (it->IsAnyCrapsBet())                           // Any Craps Bet?
@@ -1471,8 +1321,8 @@ bool Strategy::ResolveOneRollBets(std::list<Bet>::iterator &it, const Dice &cDic
         {
             it->SetPoint(cDice.RollValue());
             m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
+            it->SetWon();
         }
-        bBetResolved = true;
     }
 
     else if (it->IsCraps2Bet())                           // Craps 2 Bet?
@@ -1481,8 +1331,8 @@ bool Strategy::ResolveOneRollBets(std::list<Bet>::iterator &it, const Dice &cDic
         {
             it->SetPoint(cDice.RollValue());
             m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
+            it->SetWon();
         }
-        bBetResolved = true;
     }
 
     else if (it->IsCraps3Bet())                           // Craps 3 Bet?
@@ -1491,8 +1341,8 @@ bool Strategy::ResolveOneRollBets(std::list<Bet>::iterator &it, const Dice &cDic
         {
             it->SetPoint(cDice.RollValue());
             m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
+            it->SetWon();
         }
-        bBetResolved = true;
     }
 
     else if (it->IsYo11Bet())                           // Yo 11 Bet?
@@ -1501,8 +1351,8 @@ bool Strategy::ResolveOneRollBets(std::list<Bet>::iterator &it, const Dice &cDic
         {
             it->SetPoint(cDice.RollValue());
             m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
+            it->SetWon();
         }
-        bBetResolved = true;
     }
 
     else if (it->IsCraps12Bet())                           // Craps 12 Bet?
@@ -1511,11 +1361,12 @@ bool Strategy::ResolveOneRollBets(std::list<Bet>::iterator &it, const Dice &cDic
         {
             it->SetPoint(cDice.RollValue());
             m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
+            it->SetWon();
         }
-        bBetResolved = true;
     }
 
-    return (bBetResolved);
+    if (!it->Resolved())                                // If Bet was not resolved, set it to Lost
+        it->SetLost();
 }
 
 /**
@@ -1529,7 +1380,7 @@ bool Strategy::ResolveOneRollBets(std::list<Bet>::iterator &it, const Dice &cDic
 
 bool Strategy::StillPlaying() const
 {
-    if ((m_cMoney.Bankroll() < m_nStandardWager) && (m_lBets.empty()))
+    if ((m_cMoney.Bankroll() < m_cWager.StandardWager()) && (m_lBets.empty()))
         return (false);
 
     if ((m_cMoney.HasSignificantWinnings()) && (m_lBets.empty()))
@@ -1549,7 +1400,7 @@ void Strategy::UpdateStatistics()
 {
     m_nTimesStrategyRun++;
 
-    if (m_cMoney.Bankroll() > m_nStandardWager)
+    if (m_cMoney.Bankroll() > m_cWager.StandardWager())
     {
         m_nTimesStrategyWon++;
 
@@ -1587,7 +1438,6 @@ void Strategy::Reset()
 
     m_nNumberOfRolls         = 0;
 
-    m_nWager = m_nStandardWager;
     m_fOdds  = m_fStandardOdds;
 
     m_cMoney.Reset();
@@ -1602,46 +1452,50 @@ void Strategy::Reset()
 
 void Strategy::Muster() const
 {
-        std::cout << std::setw(20) << std::right << "Name: "                << Name()                                   << std::endl;
-        std::cout << std::setw(20) << std::right << "Description: "         << Description()                            << std::endl;
+        const int left = 26;
+        const int right = 25;
 
-        std::cout << std::setw(20) << std::right << "Pass Bet: "            << m_nNumberOfPassBetsAllowed               <<
-                     std::setw(25) << std::right << "  Standard Wager: "    << m_nStandardWager                         << std::endl;
-
-        std::cout << std::setw(20) << std::right << "Come Bets: "           << m_nNumberOfComeBetsAllowed               <<
-                     std::setw(25) << std::right << "  Full Wager: "        << std::boolalpha << m_bFullWager           << std::endl;
-
-        std::cout << std::setw(20) << std::right << "Come Odds Working: "   << std::boolalpha << m_bComeOddsWorking     <<
-                     std::setw(25) << std::right << "  Initial Bankroll: "  << m_cMoney.InitialBankroll()               << std::endl;
-
-        std::cout << std::setw(20) << std::right << "Dont Pass Bet: "       << m_nNumberOfDontPassBetsAllowed           <<
-                     std::setw(25) << std::right << "  Standard Odds: "     << m_fStandardOdds                          << std::endl;
-
-        std::cout << std::setw(20) << std::right << "Dont Come Bets: "      << m_nNumberOfDontComeBetsAllowed           << std::endl;
-
-        std::cout << std::setw(20) << std::right << "Place Bets: "          << m_nNumberOfPlaceBetsAllowed              <<
-                     std::setw(25) << std::right << "  Place Preferred: "   << m_nPreferredPlaceBet                     << std::endl;
-
-        std::cout << std::setw(20) << std::right << "Place After Come: "    << std::boolalpha << m_bPlaceAfterCome      << std::endl;
-        std::cout << std::setw(20) << std::right << "Place Made At Once: "  << m_nNumberOfPlaceBetsMadeAtOnce           << std::endl;
+        std::cout << std::setw(left) << std::right << "Name: "                << Name()                                   << std::endl;
+        std::cout << std::setw(left) << std::right << "Description: "         << Description()                            << std::endl;
 
 
-        std::cout << std::setw(20) << std::right << "Field Bets: "          << std::boolalpha << m_bFieldBetsAllowed    <<
-                     std::setw(25) << std::right << "  Track Results: "     << std::boolalpha << m_bTrackResults        << std::endl;
+        std::cout << std::setw(left) << std::right << "Pass Bet: "            << m_nNumberOfPassBetsAllowed               <<
+                     std::setw(right) << std::right << "  Standard Wager: "    << m_cWager.StandardWager()                 << std::endl;
 
-        std::cout << std::setw(20) << std::right << "Sig. Win. Mult.: "     << m_cMoney.SignificantWinningsMultiple()   << std::endl;
+        std::cout << std::setw(left) << std::right << "Come Bets: "           << m_nNumberOfComeBetsAllowed               <<
+                     std::setw(right) << std::right << "  Full Wager: "        << std::boolalpha << m_bFullWager           << std::endl;
+
+        std::cout << std::setw(left) << std::right << "Come Odds Working: "   << std::boolalpha << m_bComeOddsWorking     <<
+                     std::setw(right) << std::right << "  Initial Bankroll: "  << m_cMoney.InitialBankroll()               << std::endl;
+
+        std::cout << std::setw(left) << std::right << "Dont Pass Bet: "       << m_nNumberOfDontPassBetsAllowed           <<
+                     std::setw(right) << std::right << "  Standard Odds: "     << m_fStandardOdds                          << std::endl;
+
+        std::cout << std::setw(left) << std::right << "Dont Come Bets: "      << m_nNumberOfDontComeBetsAllowed           << std::endl;
+
+        std::cout << std::setw(left) << std::right << "Place Bets: "          << m_nNumberOfPlaceBetsAllowed              <<
+                     std::setw(right) << std::right << "  Place Preferred: "   << m_nPreferredPlaceBet                     << std::endl;
+
+        std::cout << std::setw(left) << std::right << "Place After Come: "    << std::boolalpha << m_bPlaceAfterCome      << std::endl;
+        std::cout << std::setw(left) << std::right << "Place Made At Once: "  << m_nNumberOfPlaceBetsMadeAtOnce           << std::endl;
+
+
+        std::cout << std::setw(left) << std::right << "Field Bets: "          << std::boolalpha << m_bFieldBetsAllowed    <<
+                     std::setw(right) << std::right << "  Track Results: "     << std::boolalpha << m_bTrackResults        << std::endl;
+
+        std::cout << std::setw(left) << std::right << "Sig. Win. Mult.: "     << m_cMoney.SignificantWinningsMultiple()   << std::endl;
 
         int nSigWin = m_cMoney.SignificantWinnings();
         if (nSigWin > 0)
         {
-            std::cout << std::setw(20) << std::right << "Sig. Winnings: "       << m_cMoney.SignificantWinnings()       << std::endl;
+            std::cout << std::setw(left) << std::right << "Sig. Winnings: "       << m_cMoney.SignificantWinnings()       << std::endl;
         }
         else
         {
-            std::cout << std::setw(20) << std::right << "Sig. Winnings: "       << "NOT USED"                           << std::endl;
+            std::cout << std::setw(left) << std::right << "Sig. Winnings: "       << "NOT USED"                           << std::endl;
         }
 
-        std::cout << std::setw(20) << std::right << "Odds Prog. Method: ";
+        std::cout << std::setw(left) << std::right << "Odds Prog. Method: ";
 
         if (!IsUsingOddsProgession())
             std::cout << "NOT USED" << std::endl;
@@ -1653,17 +1507,9 @@ void Strategy::Muster() const
                 std::cout << "Geometric" << std::endl;
         }
 
-        std::cout << std::setw(20) << std::right << "Wager On Loss Prog. Method: ";
-
-        if (!IsMartingaleWagerProgressionOnLoss())
-            std::cout << "NOT USED" << std::endl;
-        else
-        {
-            std::cout << "Martingale" << std::endl;
-        }
-
-        std::cout << std::setw(20) << std::right << "Qual. Sh. Method: "    << m_cQualifiedShooter.Method() << std::endl;
-        std::cout << std::setw(20) << std::right << "Qual. Sh. Method Ct: " << m_cQualifiedShooter.Count() << std::endl;
+        std::cout << std::setw(left) << std::right << "Wager Progression Method: " << m_cWager.Method() << std::endl;
+        std::cout << std::setw(left) << std::right << "Qual. Shooter Method: "     << m_cQualifiedShooter.Method() << std::endl;
+        std::cout << std::setw(left) << std::right << "Qual. Shooter Method Cnt: " << m_cQualifiedShooter.Count() << std::endl;
 
         std::cout << std::endl;
 }
@@ -1685,6 +1531,11 @@ void Strategy::Report()
     if (m_nTimesStrategyRun > 0)  fWinPercentage = (static_cast<float>(m_nTimesStrategyWon) / static_cast<float>(m_nTimesStrategyRun)) * 100;
     if (m_nTimesStrategyWon > 0)  nWinRollsAvg   = (static_cast<int>(m_nWinRollsTotal / m_nTimesStrategyWon));
     if (m_nTimesStrategyLost > 0) nLossRollsAvg  = (static_cast<int>(m_nLossRollsTotal / m_nTimesStrategyLost));
+
+    if (m_nWinRollsMin == INT_MAX) m_nWinRollsMin = 0;
+    if (m_nWinRollsMax == INT_MIN) m_nWinRollsMax = 0;
+    if (m_nLossRollsMin == INT_MAX) m_nLossRollsMin = 0;
+    if (m_nLossRollsMax == INT_MIN) m_nLossRollsMax = 0;
 
     std::cout << std::setw(40) << std::right << m_sName << " " <<
                  std::setw(6)  << std::left << m_nTimesStrategyRun <<

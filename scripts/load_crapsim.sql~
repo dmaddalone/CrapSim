@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS CrapSim.basics
      after_bankroll INT);
 
 /*
-    Create bet table.
+    Create single_bets table.
 */
 system echo '\nCreating single_bets table'
 DROP TABLE IF EXISTS CrapSim.single_bets;

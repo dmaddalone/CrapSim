@@ -122,8 +122,10 @@ int Bet::CalculatePayoff ()
                     return (m_nWager);              //1:1
                     break;
                 case 2:
+                    return (m_nWager * 2);
+                    break;
                 case 12:
-                    return (m_nWager * 2);          // 2:1
+                    return (m_nWager * 3);          // 3:1
                     break;
                 default:
                     break;

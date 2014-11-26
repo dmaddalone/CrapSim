@@ -11,7 +11,6 @@ system echo '\nCreating basics table'
 DROP TABLE IF EXISTS CrapSim.basics;
 CREATE TABLE IF NOT EXISTS CrapSim.basics
     (sequence INT, 
-     wager INT,
      odds INT,
      beginning_bankroll INT,
      table_come_out BOOL,

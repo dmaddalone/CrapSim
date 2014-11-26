@@ -47,6 +47,8 @@
 		</Compiler>
 		<Unit filename="../CDataFile/include/CDataFile.h" />
 		<Unit filename="../CDataFile/src/CDataFile.cpp" />
+		<Unit filename="../include/Progression.h" />
+		<Unit filename="../src/Progression.cpp" />
 		<Unit filename="include/Bet.h" />
 		<Unit filename="include/CrapSimVersion.h" />
 		<Unit filename="include/Dice.h" />
@@ -57,7 +59,7 @@
 		<Unit filename="include/Strategy.h" />
 		<Unit filename="include/StrategyTracker.h" />
 		<Unit filename="include/Table.h" />
-		<Unit filename="include/Wager.h" />
+		<Unit filename="main.cpp" />
 		<Unit filename="src/Bet.cpp" />
 		<Unit filename="src/Dice.cpp" />
 		<Unit filename="src/Die.cpp" />
@@ -67,8 +69,6 @@
 		<Unit filename="src/Strategy.cpp" />
 		<Unit filename="src/StrategyTracker.cpp" />
 		<Unit filename="src/Table.cpp" />
-		<Unit filename="src/Wager.cpp" />
-		<Unit filename="src/main.cpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />

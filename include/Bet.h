@@ -60,6 +60,15 @@ enum class BetType
     TYPE_CRAPS_12
 };
 
+enum class BetState
+{
+    UNRESOLVED,
+    WON,
+    LOST,
+    RETURNED,
+    PUSHED
+};
+
 class Bet
 {
     public:
@@ -94,7 +103,6 @@ class Bet
                                                             IsCraps3Bet() ||
                                                             IsYo11Bet() ||
                                                             IsCraps12Bet()); }
-
 
         // Set and return whether come odds are working on the come out
         bool ComeOddsAreWorking() const         { return (m_bComeOddsAreWorking); }
@@ -136,14 +144,33 @@ class Bet
         void SetOddsBetMade()                   { m_bOddsBetMade = true; }
         // Calulate the payoff
         int  CalculatePayoff();
+        // Set the state of bet to Won
+        void SetWon()                           { m_ecState = BetState::WON; }
+        // Set the state of bet to Lost
+        void SetLost()                          { m_ecState = BetState::LOST; }
+        // Set the state of the bet to Returned
+        void SetReturned()                      { m_ecState = BetState::RETURNED; }
+        // Set the state of the bet to Pushed
+        void SetPushed()                        { m_ecState = BetState::PUSHED; }
+        // Set the state of the bet to Unresolved
+        void SetUnresolved()                    { m_ecState = BetState::UNRESOLVED; }
+        // Check resolved state of the bet
+        bool Resolved() const                   { if (m_ecState == BetState::UNRESOLVED) return (false); else return (true); }
+        // Check pushed state of the bet
+        bool Pushed() const                     { if (m_ecState == BetState::PUSHED) return (true); else return (false); }
+        // Check won state of the bet
+        bool Won() const                        { if (m_ecState == BetState::WON) return (true); else return (false); }
+        // Check lost state of the bet
+        bool Lost() const                       { if (m_ecState == BetState::LOST) return (true); else return (false); }
 
     private:
         // Set bet defaults
         BetType m_ecType           {BetType::TYPE_NOBET};
-        int m_nWager               {0};
-        int m_nPoint               {0};
+        int  m_nWager              {0};
+        int  m_nPoint              {0};
         bool m_bOddsBetMade        {false};
         bool m_bComeOddsAreWorking {false};
+        BetState m_ecState         {BetState::UNRESOLVED};
 };
 
 #endif // BET_H

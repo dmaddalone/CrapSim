@@ -27,7 +27,10 @@
 #ifndef QUALIFIEDSHOOTER_H
 #define QUALIFIEDSHOOTER_H
 
-#include<stdexcept>
+#include <locale>
+#include <map>
+#include <stdexcept>
+#include <string>
 #include "Dice.h"
 #include "Table.h"
 

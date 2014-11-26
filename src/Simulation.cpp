@@ -206,7 +206,7 @@ void Simulation::Report()
               std::endl;
 
     std::cout << std::setw(40) << std::right << "Name " <<
-              std::setw(6)  << std::left << "Plays" <<
+              std::setw(6)  << std::left << "Runs" <<
               std::setw(5)  << std::left << "Wins" <<
               std::setw(7)  << std::left << "Losses" <<
               std::setw(6)  << std::left << "Win %" <<

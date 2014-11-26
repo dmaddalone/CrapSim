@@ -35,7 +35,9 @@
 #include "Table.h"
 #include "Bet.h"
 #include "Money.h"
+#include "Wager.h"
 #include "QualifiedShooter.h"
+
 class StrategyTracker;
 #include "StrategyTracker.h"
 
@@ -47,11 +49,18 @@ enum class OddsProgressionMethod
     GEOMETRIC
 };
 
-// Wager progression on loss method
-enum class WagerProgressionOnLossMethod
+// Odds progression triggers
+enum class OddsProgressionTrigger
 {
-    NO_METHOD,
-    MARTINGALE
+    TRIGGER_SINGLE_WIN,
+    TRIGGER_1X_WAGER,
+    TRIGGER_2X_WAGER
+};
+
+// Odds regression triggers
+enum class OddsRegressionTrigger
+{
+    TRIGGER_SINGLE_LOSS
 };
 
 class Strategy
@@ -64,11 +73,11 @@ class Strategy
         std::string Name() const            { return (m_sName); }
         void SetDescription(std::string sD) { m_sDescription.assign(sD); }
         std::string Description() const     { return (m_sDescription); }
-        // Set and return the statndard (default) wager.  Is equal to one unit.
-        void SetStandardWager(int i)        { if (i >= 1) m_nStandardWager = m_nWager = i; throw std::domain_error("Strategy::SetStandardWager"); }
-        int  StandardWager()                { return (m_nStandardWager); }
+        //// Set and return the statndard (default) wager.  Is equal to one unit.
+        //void SetStandardWager(int i)        { if (i >= 1) m_nStandardWager = m_nWager = i; throw std::domain_error("Strategy::SetStandardWager: standard wager less than 1"); }
+        //int  StandardWager()                { return (m_nStandardWager); }
         // Used to flag use full payoff wager versus a wager that may not payoff fully
-        void SetFullWager(bool b)           { m_bFullWager = b; }
+        void SetFullWager(bool b)           { m_cWager.SetFullWager(b); }
         // Set whether we are using a type of bet (e.g., Pass) or the number
         // of bets used (e.g., Come bets)
         void SetPassBet(int i)              { if ((i == 0) || (i == 1)) m_nNumberOfPassBetsAllowed = i; else throw std::domain_error("Strategy::SetPassBet"); }
@@ -93,7 +102,7 @@ class Strategy
         // Set Big 6 or 8 bet specifics
         void SetBig6BetAllowed(bool b)      { m_bBig6BetAllowed = b; }
         void SetBig8BetAllowed(bool b)      { m_bBig8BetAllowed = b; }
-        void SetStandardOdds(float f)       { if ( f >= 1.0) m_fStandardOdds = m_fOdds = f; else throw std::domain_error("Strategy::SetStandardOdds"); }
+        void SetStandardOdds(float f)       { if ( f >= 1.0 || f == 0.0) m_fStandardOdds = m_fOdds = f; else throw std::domain_error("Strategy::SetStandardOdds"); }
         // Set significant winnings multiple and absolute figures (see Money.h)
         void SetSignificantWinningsMultiple(float f) { m_cMoney.SetSignificantWinningsMultiple(f); }
         void SetSignificantWinnings(int i)           { m_cMoney.SetSignificantWinnings(i); }
@@ -107,10 +116,10 @@ class Strategy
         void SetComeOddsWorking(bool b)     { m_bComeOddsWorking = b; }
         void IncreaseOdds()                 { if (IsArithmeticOddsProgression()) m_fOdds += 1; else if (IsGeometricOddsProgression()) m_fOdds *= 2; else throw std::domain_error("Strategy::IncreaseOdds"); }
         void ResetOdds()                    { m_fOdds = m_fStandardOdds; }
-        // Wager progression methods
-        void SetWagerProgressionOnLoss(std::string sMethod);
-        void IncreaseWagerOnLoss()          { if (IsMartingaleWagerProgressionOnLoss()) m_nWager *=2; else throw std::domain_error("Strategy::IncreaseWager"); }
-        void ResetWager()                   { m_nWager = m_nStandardWager; }
+        // Wager methods
+        void SetWagerProgressionMethod(std::string sMethod) { m_cWager.SetMethod(sMethod); }
+        ////void IncreaseWagerOnLoss()          { if (IsMartingaleWagerProgressionOnLoss()) m_nWager *=2; else throw std::domain_error("Strategy::IncreaseWager"); }
+        ////void ResetWager()                   { m_nWager = m_nStandardWager; }
         // Qualified Shooter methods
         void SetQualifiedShooterMethod(std::string);
         void SetQualifiedShooterMethodCount(int n) { m_cQualifiedShooter.SetCount(n); }
@@ -125,7 +134,7 @@ class Strategy
         bool StillPlaying() const;
         // Return Strategy state
         int   Bankroll() const      { return m_cMoney.Bankroll(); }
-        int   Wager() const         { return m_nWager; }
+        ////int   Wager() const         { return m_nWager; }
         float Odds() const          { return m_fOdds; }
         // Update stats
         void  UpdateStatistics();
@@ -143,11 +152,8 @@ class Strategy
         void MakeDontPassBet(const Table &cTable);
         void MakeDontComeBet(const Table &cTable);
         void MakeOddsBet(const Table &cTable);
-        void MakeFieldBet();
         void MakeBigBet();
         void MakeOneRollBets();
-        // Set wager to an amount that creates a full payoff
-        int  OddsBetFullPayoffWager(const int  nWager, const int nPointNumber);
 
         // Make appropriate Place bets
         void MakePlaceBets(const Table &cTable);
@@ -161,17 +167,17 @@ class Strategy
         int  PlaceBetNumber();
 
         // Resolve bets
-        bool ResolvePass(std::list<Bet>::iterator &it, const Dice &cDice);
-        bool ResolvePassOdds(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice);
-        bool ResolveDontPass(std::list<Bet>::iterator &it, const Dice &cDice);
-        bool ResolveDontPassOdds(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice);
-        bool ResolveCome(std::list<Bet>::iterator &it, const Dice &cDice);
-        bool ResolveComeOdds(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice);
-        bool ResolveDontCome(std::list<Bet>::iterator &it, const Dice &cDice);
-        bool ResolveDontComeOdds(std::list<Bet>::iterator &it, const Dice &cDice);
-        bool ResolvePlace(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice);
-        bool ResolveBig(std::list<Bet>::iterator &it, const Dice &cDice);
-        bool ResolveOneRollBets(std::list<Bet>::iterator &it, const Dice &cDice);
+        void ResolvePass(std::list<Bet>::iterator &it, const Dice &cDice);
+        void ResolvePassOdds(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice);
+        void ResolveDontPass(std::list<Bet>::iterator &it, const Dice &cDice);
+        void ResolveDontPassOdds(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice);
+        void ResolveCome(std::list<Bet>::iterator &it, const Dice &cDice);
+        void ResolveComeOdds(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice);
+        void ResolveDontCome(std::list<Bet>::iterator &it, const Dice &cDice);
+        void ResolveDontComeOdds(std::list<Bet>::iterator &it, const Dice &cDice);
+        void ResolvePlace(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice);
+        void ResolveBig(std::list<Bet>::iterator &it, const Dice &cDice);
+        void ResolveOneRollBets(std::list<Bet>::iterator &it, const Dice &cDice);
 
         // Check to see if a current bet covers 6 or 8
         bool SixOrEightCovered();
@@ -179,14 +185,19 @@ class Strategy
         bool IsUsingOddsProgession() const       {return (m_ecOddsProgressionMethod != OddsProgressionMethod::NO_METHOD); }
         bool IsArithmeticOddsProgression() const { return (m_ecOddsProgressionMethod == OddsProgressionMethod::ARITHMETIC); }
         bool IsGeometricOddsProgression() const  { return (m_ecOddsProgressionMethod == OddsProgressionMethod::GEOMETRIC); }
-        // Checks for wager progressions
-        bool IsMartingaleWagerProgressionOnLoss() const { return (m_ecWagerProgressionOnLossMethod == WagerProgressionOnLossMethod::MARTINGALE); }
+        //// Checks for wager progressions
+        ////bool IsUsingWagerProgressionOnLoss() const { return (m_ecWagerProgressionOnLossMethod != WagerProgressionOnLossMethod::NO_METHOD); }
+        ////bool IsMartingaleWagerProgressionOnLoss() const { return (m_ecWagerProgressionOnLossMethod == WagerProgressionOnLossMethod::MARTINGALE); }
+
         // Name and description
         std::string m_sName;
         std::string m_sDescription;
 
         // Money class to track bankroll
         Money m_cMoney;
+
+        // Wager class to generate wager amounts
+        Wager m_cWager;
 
         // QualifiedShooter class to track qualified shooters
         QualifiedShooter m_cQualifiedShooter;
@@ -221,14 +232,14 @@ class Strategy
         bool m_bCraps3BetAllowed            = false;
         bool m_bYo11BetAllowed              = false;
         bool m_bCraps12BetAllowed           = false;
-        int m_nStandardWager                = 0;
-        int m_nWager                        = 0;
+        //int m_nStandardWager                = 0;
+        //int m_nWager                        = 0;
         bool m_bFullWager                   = false;
         float m_fStandardOdds               = 1.0;
         float m_fOdds                       = 1.0;
         bool  m_bComeOddsWorking            = false;
         OddsProgressionMethod m_ecOddsProgressionMethod = OddsProgressionMethod::NO_METHOD;
-        WagerProgressionOnLossMethod m_ecWagerProgressionOnLossMethod = WagerProgressionOnLossMethod::NO_METHOD;
+        WagerProgressionMethod m_ecWagerProgressionMethod = WagerProgressionMethod::WP_NO_METHOD;
         int m_nPreferredPlaceBet            = 8;
 
         // Set counters to zero or defaults

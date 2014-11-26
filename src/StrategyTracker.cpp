@@ -64,7 +64,6 @@ StrategyTracker::StrategyTracker(const StrategyTracker &cSource) :
 {
     m_nSequence          = cSource.m_nSequence;
     m_nBeginningBankroll = cSource.m_nBeginningBankroll;
-    m_nWager             = cSource.m_nWager;
     m_fOdds              = cSource.m_fOdds;
     m_bTableComeOutRoll  = cSource.m_bTableComeOutRoll;
     m_nTablePoint        = cSource.m_nTablePoint;
@@ -101,7 +100,6 @@ StrategyTracker& StrategyTracker::operator=(const StrategyTracker& cSource)
 
     m_nSequence          = cSource.m_nSequence;
     m_nBeginningBankroll = cSource.m_nBeginningBankroll;
-    m_nWager             = cSource.m_nWager;
     m_fOdds              = cSource.m_fOdds;
     m_bTableComeOutRoll  = cSource.m_bTableComeOutRoll;
     m_nTablePoint        = cSource.m_nTablePoint;
@@ -131,8 +129,6 @@ void StrategyTracker::RecordNew(const Strategy *pcStrategy, const Table &cTable)
     m_nSequence++;
     // Record current bankroll
     m_nBeginningBankroll = pcStrategy->Bankroll();
-    // Record current wager amount
-    m_nWager = pcStrategy->Wager();
     // Record current odds multiple
     m_fOdds = pcStrategy->Odds();
     // Record Table status
@@ -231,7 +227,6 @@ void StrategyTracker::RecordBetsAfterRoll(const Strategy *pcStrategy, const std:
 void StrategyTracker::Post()
 {
     *m_ofsBasics <<  m_nSequence                     << "," <<
-                    m_nWager                        << "," <<
                     m_fOdds                         << "," <<
                     m_nBeginningBankroll            << "," <<
                     m_bTableComeOutRoll             << "," <<

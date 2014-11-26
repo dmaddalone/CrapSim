@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1416452609 source:/home/maddalone/CCPP/CrapSim/main.cpp
+1416593398 source:/home/maddalone/CCPP/CrapSim/main.cpp
 	<iostream>
 	<stdexcept>
 	<climits>
@@ -14,48 +14,48 @@
 	"CDataFile.h"
 	"CrapSimVersion.h"
 
-1416176054 source:/home/maddalone/CCPP/CrapSim/src/Die.cpp
+1416593398 source:/home/maddalone/CCPP/CrapSim/src/Die.cpp
 	"Die.h"
 
-1416172736 /home/maddalone/CCPP/CrapSim/include/Die.h
+1416593398 /home/maddalone/CCPP/CrapSim/include/Die.h
 	<random>
 	<functional>
 	<algorithm>
 	<iterator>
 
-1416152983 source:/home/maddalone/CCPP/CrapSim/src/Dice.cpp
+1416154374 source:/home/maddalone/CCPP/CrapSim/src/Dice.cpp
 	<iostream>
 	"Dice.h"
 
-1416367436 /home/maddalone/CCPP/CrapSim/include/Dice.h
+1416593398 /home/maddalone/CCPP/CrapSim/include/Dice.h
 	<algorithm>
 	<array>
 	<list>
 	"Die.h"
 
-1416369143 source:/home/maddalone/CCPP/CrapSim/src/Table.cpp
+1416593398 source:/home/maddalone/CCPP/CrapSim/src/Table.cpp
 	"Table.h"
 
-1416368991 /home/maddalone/CCPP/CrapSim/include/Table.h
+1416593398 /home/maddalone/CCPP/CrapSim/include/Table.h
 	<stdexcept>
 	<map>
 	<string>
 	<locale>
 	"Dice.h"
 
-1416368991 source:/home/maddalone/CCPP/CrapSim/src/Bet.cpp
+1416760676 source:/home/maddalone/CCPP/CrapSim/src/Bet.cpp
 	"Bet.h"
 
-1416449467 /home/maddalone/CCPP/CrapSim/include/Bet.h
+1416953751 /home/maddalone/CCPP/CrapSim/include/Bet.h
 	<stdexcept>
 
-1416454447 source:/home/maddalone/CCPP/CrapSim/src/Strategy.cpp
+1416959513 source:/home/maddalone/CCPP/CrapSim/src/Strategy.cpp
 	"Strategy.h"
 	<fstream>
 	<iostream>
 	<iomanip>
 
-1416452514 /home/maddalone/CCPP/CrapSim/include/Strategy.h
+1416958129 /home/maddalone/CCPP/CrapSim/include/Strategy.h
 	<algorithm>
 	<climits>
 	<string>
@@ -65,29 +65,30 @@
 	"Table.h"
 	"Bet.h"
 	"Money.h"
+	"Wager.h"
 	"QualifiedShooter.h"
 	"StrategyTracker.h"
 
-1416093513 /home/maddalone/CCPP/CrapSim/include/Simulation.h
+1416096152 /home/maddalone/CCPP/CrapSim/include/Simulation.h
 	"Dice.h"
 	"Table.h"
 	"Strategy.h"
 	<vector>
 
-1416449226 source:/home/maddalone/CCPP/CrapSim/src/Simulation.cpp
+1416954025 source:/home/maddalone/CCPP/CrapSim/src/Simulation.cpp
 	"Simulation.h"
 	<iostream>
 	<iomanip>
 
-1416369004 /home/maddalone/CCPP/CrapSim/include/Money.h
+1416960714 /home/maddalone/CCPP/CrapSim/include/Money.h
 	<stdexcept>
 	<climits>
 	<iostream>
 
-1415595157 source:/home/maddalone/CCPP/CrapSim/src/Money.cpp
+1415574602 source:/home/maddalone/CCPP/CrapSim/src/Money.cpp
 	"Money.h"
 
-1413649596 source:/home/maddalone/CCPP/CDataFile/src/CDataFile.cpp
+1416096831 source:/home/maddalone/CCPP/CDataFile/src/CDataFile.cpp
 	<vector>
 	<string>
 	<ctype.h>
@@ -103,7 +104,7 @@
 	<windows.h>
 	"CDataFile.h"
 
-1416374415 /home/maddalone/CCPP/CDataFile/include/CDataFile.h
+1416096831 /home/maddalone/CCPP/CDataFile/include/CDataFile.h
 	<vector>
 	<fstream>
 	<string>
@@ -113,26 +114,55 @@
 	<iostream>
 	"Die.h"
 
-1415560844 /home/maddalone/CCPP/CrapSim/include/StrategyTracker.h
+1416950792 /home/maddalone/CCPP/CrapSim/include/StrategyTracker.h
 	<string>
 	<fstream>
 	"Strategy.h"
 	"Table.h"
 	"Bet.h"
 
-1415571932 source:/home/maddalone/CCPP/CrapSim/src/StrategyTracker.cpp
+1416950822 source:/home/maddalone/CCPP/CrapSim/src/StrategyTracker.cpp
 	<iostream>
 	"StrategyTracker.h"
 
-1416452486 source:/home/maddalone/CCPP/CrapSim/src/QualifiedShooter.cpp
+1416691549 source:/home/maddalone/CCPP/CrapSim/src/QualifiedShooter.cpp
 	<iostream>
 	"QualifiedShooter.h"
 
-1416452486 /home/maddalone/CCPP/CrapSim/include/QualifiedShooter.h
+1416953376 /home/maddalone/CCPP/CrapSim/include/QualifiedShooter.h
+	<locale>
+	<map>
 	<stdexcept>
+	<string>
 	"Dice.h"
 	"Table.h"
 
-1416446665 /home/maddalone/CCPP/CrapSim/include/CrapSimVersion.h
+1416947951 /home/maddalone/CCPP/CrapSim/include/CrapSimVersion.h
 	<string>
+
+1416948441 source:/home/maddalone/CCPP/CrapSim/src/main.cpp
+	<iostream>
+	<stdexcept>
+	<climits>
+	<cfloat>
+	"Die.h"
+	"Dice.h"
+	"Table.h"
+	"Money.h"
+	"Bet.h"
+	"Strategy.h"
+	"Simulation.h"
+	"CDataFile.h"
+	"CrapSimVersion.h"
+
+1416956001 /home/maddalone/CCPP/CrapSim/include/Wager.h
+	<list>
+	<locale>
+	<map>
+	<stdexcept>
+	<string>
+	"Bet.h"
+
+1416959513 source:/home/maddalone/CCPP/CrapSim/src/Wager.cpp
+	"Wager.h"
 

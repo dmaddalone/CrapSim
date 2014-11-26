@@ -25,7 +25,7 @@
 ;	Required:	     No
 ;
 [Simulation]
-Runs=2
+Runs=5
 Muster=true
 Tally=true
 

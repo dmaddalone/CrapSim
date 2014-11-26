@@ -64,7 +64,6 @@ class StrategyTracker
         // Basic record fields
         int   m_nSequence                           {};
         int   m_nBeginningBankroll                  {};
-        int   m_nWager                              {};
         float m_fOdds                               {};
         bool  m_bTableComeOutRoll                   {};
         int   m_nTablePoint                         {};
