@@ -499,3 +499,17 @@ int Wager::MethodParoli(const std::list<Bet>::iterator &it)
 
     return (m_nUnits);
 }
+
+/**
+  * Reset the class.
+  *
+  * Reset values for a new simulation run.
+  *
+  */
+
+void Wager::Reset()
+{
+    m_nUnits          = 1;
+    m_nPreviousUnits1 = 1;
+    m_nPreviousUnits2 = 0;
+}

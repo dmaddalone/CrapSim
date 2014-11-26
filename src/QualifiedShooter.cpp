@@ -30,6 +30,7 @@ QualifiedShooter::QualifiedShooter()
 {
     m_mQualificationMethod["NO_METHOD"]                               = QualificationMethod::QM_NO_METHOD;
     m_mQualificationMethod["5COUNT"]                                  = QualificationMethod::QM_5COUNT;
+    m_mQualificationMethod["AFTER_POINT_ESTABLISHED"]                 = QualificationMethod::QM_AFTER_POINT_ESTABLISHED;
     m_mQualificationMethod["AFTER_POINT_MADE"]                        = QualificationMethod::QM_AFTER_POINT_MADE;
     m_mQualificationMethod["AFTER_LOSING_FIELD_THREE_TIMES_IN_A_ROW"] = QualificationMethod::QM_AFTER_LOSING_FIELD_THREE_TIMES_IN_A_ROW;
     m_mQualificationMethod["AFTER_FIVE_NON_SEVEN_ROLLS"]              = QualificationMethod::QM_AFTER_FIVE_NON_SEVEN_ROLLS;
@@ -68,7 +69,10 @@ void QualifiedShooter::SetMethod(std::string sMethod)
     }
     else
     {
-        throw std::domain_error("QualifiedShooter::SetMethod: unknown method");
+        // TODO: use same technique for other throws OR create an exception class
+        std::string sWhat ("QualifiedShooter::SetMethod: unknown method ");
+        sWhat += sMethod;
+        throw std::domain_error(sWhat);
     }
 }
 
@@ -119,6 +123,9 @@ void QualifiedShooter::QualifyTheShooter(const Table &cTable, const Dice &cDice)
             break;
         case QualificationMethod::QM_5COUNT:
             Method5Count(cTable, cDice);
+            break;
+        case QualificationMethod::QM_AFTER_POINT_ESTABLISHED:
+            MethodAfterPointEstablished(cTable, cDice);
             break;
         case QualificationMethod::QM_AFTER_POINT_MADE:
             MethodAfterPointMade(cTable, cDice);
@@ -194,29 +201,49 @@ bool QualifiedShooter::Method5Count(const Table &cTable, const Dice &cDice)
 
     if (cTable.NewShooter() && cTable.IsComingOutRoll())
     {
-        m_n5Count = 0;
-        if (cDice.IsAPointNumber()) m_n5Count++;
+        m_nCounter = 0;
+        if (cDice.IsAPointNumber()) m_nCounter++;
     }
-    else if ((m_n5Count >= 1) && (m_n5Count < 4))
+    else if ((m_nCounter >= 1) && (m_nCounter < 4))
     {
-        if (!cDice.IsSeven()) m_n5Count++;
-        if (cDice.IsSeven() && cTable.IsComingOutRoll()) m_n5Count++;
+        if (!cDice.IsSeven()) m_nCounter++;
+        if (cDice.IsSeven() && cTable.IsComingOutRoll()) m_nCounter++;
     }
-    else if (m_n5Count == 4)
+    else if (m_nCounter == 4)
     {
         if (cDice.IsAPointNumber())
         {
-            m_n5Count++;
+            m_nCounter++;
             m_bShooterQualified = true;
         }
     }
-    else if (m_n5Count == 5)
+    else if (m_nCounter == 5)
     {
         if (!cDice.IsSeven()) m_bShooterQualified = true;
         if (cDice.IsSeven() && cTable.IsComingOutRoll()) m_bShooterQualified = true;
     }
 
-    std::cout << "DEBUG: m_n5Count=" << m_n5Count << "\t";
+    return (m_bShooterQualified);
+}
+
+/**
+  * Consider a new shooter qualified after she has established a point.
+  *
+  * Method:
+  * Once a shooter establishes the point, the shooter is qualified.
+  *
+  * \param cTable The Table.
+  *
+  * \return True if the shooter has qualified, false otherwise.
+  */
+
+bool QualifiedShooter::MethodAfterPointEstablished(const Table &cTable, const Dice &cDice)
+{
+    m_bShooterQualified = false;
+
+    // If puck is OFF and Dice is a point number, shooter has established a point
+    if (!cTable.IsPuckOn() && cDice.IsAPointNumber())
+        m_bShooterQualified = true;
 
     return (m_bShooterQualified);
 }
@@ -273,64 +300,64 @@ bool QualifiedShooter::MethodAfterLosingFieldThreeTimesInARow(const Table &cTabl
     {
         if (cDice.IsSeven())
         {
-            m_nLosingFieldInARow++;
+            m_nCounter++;
         }
         else if (cDice.IsField())
         {
-            m_nLosingFieldInARow = 0;
+            m_nCounter = 0;
         }
         else
         {
-            m_nLosingFieldInARow++;
+            m_nCounter++;
         }
     }
     else if (cTable.NewShooter() && !cTable.IsComingOutRoll())
     {
         if (cDice.IsSeven())
         {
-            m_nLosingFieldInARow = 0;
+            m_nCounter = 0;
         }
         else if (cDice.IsField())
         {
-            if (m_nLosingFieldInARow < 3) m_nLosingFieldInARow = 0;
+            if (m_nCounter < 3) m_nCounter = 0;
         }
         else
         {
-            m_nLosingFieldInARow++;
+            m_nCounter++;
         }
     }
     else if (!cTable.NewShooter() && cTable.IsComingOutRoll())
     {
         if (cDice.IsSeven())
         {
-            m_nLosingFieldInARow++;
+            m_nCounter++;
         }
         else if (cDice.IsField())
         {
-            if (m_nLosingFieldInARow < 3) m_nLosingFieldInARow = 0;
+            if (m_nCounter < 3) m_nCounter = 0;
         }
         else
         {
-            m_nLosingFieldInARow++;
+            m_nCounter++;
         }
     }
     else
     {
         if (cDice.IsSeven())
         {
-            m_nLosingFieldInARow = 0;
+            m_nCounter = 0;
         }
         else if (cDice.IsField())
         {
-            if (m_nLosingFieldInARow < 3) m_nLosingFieldInARow = 0;
+            if (m_nCounter < 3) m_nCounter = 0;
         }
         else
         {
-            m_nLosingFieldInARow++;
+            m_nCounter++;
         }
     }
 
-    if (m_nLosingFieldInARow >= 3) m_bShooterQualified = true;
+    if (m_nCounter >= 3) m_bShooterQualified = true;
 
     return (m_bShooterQualified);
 }
@@ -354,14 +381,14 @@ bool QualifiedShooter::MethodAfterFiveNon7Rolls(const Dice &cDice)
 
     if (!cDice.IsSeven())
     {
-        m_nNon7InARow ++;
+        m_nCounter++;
     }
     else
     {
-        m_nNon7InARow = 0;
+        m_nCounter = 0;
     }
 
-    if (m_nNon7InARow >= 5) m_bShooterQualified = true;
+    if (m_nCounter >= 5) m_bShooterQualified = true;
 
     return (m_bShooterQualified);
 }
@@ -432,4 +459,16 @@ bool QualifiedShooter::MethodAfterNXRollsInARow(const Table &cTable, const Dice 
     }
 
     return (m_bShooterQualified);
+}
+
+/**
+  * Reset the class.
+  *
+  * Reset values for a new simulation run.
+  *
+  */
+
+void QualifiedShooter::Reset()
+{
+    m_nCounter = 0;
 }

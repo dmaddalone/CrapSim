@@ -57,8 +57,10 @@ int Bet::CalculatePayoff ()
                     break;
 
                 default:
+                    throw std::domain_error("Bet::CalculatePayoff: unknown point for TYPE_PASS_ODDS or TYPE_COME_ODDS");
                     break;
             }
+            break;
 
         case BetType::TYPE_DONT_PASS:                   // 1:1
             return (m_nWager);
@@ -86,8 +88,10 @@ int Bet::CalculatePayoff ()
                     break;
 
                 default:
+                    throw std::domain_error("Bet::CalculatePayoff: unknown point for TYPE_DONT_PASS_ODDS or TYPE_DONT_COME_ODDS");
                     break;
             }
+            break;
 
         case BetType::TYPE_PLACE:
             switch (Point())
@@ -108,8 +112,10 @@ int Bet::CalculatePayoff ()
                     break;
 
                 default:
+                    throw std::domain_error("Bet::CalculatePayoff: unknown point for TYPE_PLACE");
                     break;
             }
+            break;
 
         case BetType::TYPE_FIELD:
             switch (Point())
@@ -128,28 +134,40 @@ int Bet::CalculatePayoff ()
                     return (m_nWager * 3);          // 3:1
                     break;
                 default:
+                    throw std::domain_error("Bet::CalculatePayoff: unknown point for TYPE_FIELD");
                     break;
             }
+            break;
 
-        case BetType::TYPE_BIG_6:
+        case BetType::TYPE_HARD:
+            switch (Point())
+            {
+                case 4:
+                case 10:
+                    return (m_nWager * 7);           // 7:1
+                    break;
+                case 6:
+                case 8:
+                    return (m_nWager * 9);           // 9:1
+                    break;
+                default:
+                    throw std::domain_error("Bet::CalculatePayoff: unknown point for TYPE_HARD");
+                    break;
+            }
+            break;
+
+        case BetType::TYPE_BIG:
             switch (Point())
             {
                 case 6:
-                    return (m_nWager);              // 1:1
-                    break;
-                default:
-                    break;
-            }
-
-        case BetType::TYPE_BIG_8:
-            switch (Point())
-            {
                 case 8:
                     return (m_nWager);              // 1:1
                     break;
                 default:
+                    throw std::domain_error("Bet::CalculatePayoff: unknown point for TYPE_BIG");
                     break;
             }
+            break;
 
         case BetType::TYPE_ANY_7:
             switch (Point())
@@ -158,8 +176,10 @@ int Bet::CalculatePayoff ()
                     return (m_nWager * 4);          // 4:1
                     break;
                 default:
+                    throw std::domain_error("Bet::CalculatePayoff: unknown point for TYPE_ANY_7");
                     break;
             }
+            break;
 
         case BetType::TYPE_ANY_CRAPS:
             switch (Point())
@@ -170,8 +190,10 @@ int Bet::CalculatePayoff ()
                     return (m_nWager * 7);          // 7:1
                     break;
                 default:
+                    throw std::domain_error("Bet::CalculatePayoff: unknown point for TYPE_ANY_CRAPS");
                     break;
             }
+            break;
 
         case BetType::TYPE_CRAPS_2:
             switch (Point())
@@ -180,8 +202,10 @@ int Bet::CalculatePayoff ()
                     return (m_nWager * 30);         // 30:1
                     break;
                 default:
+                    throw std::domain_error("Bet::CalculatePayoff: unknown point for TYPE_CRAPS_2");
                     break;
             }
+            break;
 
         case BetType::TYPE_CRAPS_3:
             switch (Point())
@@ -190,8 +214,10 @@ int Bet::CalculatePayoff ()
                     return (m_nWager * 15);         // 15:1
                     break;
                 default:
+                    throw std::domain_error("Bet::CalculatePayoff: unknown point for TYPE_CRAPS_3");
                     break;
             }
+            break;
 
         case BetType::TYPE_YO_11:
             switch (Point())
@@ -200,8 +226,10 @@ int Bet::CalculatePayoff ()
                     return (m_nWager * 15);         // 15:1
                     break;
                 default:
+                    throw std::domain_error("Bet::CalculatePayoff: unknown point for TYPE_YO_11");
                     break;
             }
+            break;
 
         case BetType::TYPE_CRAPS_12:
             switch (Point())
@@ -210,8 +238,10 @@ int Bet::CalculatePayoff ()
                     return (m_nWager * 30);         // 30:1
                     break;
                 default:
+                    throw std::domain_error("Bet::CalculatePayoff: unknown point for TYPE_CRAPS_12");
                     break;
             }
+            break;
 
         default:
             throw std::domain_error("Bet::CalculatePayoff: unknown BetType");

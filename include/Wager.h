@@ -74,6 +74,10 @@ class Wager
 
         bool WagerProgressionMethodSet() { return (m_ecWagerProgressionMethod != WagerProgressionMethod::WP_NO_METHOD); }
 
+        // Reset the class - meant to be called before a new Simulation run
+        void Reset();
+
+
     private:
         // Check wager against environment.
         void CheckWager(const int nBankroll);

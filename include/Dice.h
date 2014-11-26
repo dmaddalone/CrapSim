@@ -54,14 +54,17 @@ class Dice
         bool  IsNatural() const                { return ((m_nRollValue == 7) || (m_nRollValue == 11)); }
         bool  IsTwo() const                    { return (m_nRollValue == 2); }
         bool  IsThree() const                  { return (m_nRollValue == 3); }
+        bool  IsFour() const                   { return (m_nRollValue == 4); }
         bool  IsSix() const                    { return (m_nRollValue == 6); }
         bool  IsSeven() const                  { return (m_nRollValue == 7); }
         bool  IsEight() const                  { return (m_nRollValue == 8); }
+        bool  IsTen() const                    { return (m_nRollValue == 10); }
         bool  IsEleven() const                 { return (m_nRollValue == 11); }
         bool  IsTweleve() const                { return (m_nRollValue == 12); }
         bool  IsBar() const                    { return (m_nRollValue == 12); }
         bool  IsField() const                  { return (std::count(m_anFieldNumbers.begin(), m_anFieldNumbers.end(), m_nRollValue)) ? true : false; }
         bool  IsAPointNumber() const           { return (std::count(m_anPointNumbers.begin(), m_anPointNumbers.end(), m_nRollValue)) ? true : false; }
+        bool  IsHard() const;
         // Return the number times a value has been rolled
         int   RollValueCount(int i) const      { return (m_pnDiceRollValues[i - 1]); }
         // Return the total number of rolls

@@ -41,7 +41,7 @@
   * \param bTrackResults Flag to track results
   */
 
-Strategy::Strategy(std::string sName, std::string sDesc, int nInitiBank, int nStdWager, bool bTrackResults)
+Strategy::Strategy(std::string sName, std::string sDesc, int nInitiBank, int nStdWager, bool bTrace)
 {
     m_sName.assign(sName);
     m_sDescription.assign(sDesc);
@@ -50,8 +50,8 @@ Strategy::Strategy(std::string sName, std::string sDesc, int nInitiBank, int nSt
 
     m_cWager.Initialize(nStdWager);
 
-    m_bTrackResults = bTrackResults;
-    if (m_bTrackResults) m_pcStrategyTracker = new StrategyTracker(this);
+    m_bTrace = bTrace;
+    if (m_bTrace) m_pcStrategyTracker = new StrategyTracker(this);
 }
 
 /**
@@ -275,7 +275,7 @@ void Strategy::MakeBets(const Table &cTable)
     if (StillPlaying() && ShooterQualified())
     {
         // If tracking results, start a new record, which updates bankroll, and update table stats
-        if (m_bTrackResults) m_pcStrategyTracker->RecordNew(this, cTable);
+        if (m_bTrace) m_pcStrategyTracker->RecordNew(this, cTable);
 
         // Mark beinning bankroll
         m_cMoney.MarkBeforeBetting();
@@ -290,7 +290,9 @@ void Strategy::MakeBets(const Table &cTable)
 
         MakePlaceBets(cTable);
 
-        MakeBigBet();
+        MakeHardWayBets();
+
+        MakeBigBets();
 
         MakeOneRollBets();
 
@@ -298,7 +300,7 @@ void Strategy::MakeBets(const Table &cTable)
         m_cMoney.MarkAfterBetting();
 
         // If tracking results, capture bankroll post bets
-        if (m_bTrackResults) m_pcStrategyTracker->RecordBetsBeforeRoll(this, m_lBets);
+        if (m_bTrace) m_pcStrategyTracker->RecordBetsBeforeRoll(this, m_lBets);
     }
 }
 
@@ -339,6 +341,8 @@ void Strategy::ResolveBets(const Table &cTable, const Dice &cDice)
 
             if (it->IsPlaceBet())        ResolvePlace(it, cTable, cDice);
 
+            if (it->IsHardBet())         ResolveHardWayBets(it, cTable, cDice);
+
             if (it->IsBigBet())          ResolveBig(it, cDice);
 
             if (it->IsOneRollBet())      ResolveOneRollBets(it, cDice);
@@ -372,8 +376,8 @@ void Strategy::ResolveBets(const Table &cTable, const Dice &cDice)
         }
 
         // If tracking results, record ending bankroll and post results
-        if (m_bTrackResults) m_pcStrategyTracker->RecordBetsAfterRoll(this, m_lBets, cDice.RollValue());
-        if (m_bTrackResults) m_pcStrategyTracker->Post();
+        if (m_bTrace) m_pcStrategyTracker->RecordBetsAfterRoll(this, m_lBets, cDice.RollValue());
+        if (m_bTrace) m_pcStrategyTracker->Post();
     }
 }
 
@@ -728,6 +732,73 @@ bool Strategy::SixOrEightCovered()
 }
 
 /**
+  * Make a Hard Way Bet.
+  *
+  * Make a Hard 4, 6, 8, and/or 10 and add it to bets container.
+  *
+  * INI File:
+  * HardWay4Bet=true|false
+  * HardWay6Bet=true|false
+  * HardWay8Bet=true|false
+  * HardWay10Bet=true|false
+  */
+
+void Strategy::MakeHardWayBets()
+{
+    if (m_bHard4BetAllowed && m_nNumberOfHard4BetsMade == 0)
+    {
+        // If money is not available to bet, do not make a bet
+        int nWager = m_cWager.BetWager(m_cMoney.Bankroll());
+        if (nWager < 1) return;
+
+        Bet cBet;
+        cBet.MakeHard4Bet(nWager);
+        m_cMoney.Decrement(nWager);
+        ++m_nNumberOfHard4BetsMade;
+        m_lBets.push_back(cBet);
+    }
+
+    if (m_bHard6BetAllowed && m_nNumberOfHard6BetsMade == 0)
+    {
+        // If money is not available to bet, do not make a bet
+        int nWager = m_cWager.BetWager(m_cMoney.Bankroll());
+        if (nWager < 1) return;
+
+        Bet cBet;
+        cBet.MakeHard6Bet(nWager);
+        m_cMoney.Decrement(nWager);
+        ++m_nNumberOfHard6BetsMade;
+        m_lBets.push_back(cBet);
+    }
+
+    if (m_bHard8BetAllowed && m_nNumberOfHard8BetsMade)
+    {
+        // If money is not available to bet, do not make a bet
+        int nWager = m_cWager.BetWager(m_cMoney.Bankroll());
+        if (nWager < 1) return;
+
+        Bet cBet;
+        cBet.MakeHard8Bet(nWager);
+        m_cMoney.Decrement(nWager);
+        ++m_nNumberOfHard8BetsMade;
+        m_lBets.push_back(cBet);
+    }
+
+    if (m_bHard10BetAllowed && m_nNumberOfHard10BetsMade)
+    {
+        // If money is not available to bet, do not make a bet
+        int nWager = m_cWager.BetWager(m_cMoney.Bankroll());
+        if (nWager < 1) return;
+
+        Bet cBet;
+        cBet.MakeHard10Bet(nWager);
+        m_cMoney.Decrement(nWager);
+        ++m_nNumberOfHard10BetsMade;
+        m_lBets.push_back(cBet);
+    }
+}
+
+/**
   * Make a Big Bet.
   *
   * Make a Big 6 and/or 8 Bet and add it to bets container.
@@ -737,9 +808,9 @@ bool Strategy::SixOrEightCovered()
   * Big8Bet=true|false
   */
 
-void Strategy::MakeBigBet()
+void Strategy::MakeBigBets()
 {
-    if (m_bBig6BetAllowed)
+    if (m_bBig6BetAllowed && m_nNumberOfBig6BetsMade == 0)
     {
         // If money is not available to bet, do not make a bet
         int nWager = m_cWager.BetWager(m_cMoney.Bankroll());
@@ -747,12 +818,14 @@ void Strategy::MakeBigBet()
 
         Bet cBet;
         cBet.MakeBig6Bet(nWager);
+        ////cBet.MakeBigBet(nWager, 6);
         m_cMoney.Decrement(nWager);
+        ++m_nNumberOfBig6BetsMade;
         m_lBets.push_back(cBet);
     }
 
 
-    if (m_bBig8BetAllowed)
+    if (m_bBig8BetAllowed && m_nNumberOfBig8BetsMade == 0)
     {
         // If money is not available to bet, do not make a bet
         int nWager = m_cWager.BetWager(m_cMoney.Bankroll());
@@ -760,7 +833,9 @@ void Strategy::MakeBigBet()
 
         Bet cBet;
         cBet.MakeBig8Bet(nWager);
+        ////cBet.MakeBigBet(nWager, 8);
         m_cMoney.Decrement(nWager);
+        ++m_nNumberOfBig8BetsMade;
         m_lBets.push_back(cBet);
     }
 }
@@ -1243,44 +1318,86 @@ void Strategy::ResolvePlace(std::list<Bet>::iterator &it, const Table &cTable, c
 }
 
 /**
+  * Resolve Hard Way Bets.
+  *
+  * Resolve based on the state of the bet, the table, and the dice.
+  *
+  *\param cDice The Dice.
+  */
+
+void Strategy::ResolveHardWayBets(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice)
+{
+    if (!cTable.IsComingOutRoll())
+    {
+        if (cDice.IsSeven() || !cDice.IsHard())
+        {
+            it->SetLost();
+            if (it->IsHard4Bet())  --m_nNumberOfHard4BetsMade;
+            if (it->IsHard6Bet())  --m_nNumberOfHard6BetsMade;
+            if (it->IsHard8Bet())  --m_nNumberOfHard8BetsMade;
+            if (it->IsHard10Bet()) --m_nNumberOfHard10BetsMade;
+        }
+
+        if (cDice.IsFour() && it->IsHard4Bet())
+        {
+            m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
+            it->SetWon();
+            --m_nNumberOfHard4BetsMade;
+        }
+
+        if (cDice.IsSix() && it->IsHard6Bet())
+        {
+            m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
+            it->SetWon();
+            --m_nNumberOfHard6BetsMade;
+        }
+
+        if (cDice.IsEight() && it->IsHard8Bet())
+        {
+            m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
+            it->SetWon();
+            --m_nNumberOfHard8BetsMade;
+
+        }
+
+        if (cDice.IsTen() && it->IsHard10Bet())
+        {
+            m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
+            it->SetWon();
+            --m_nNumberOfHard10BetsMade;
+        }
+    }
+}
+
+/**
   * Resolve Big Bets.
   *
-  * Loop through all bets looking for Big 6 and 8 Bets.  Resolve based on
-  * the state of the bet and the dice.
+  * Resolve based on the state of the bet and the dice.
   *
   *\param cDice The Dice.
   */
 
 void Strategy::ResolveBig(std::list<Bet>::iterator &it, const Dice &cDice)
 {
-    if (it->IsBig6Bet())                                        // Big 6 Bet?
+    if (cDice.IsSeven())
     {
-        if (cDice.IsSeven())                                        // Big 6 Bet and seven roll?
-        {
-            it->SetLost();
-        }
-
-        else if (cDice.IsSix())                                     // Big 6 Bet and a six roll?
-        {
-            it->SetPoint(cDice.RollValue());                            // Set the bet point to last dice roll value to make CalculatePayoff work
-            m_cMoney.Increment(it->Wager() + it->CalculatePayoff());    // Payoff
-            it->SetWon();
-        }
+        it->SetLost();
+        if (it->IsBig6Bet()) --m_nNumberOfBig6BetsMade;
+        if (it->IsBig8Bet()) --m_nNumberOfBig8BetsMade;
     }
 
-    else if (it->IsBig8Bet())                                   // Big 8 Bet?
+    if (cDice.IsSix() && it->IsBig6Bet())
     {
-        if (cDice.IsSeven())                                        // Big 8 Bet and seven roll?
-        {
-            it->SetLost();
-        }
+        m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
+        it->SetWon();
+        --m_nNumberOfBig6BetsMade;
+    }
 
-        if (cDice.IsEight())                                    // Big 8 Bet and an eight roll?
-        {
-            it->SetPoint(cDice.RollValue());                            // Set the bet point to last dice roll value to make CalculatePayoff work
-            m_cMoney.Increment(it->Wager() + it->CalculatePayoff());    // Payoff
-            it->SetWon();
-        }
+    if (cDice.IsEight() && it->IsBig8Bet())
+    {
+        m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
+        it->SetWon();
+        --m_nNumberOfBig8BetsMade;
     }
 }
 
@@ -1428,19 +1545,23 @@ void Strategy::UpdateStatistics()
 
 void Strategy::Reset()
 {
-    m_nNumberOfPassBetsMade  = 0;
-    m_nNumberOfComeBetsMade  = 0;
-
-    m_nNumberOfDontPassBetsMade  = 0;
-    m_nNumberOfDontComeBetsMade  = 0;
-
-    m_nNumberOfPlaceBetsMade = 0;
+    //// Should not need these
+    ////m_nNumberOfPassBetsMade  = 0;
+    ////m_nNumberOfComeBetsMade  = 0;
+    ////
+    ////m_nNumberOfDontPassBetsMade  = 0;
+    ////m_nNumberOfDontComeBetsMade  = 0;
+    ////
+    ////m_nNumberOfPlaceBetsMade = 0;
+    ////
 
     m_nNumberOfRolls         = 0;
 
     m_fOdds  = m_fStandardOdds;
 
     m_cMoney.Reset();
+    m_cWager.Reset();
+    m_cQualifiedShooter.Reset();
 }
 
 /**
@@ -1481,7 +1602,7 @@ void Strategy::Muster() const
 
 
         std::cout << std::setw(left) << std::right << "Field Bets: "          << std::boolalpha << m_bFieldBetsAllowed    <<
-                     std::setw(right) << std::right << "  Track Results: "     << std::boolalpha << m_bTrackResults        << std::endl;
+                     std::setw(right) << std::right << "  Trace Results: "     << std::boolalpha << m_bTrace              << std::endl;
 
         std::cout << std::setw(left) << std::right << "Sig. Win. Mult.: "     << m_cMoney.SignificantWinningsMultiple()   << std::endl;
 

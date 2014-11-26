@@ -105,7 +105,7 @@ void CreateStrategy(const std::string sStrategy, CDataFile &cConfigFile, const i
     int         nQualifiedShooterMethodCount = cConfigFile.GetInt("QualifiedShooterMethodCount", sStrategy);
 
     // Tracking results (used for debugging)
-    bool        bTrackResults           = cConfigFile.GetBool("TrackResults", sStrategy);
+    bool        bTrace                  = cConfigFile.GetBool("Trace", sStrategy);
 
     //
     // Set the Strategy's parameters
@@ -118,7 +118,7 @@ void CreateStrategy(const std::string sStrategy, CDataFile &cConfigFile, const i
     if (nStandardWager == INT_MIN) nStandardWager = nDefaultStdWager;
 
     //Create Strategy
-    Strategy cStrategy(sName, sDescription, nInitialBankroll, nStandardWager, bTrackResults);
+    Strategy cStrategy(sName, sDescription, nInitialBankroll, nStandardWager, bTrace);
 
     // If Predefined is defined, use it to modify Strategy.  Exit if entry is unknown.
     if (sPredefined != "")

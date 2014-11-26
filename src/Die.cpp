@@ -21,9 +21,6 @@
 
 // Setup random number generator, using Mersenne Twister 19937.  Assign it to
 // function rollDie().
-////std::random_device   rdev{};
-////std::mt19937         generator{rdev()};
-////std::function<int()> rollDie;
 
 /**
   * Construct a Die.
@@ -38,8 +35,6 @@
 
 Die::Die(int nFaces)
 {
-    ////std::uniform_int_distribution<int>   distribution(1, nFaces);
-    ////rollDie            = std::bind(distribution, std::ref(generator));
     std::random_device rdev{};
     std::mt19937 generator{rdev()};
     std::uniform_int_distribution<int> distribution(1, nFaces);
@@ -135,7 +130,3 @@ int Die::Roll()
     m_nTotalDieRolls++;
     return(m_nLastDieRollValue);
 }
-
-
-
-

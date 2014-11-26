@@ -39,6 +39,7 @@ enum class QualificationMethod
 {
     QM_NO_METHOD,
     QM_5COUNT,
+    QM_AFTER_POINT_ESTABLISHED,
     QM_AFTER_POINT_MADE,
     QM_AFTER_LOSING_FIELD_THREE_TIMES_IN_A_ROW,
     QM_AFTER_FIVE_NON_SEVEN_ROLLS,
@@ -75,30 +76,37 @@ class QualifiedShooter
         // Check if shooter has been qualified
         bool ShooterQualified() const           { return (m_bShooterQualified); }
 
+        // Reset the class - meant to be called before a new Simulation run
+        void Reset();
+
     private:
         // Set defaults
         QualificationMethod m_ecQualificationMethod = QualificationMethod::QM_NO_METHOD;
         bool m_bShooterQualified                    = true;
         int  m_nQualificationCount                  = 1;
         bool m_bQualificationStopsWithShooter       = true;
+        int  m_nCounter                             = 0;
 
         // Map to associate the strings with the enum values
         std::map<std::string, QualificationMethod> m_mQualificationMethod;
 
         // The 5 Count method
         bool Method5Count(const Table &cTable, const Dice &cDice);
-        int m_n5Count = 0;
+
+        // The After Point Established method
+        bool MethodAfterPointEstablished(const Table &cTable, const Dice &cDice);
+
         // The After Point Made method
         bool MethodAfterPointMade(const Table &cTable, const Dice &cDice);
+
         // The After Losing Field Three Times method
         bool MethodAfterLosingFieldThreeTimesInARow(const Table &cTable, const Dice &cDice);
-        int m_nLosingFieldInARow = 0;
+
         // The After Five Non Seven Rolls method
         bool MethodAfterFiveNon7Rolls(const Dice &cDice);
-        int m_nNon7InARow = 0;
+
         // The After N (number) of X (value) rolls in a row
         bool MethodAfterNXRollsInARow(const Table &cTable, const Dice &cDice, int nNumber);
-        int m_nCounter = 0;
 };
 
 #endif // QUALIFIEDSHOOTER_H

@@ -143,3 +143,26 @@ int Dice::Roll()
 
     return(m_nRollValue);
 }
+
+/**
+  * Check for a hard way.
+  *
+  * Check last values of the dice and return true if they are equal to
+  * each other.
+  *
+  *\return True if Die values are equal, false oherwise
+  */
+
+bool Dice::IsHard() const
+{
+    bool bHard = false;
+
+    const Die &cFirstDie = m_lDice.front();
+    int nFirstValue = cFirstDie.RollValue();
+
+    const Die &cSecondDie = m_lDice.back();
+    if (nFirstValue == cSecondDie.RollValue())
+        bHard = true;
+
+    return(bHard);
+}

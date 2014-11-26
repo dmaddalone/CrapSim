@@ -25,7 +25,7 @@
 ;	Required:	     No
 ;
 [Simulation]
-Runs=5
+Runs=10000
 Muster=true
 Tally=true
 
@@ -352,6 +352,7 @@ Description=Pass Only, No Odds, Martingale
 PassBet=1
 StandardOdds=0.0
 WagerProgressionMethod=Martingale
+Trace=true
 
 ;[Strategy3]
 ;Name=Pass & Fibonacci

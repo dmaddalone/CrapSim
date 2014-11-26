@@ -70,8 +70,7 @@ class Money
         bool HasSignificantWinnings() const;
 
         // Reset the class - meant to be called before a new Simulation run
-        void Reset()                                 { m_nBankroll = m_nMaxBankroll = m_nInitialBankroll; \
-                                                       m_nBankrollBeforeBetting = m_nBankrollAfterBetting = m_nBankrollAfterResolving = 0; }
+        void Reset();
 
     private:
         //  Set counters to zero

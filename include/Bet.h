@@ -40,12 +40,14 @@ enum class BetType
     TYPE_PLACE_TO_LOSE,
     TYPE_BUY,
     TYPE_LAY,
-    TYPE_BIG_6,
-    TYPE_BIG_8,
-    TYPE_HARD_6,
-    TYPE_HARD_4,
-    TYPE_HARD_8,
-    TYPE_HARD_10,
+    TYPE_BIG,
+    ////TYPE_BIG_6,
+    ////TYPE_BIG_8,
+    TYPE_HARD,
+    ////TYPE_HARD_4,
+    ////TYPE_HARD_6,
+    ////TYPE_HARD_8,
+    ////TYPE_HARD_10,
     TYPE_PUT,
     TYPE_PASS_ODDS,
     TYPE_COME_ODDS,
@@ -82,13 +84,17 @@ class Bet
         bool IsDontComeBet() const              { return (m_ecType == BetType::TYPE_DONT_COME); }
         bool IsDontComeOddsBet() const          { return (m_ecType == BetType::TYPE_DONT_COME_ODDS); }
         bool IsPlaceBet() const                 { return (m_ecType == BetType::TYPE_PLACE); }
-        bool IsBig6Bet() const                  { return (m_ecType == BetType::TYPE_BIG_6); }
-        bool IsBig8Bet() const                  { return (m_ecType == BetType::TYPE_BIG_8); }
-        bool IsBigBet() const                   { return (IsBig6Bet() || IsBig8Bet()); }
-        bool IsHard4() const                    { return (m_ecType == BetType::TYPE_HARD_4); }
-        bool IsHard6() const                    { return (m_ecType == BetType::TYPE_HARD_6); }
-        bool IsHard8() const                    { return (m_ecType == BetType::TYPE_HARD_8); }
-        bool IsHard10() const                   { return (m_ecType == BetType::TYPE_HARD_10); }
+        bool IsBigBet() const                   { return (m_ecType == BetType::TYPE_BIG); }
+        bool IsBig6Bet() const                  { return (m_ecType == BetType::TYPE_BIG && m_nPoint == 6); }
+        bool IsBig8Bet() const                  { return (m_ecType == BetType::TYPE_BIG && m_nPoint == 8); }
+        ////bool IsBig6Bet() const                  { return (m_ecType == BetType::TYPE_BIG_6); }
+        ////bool IsBig8Bet() const                  { return (m_ecType == BetType::TYPE_BIG_8); }
+        ////bool IsBigBet() const                   { return (IsBig6Bet() || IsBig8Bet()); }
+        bool IsHardBet() const                  { return (m_ecType == BetType::TYPE_HARD); }
+        bool IsHard4Bet() const                 { return (m_ecType == BetType::TYPE_HARD && m_nPoint == 4); }
+        bool IsHard6Bet() const                 { return (m_ecType == BetType::TYPE_HARD && m_nPoint == 6); }
+        bool IsHard8Bet() const                 { return (m_ecType == BetType::TYPE_HARD && m_nPoint == 8); }
+        bool IsHard10Bet() const                { return (m_ecType == BetType::TYPE_HARD && m_nPoint == 10); }
         bool IsFieldBet() const                 { return (m_ecType == BetType::TYPE_FIELD); }
         bool IsAny7Bet() const                  { return (m_ecType == BetType::TYPE_ANY_7); }
         bool IsAnyCrapsBet() const              { return (m_ecType == BetType::TYPE_ANY_CRAPS); }
@@ -119,12 +125,16 @@ class Bet
         void MakeDontComeOddsBet(int w, int p)  { m_ecType = BetType::TYPE_DONT_COME_ODDS; m_nWager = w; m_nPoint = p; }
         void MakePlaceBet(int w, int p)         { m_ecType = BetType::TYPE_PLACE; m_nWager = w; m_nPoint = p; }
         void MakeFieldBet(int w)                { m_ecType = BetType::TYPE_FIELD; m_nWager = w; }
-        void MakeBig6Bet(int w)                 { m_ecType = BetType::TYPE_BIG_6; m_nWager = w; }
-        void MakeBig8Bet(int w)                 { m_ecType = BetType::TYPE_BIG_8; m_nWager = w; }
-        void MakeHard4(int w)                   { m_ecType = BetType::TYPE_HARD_4; m_nWager = w; }
-        void MakeHard6(int w)                   { m_ecType = BetType::TYPE_HARD_6; m_nWager = w; }
-        void MakeHard8(int w)                   { m_ecType = BetType::TYPE_HARD_8; m_nWager = w; }
-        void MakeHard10(int w)                  { m_ecType = BetType::TYPE_HARD_10; m_nWager = w; }
+        ////void MakeBigBet(int w, int p)           { m_ecType = BetType::TYPE_BIG; m_nWager = w; m_nPoint = p; }
+        ////void MakeBigBet(int w, int p);
+        ////void MakeBig6Bet(int w)                 { m_ecType = BetType::TYPE_BIG_6; m_nWager = w; }
+        ////void MakeBig8Bet(int w)                 { m_ecType = BetType::TYPE_BIG_8; m_nWager = w; }
+        void MakeBig6Bet(int w)                 { m_ecType = BetType::TYPE_BIG; m_nWager = w; m_nPoint = 6; }
+        void MakeBig8Bet(int w)                 { m_ecType = BetType::TYPE_BIG; m_nWager = w; m_nPoint = 8; }
+        void MakeHard4Bet(int w)                { m_ecType = BetType::TYPE_HARD; m_nWager = w; m_nPoint = 4; }
+        void MakeHard6Bet(int w)                { m_ecType = BetType::TYPE_HARD; m_nWager = w; m_nPoint = 6; }
+        void MakeHard8Bet(int w)                { m_ecType = BetType::TYPE_HARD; m_nWager = w; m_nPoint = 8; }
+        void MakeHard10Bet(int w)               { m_ecType = BetType::TYPE_HARD; m_nWager = w; m_nPoint = 10; }
         void MakeAny7Bet(int w)                 { m_ecType = BetType::TYPE_ANY_7; m_nWager = w; }
         void MakeAnyCrapsBet(int w)             { m_ecType = BetType::TYPE_ANY_CRAPS; m_nWager = w; }
         void MakeCraps2Bet(int w)               { m_ecType = BetType::TYPE_CRAPS_2; m_nWager = w; }

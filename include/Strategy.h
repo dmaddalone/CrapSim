@@ -73,9 +73,6 @@ class Strategy
         std::string Name() const            { return (m_sName); }
         void SetDescription(std::string sD) { m_sDescription.assign(sD); }
         std::string Description() const     { return (m_sDescription); }
-        //// Set and return the statndard (default) wager.  Is equal to one unit.
-        //void SetStandardWager(int i)        { if (i >= 1) m_nStandardWager = m_nWager = i; throw std::domain_error("Strategy::SetStandardWager: standard wager less than 1"); }
-        //int  StandardWager()                { return (m_nStandardWager); }
         // Used to flag use full payoff wager versus a wager that may not payoff fully
         void SetFullWager(bool b)           { m_cWager.SetFullWager(b); }
         // Set whether we are using a type of bet (e.g., Pass) or the number
@@ -118,8 +115,6 @@ class Strategy
         void ResetOdds()                    { m_fOdds = m_fStandardOdds; }
         // Wager methods
         void SetWagerProgressionMethod(std::string sMethod) { m_cWager.SetMethod(sMethod); }
-        ////void IncreaseWagerOnLoss()          { if (IsMartingaleWagerProgressionOnLoss()) m_nWager *=2; else throw std::domain_error("Strategy::IncreaseWager"); }
-        ////void ResetWager()                   { m_nWager = m_nStandardWager; }
         // Qualified Shooter methods
         void SetQualifiedShooterMethod(std::string);
         void SetQualifiedShooterMethodCount(int n) { m_cQualifiedShooter.SetCount(n); }
@@ -134,7 +129,7 @@ class Strategy
         bool StillPlaying() const;
         // Return Strategy state
         int   Bankroll() const      { return m_cMoney.Bankroll(); }
-        ////int   Wager() const         { return m_nWager; }
+        // Return current odds
         float Odds() const          { return m_fOdds; }
         // Update stats
         void  UpdateStatistics();
@@ -152,7 +147,8 @@ class Strategy
         void MakeDontPassBet(const Table &cTable);
         void MakeDontComeBet(const Table &cTable);
         void MakeOddsBet(const Table &cTable);
-        void MakeBigBet();
+        void MakeHardWayBets();
+        void MakeBigBets();
         void MakeOneRollBets();
 
         // Make appropriate Place bets
@@ -176,6 +172,7 @@ class Strategy
         void ResolveDontCome(std::list<Bet>::iterator &it, const Dice &cDice);
         void ResolveDontComeOdds(std::list<Bet>::iterator &it, const Dice &cDice);
         void ResolvePlace(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice);
+        void ResolveHardWayBets(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice);
         void ResolveBig(std::list<Bet>::iterator &it, const Dice &cDice);
         void ResolveOneRollBets(std::list<Bet>::iterator &it, const Dice &cDice);
 
@@ -185,9 +182,6 @@ class Strategy
         bool IsUsingOddsProgession() const       {return (m_ecOddsProgressionMethod != OddsProgressionMethod::NO_METHOD); }
         bool IsArithmeticOddsProgression() const { return (m_ecOddsProgressionMethod == OddsProgressionMethod::ARITHMETIC); }
         bool IsGeometricOddsProgression() const  { return (m_ecOddsProgressionMethod == OddsProgressionMethod::GEOMETRIC); }
-        //// Checks for wager progressions
-        ////bool IsUsingWagerProgressionOnLoss() const { return (m_ecWagerProgressionOnLossMethod != WagerProgressionOnLossMethod::NO_METHOD); }
-        ////bool IsMartingaleWagerProgressionOnLoss() const { return (m_ecWagerProgressionOnLossMethod == WagerProgressionOnLossMethod::MARTINGALE); }
 
         // Name and description
         std::string m_sName;
@@ -208,32 +202,42 @@ class Strategy
         StrategyTracker* m_pcStrategyTracker;
 
         // Set Strategy defaults
-        int m_nNumberOfPassBetsAllowed      = 0;
-        int m_nNumberOfComeBetsAllowed      = 0;
-        int m_nNumberOfDontPassBetsAllowed  = 0;
-        int m_nNumberOfDontComeBetsAllowed  = 0;
-
-        int m_nNumberOfPassBetsMade         = 0;
-        int m_nNumberOfComeBetsMade         = 0;
-        int m_nNumberOfDontPassBetsMade     = 0;
-        int m_nNumberOfDontComeBetsMade     = 0;
-        int m_nNumberOfPlaceBetsAllowed     = 0;
-        int m_nNumberOfPlaceBetsMade        = 0;
-        int m_nNumberOfPlaceBetsMadeAtOnce  = 0;
-        bool m_bPlaceAfterCome              = false;
-        int m_nPlaceBetUnits                = 1;
-        int m_bBig6BetAllowed               = false;
-        int m_bBig8BetAllowed               = false;
+        int  m_nNumberOfPassBetsAllowed      = 0;
+        int  m_nNumberOfComeBetsAllowed      = 0;
+        int  m_nNumberOfDontPassBetsAllowed  = 0;
+        int  m_nNumberOfDontComeBetsAllowed  = 0;
+        bool m_bBig6BetAllowed               = false;
+        bool m_bBig8BetAllowed               = false;
+        bool m_bHard4BetAllowed              = false;
+        bool m_bHard6BetAllowed              = false;
+        bool m_bHard8BetAllowed              = false;
+        bool m_bHard10BetAllowed             = false;
         bool m_bFieldBetsAllowed            = false;
-        int m_nFieldBetUnits                = 1;
         bool m_bAny7BetAllowed              = false;
         bool m_bAnyCrapsBetAllowed          = false;
         bool m_bCraps2BetAllowed            = false;
         bool m_bCraps3BetAllowed            = false;
         bool m_bYo11BetAllowed              = false;
         bool m_bCraps12BetAllowed           = false;
-        //int m_nStandardWager                = 0;
-        //int m_nWager                        = 0;
+
+        int m_nNumberOfPassBetsMade         = 0;
+        int m_nNumberOfComeBetsMade         = 0;
+        int m_nNumberOfDontPassBetsMade     = 0;
+        int m_nNumberOfDontComeBetsMade     = 0;
+        int m_nNumberOfBig6BetsMade         = 0;
+        int m_nNumberOfBig8BetsMade         = 0;
+        int m_nNumberOfHard4BetsMade        = 0;
+        int m_nNumberOfHard6BetsMade        = 0;
+        int m_nNumberOfHard8BetsMade        = 0;
+        int m_nNumberOfHard10BetsMade       = 0;
+        int m_nNumberOfPlaceBetsAllowed     = 0;
+        int m_nNumberOfPlaceBetsMade        = 0;
+        int m_nNumberOfPlaceBetsMadeAtOnce  = 0;
+        bool m_bPlaceAfterCome              = false;
+        int m_nPlaceBetUnits                = 1;
+
+        int m_nFieldBetUnits                = 1;
+
         bool m_bFullWager                   = false;
         float m_fStandardOdds               = 1.0;
         float m_fOdds                       = 1.0;
@@ -255,7 +259,7 @@ class Strategy
         int m_nLossRollsTotal               = 0;
 
         // Don't track results by default
-        bool m_bTrackResults                = false;
+        bool m_bTrace                       = false;
 
         // Container for bets
         std::list<Bet>       m_lBets;

@@ -24,7 +24,7 @@ StrategyTracker::StrategyTracker(Strategy *pcStrategy)
 {
     std::string sFileName {};
     std::string sStrategyName(pcStrategy->Name());
-    std::string chars = ".()-'";
+    std::string chars = " ~!@#$%^&*()-'=+{}[]|\\/?<>,.;:";
 
     for (size_t iii = 0; iii < chars.length(); iii++)
     {

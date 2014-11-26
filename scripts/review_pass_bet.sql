@@ -11,6 +11,6 @@ select
     after_pass_odds_wager,
     after_bankroll
 from
-    basics
+    CrapSim.basics
         inner join
-    single_bets ON basics.sequence = single_bets.sequence;
+    CrapSim.single_bets ON CrapSim.basics.sequence = CrapSim.single_bets.sequence;

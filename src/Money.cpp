@@ -43,8 +43,8 @@ void Money::Initialize(int n)
   * Check for significant winnings.
   *
   * Using the significant winning multiple and the significant winning
-  * absolute figure, return true if current bankroll is greater than
-  * these values.
+  * absolute figure, return true if current bankroll is greater than or equal
+  * to these values.
   *
   * \return True if current bankroll exceeds significant winnings goal.
   */
@@ -53,12 +53,25 @@ bool Money::HasSignificantWinnings() const
 {
     bool bSignificantWinnings = false;
 
-    if (m_nBankroll > (static_cast<float>(m_nInitialBankroll) * m_fSignificantWinningsMultiple))
+    if (m_nBankroll >= (static_cast<float>(m_nInitialBankroll) * m_fSignificantWinningsMultiple))
         bSignificantWinnings = true;
 
     if (m_nSignificantWinnings > 0)
-        if (m_nBankroll > m_nInitialBankroll + m_nSignificantWinnings)
+        if (m_nBankroll >= m_nInitialBankroll + m_nSignificantWinnings)
             bSignificantWinnings = true;
 
     return (bSignificantWinnings);
+}
+
+/**
+  * Reset the class.
+  *
+  * Reset values for a new simulation run.
+  *
+  */
+
+void Money::Reset()
+{
+    m_nBankroll = m_nMaxBankroll = m_nInitialBankroll;
+    m_nBankrollBeforeBetting = m_nBankrollAfterBetting = m_nBankrollAfterResolving = 0;
 }

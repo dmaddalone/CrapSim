@@ -47,6 +47,9 @@ class Die
         // Roll the die
         int Roll();
 
+        // Return the last rolled value
+        int RollValue() const                  { return (m_nLastDieRollValue); }
+
         // Return the number of times a particular value is rolled
         int   RollValueCount(int i) const      { return m_pnDieRollValues[i-1];}
         // Return the total number of times the die has been rolled
