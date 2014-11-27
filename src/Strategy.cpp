@@ -189,7 +189,7 @@ void Strategy::SetOddsProgressionMethod(std::string sOddsProgressionMethod)
 
     if (sOddsProgressionMethod == "ARITHMETIC")     m_ecOddsProgressionMethod = OddsProgressionMethod::ARITHMETIC;
     else if (sOddsProgressionMethod == "GEOMETRIC") m_ecOddsProgressionMethod = OddsProgressionMethod::GEOMETRIC;
-    else throw std::domain_error("Strategy::SetOddsProgressionMethod");
+    else throw CrapSimException("Strategy::SetOddsProgressionMethod: unknown odds progression method");
 }
 
 /**
@@ -1159,7 +1159,7 @@ void Strategy::ResolveDontCome(std::list<Bet>::iterator &it, const Dice &cDice)
 void Strategy::ResolvePassOdds(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice)
 {
     if (cTable.IsComingOutRoll() == true)             // There should not be a Pass Odds bet if this is coming out roll
-        throw std::domain_error("Strategy::ResolvePassOdds: called when Table is coming out");
+        throw CrapSimException("Strategy::ResolvePassOdds: called when Table is coming out");
 
     if (cDice.IsSeven())                                    // Pass Odds Bets and a Seven Roll?
     {
@@ -1185,7 +1185,7 @@ void Strategy::ResolvePassOdds(std::list<Bet>::iterator &it, const Table &cTable
 void Strategy::ResolveDontPassOdds(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice)
 {
     if (cTable.IsComingOutRoll() == true)             // There should not be a Don't Pass Odds bet if this is coming out roll
-        throw std::domain_error("Strategy::ResolveDontPassOdds: called when Table is coming out");
+        throw CrapSimException("Strategy::ResolveDontPassOdds: called when Table is coming out");
 
     if (cDice.IsSeven())                                    // Dont Pass Odds Bets and a Seven Roll?
     {

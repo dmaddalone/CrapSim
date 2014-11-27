@@ -29,8 +29,8 @@
 
 #include <locale>
 #include <map>
-#include <stdexcept>
 #include <string>
+#include "CrapSimException.h"
 #include "Dice.h"
 #include "Table.h"
 
@@ -67,7 +67,9 @@ class QualifiedShooter
         void SetMethod(std::string sMethod);
         std::string Method() const;
         // Set the count for the qualification method
-        void SetCount(int i)                    { if (i >= 1) m_nQualificationCount = i; else throw std::domain_error("QualifiedShooter::SetCount"); }
+        void SetCount(int i)
+            { if (i >= 1) m_nQualificationCount = i;
+              else throw CrapSimException("QualifiedShooter::SetCount", std::to_string(i)); }
         int Count() const                       { return (m_nQualificationCount); }
         // Set when the qualification method starts, usually with a new shooter
         void SetStopWithShooter(bool b)         { m_bQualificationStopsWithShooter = b; }

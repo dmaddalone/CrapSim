@@ -23,9 +23,9 @@
 #include <list>
 #include <locale>
 #include <map>
-#include <stdexcept>
 #include <string>
 
+#include "CrapSimException.h"
 #include "Bet.h"
 
 // Wager progression method

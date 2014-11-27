@@ -5,6 +5,7 @@
 		<Option title="CrapSim" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
+		<Option virtualFolders="CrapSim/include/;" />
 		<Build>
 			<Target title="Debug">
 				<Option output="bin/Debug/CrapSim" prefix_auto="1" extension_auto="1" />
@@ -49,6 +50,7 @@
 		<Unit filename="../CDataFile/src/CDataFile.cpp" />
 		<Unit filename="include/Bet.h" />
 		<Unit filename="include/CrapSimVersion.h" />
+		<Unit filename="include/CrapSimException.h" />
 		<Unit filename="include/Dice.h" />
 		<Unit filename="include/Die.h" />
 		<Unit filename="include/Money.h" />

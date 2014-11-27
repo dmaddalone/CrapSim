@@ -69,10 +69,7 @@ void QualifiedShooter::SetMethod(std::string sMethod)
     }
     else
     {
-        // TODO: use same technique for other throws OR create an exception class
-        std::string sWhat ("QualifiedShooter::SetMethod: unknown method ");
-        sWhat += sMethod;
-        throw std::domain_error(sWhat);
+        throw CrapSimException("QualifiedShooter::SetMethod: unknown method", sMethod);
     }
 }
 
@@ -167,7 +164,7 @@ void QualifiedShooter::QualifyTheShooter(const Table &cTable, const Dice &cDice)
             MethodAfterNXRollsInARow(cTable, cDice, 12);
             break;
         default:
-            throw std::domain_error("QualifiedShooter::QualifyTheShooter: unknown QualificationMethod");
+            throw CrapSimException("QualifiedShooter::QualifyTheShooter: unknown QualificationMethod");
             break;
     }
 }

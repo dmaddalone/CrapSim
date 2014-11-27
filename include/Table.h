@@ -26,10 +26,10 @@
 #ifndef TABLE_H
 #define TABLE_H
 
-#include <stdexcept>
 #include <map>
 #include <string>
 #include <locale>
+#include "CrapSimException.h"
 #include "Dice.h"
 
 // Used to identify the type of table odds
@@ -53,9 +53,13 @@ class Table
         Table(int nMin, int nMax);
 
         // Set and return the minimum and maximum bet wagers
-        void   SetMinimumBet(int i)     { if (i > 0) m_nMinimumBet = i; else throw std::domain_error("Table::SetMinimumBet"); }
+        void   SetMinimumBet(int i)
+            { if (i > 0) m_nMinimumBet = i;
+              else throw CrapSimException("Table::SetMinimumBet", std::to_string(i)); }
         int    MinimumBet() const       { return (m_nMinimumBet); }
-        void   SetMaximumBet(int i)     { if (i > 0) m_nMaximumBet = i; else throw std::domain_error("Table::SetMaximumBet"); }
+        void   SetMaximumBet(int i)
+            { if (i > 0) m_nMaximumBet = i;
+              else throw CrapSimException("Table::SetMaximumBet", std::to_string(i)); }
         int    MaximumBet() const       { return (m_nMaximumBet); }
         // Set and return the table point
         void   SetPoint(int p)          { m_bPuckOn = true; m_nPoint = p; }

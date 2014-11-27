@@ -18,9 +18,9 @@
 */
 
 #include <iostream>
-#include <stdexcept>
 #include <climits>
 #include <cfloat>
+#include "CrapSimException.h"
 #include "Die.h"
 #include "Dice.h"
 #include "Table.h"
@@ -259,6 +259,9 @@ int CrapsSimulation(std::string sINIFile)
     // Open the configuration file and load the configuration.
     CDataFile cConfigFile(sINIFile);
 
+    // Stop CDataFile cConfigFile from Save() and writing out (aka corrupting) the file
+    cConfigFile.ClearDirty();
+
     // Set non-Strategy configuration items.
     std::string sTableType = cConfigFile.GetString("Type", "Table");
     int nMinimumWager      = cConfigFile.GetInt("MinimumWager", "Table");
@@ -307,8 +310,8 @@ int CrapsSimulation(std::string sINIFile)
             CreateStrategy(sStrategyName, cConfigFile, nDefaultInitBank, nDefaultStdWager, fDefaultSWM, nDefaultSigWin, cSim);
     }
 
-    // Stop CDataFile cConfigFile from Save() and writing out the file
-    cConfigFile.Clear();
+    //// Stop CDataFile cConfigFile from Save() and writing out (aka corrupting) the file
+    ////cConfigFile.Clear();
 
     // Run the Simulation.
     cSim.Run(nNumberOfRuns, bMusterReport, bTally);
@@ -334,5 +337,16 @@ int main(int argc, char* argv[])
         exit (EXIT_FAILURE);
     }
 
-    return (CrapsSimulation(argv[1]));
+    try
+    {
+        return (CrapsSimulation(argv[1]));
+    }
+    catch (const CrapSimException &e)
+    {
+        std::cerr << "ERROR" << std::endl;
+        std::cerr << e.what() << " " << e.m_sArg << std::endl;
+        std::cerr << "Terminating" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
 }

@@ -30,8 +30,8 @@
 #include <climits>
 #include <string>
 #include <list>
-#include <stdexcept>
 #include <vector>
+#include "CrapSimException.h"
 #include "Table.h"
 #include "Bet.h"
 #include "Money.h"
@@ -77,19 +77,37 @@ class Strategy
         void SetFullWager(bool b)           { m_cWager.SetFullWager(b); }
         // Set whether we are using a type of bet (e.g., Pass) or the number
         // of bets used (e.g., Come bets)
-        void SetPassBet(int i)              { if ((i == 0) || (i == 1)) m_nNumberOfPassBetsAllowed = i; else throw std::domain_error("Strategy::SetPassBet"); }
-        void SetNumberOfComeBets(int i)     { if ((i >= 0) && (i <= 6)) m_nNumberOfComeBetsAllowed = i; else throw std::domain_error("Strategy::SetNumberOfComeBets"); }
-        void SetDontPassBet(int i)          { if ((i == 0) || (i == 1)) m_nNumberOfDontPassBetsAllowed = i; else throw std::domain_error("Strategy::SetDontPassBet: argument"); }
-        void SetNumberOfDontComeBets(int i) { if ((i >= 0) && (i <= 6)) m_nNumberOfDontComeBetsAllowed = i; else throw std::domain_error("Strategy::SetNumberOfDontComeBets"); }
-        void SetNumberOfPlaceBets(int i)    { if ((i >= 0) && (i <= 6)) m_nNumberOfPlaceBetsAllowed = i; else throw std::domain_error("Strategy::SetNumberOfPlaceBets: argument"); }
+        void SetPassBet(int i)
+            { if ((i == 0) || (i == 1)) m_nNumberOfPassBetsAllowed = i;
+              else throw CrapSimException("Strategy::SetPassBet:", std::to_string(i)); }
+        void SetNumberOfComeBets(int i)
+            { if ((i >= 0) && (i <= 6)) m_nNumberOfComeBetsAllowed = i;
+              else throw CrapSimException("Strategy::SetNumberOfComeBets", std::to_string(i)); }
+        void SetDontPassBet(int i)
+            { if ((i == 0) || (i == 1)) m_nNumberOfDontPassBetsAllowed = i;
+              else throw CrapSimException("Strategy::SetDontPassBet:", std::to_string(i)); }
+        void SetNumberOfDontComeBets(int i)
+            { if ((i >= 0) && (i <= 6)) m_nNumberOfDontComeBetsAllowed = i;
+              else throw CrapSimException("Strategy::SetNumberOfDontComeBets", std::to_string(i)); }
+        void SetNumberOfPlaceBets(int i)
+            { if ((i >= 0) && (i <= 6)) m_nNumberOfPlaceBetsAllowed = i;
+              else throw CrapSimException("Strategy::SetNumberOfPlaceBets:", std::to_string(i)); }
         // Set Place bet specifics
-        void SetNumberOfPlaceBetsMadeAtOnce(int i) { if ((i >= 0) && (i <= 6)) m_nNumberOfPlaceBetsMadeAtOnce = i; else throw std::domain_error("Strategy::SetNumberOfPlaceBetsMadeAtOnce"); }
+        void SetNumberOfPlaceBetsMadeAtOnce(int i)
+            { if ((i >= 0) && (i <= 6)) m_nNumberOfPlaceBetsMadeAtOnce = i;
+              else throw CrapSimException("Strategy::SetNumberOfPlaceBetsMadeAtOnce", std::to_string(i)); }
         void SetPlaceAfterCome(bool b)      { m_bPlaceAfterCome = b; }
-        void SetPlacePreferred(int i)       { if ((i == 4) || (i == 5) || (i ==6) || (i == 8) ||(i == 9) || (i == 10)) m_nPreferredPlaceBet = i; else throw std::domain_error("Strategy::SetPlacePreferred");  }
-        void SetPlaceBetUnits(int i)        { if (i >= 1) m_nPlaceBetUnits = i; else throw std::domain_error("Strategy::SetPlaceBetUnits"); }
+        void SetPlacePreferred(int i)
+        { if ((i == 4) || (i == 5) || (i ==6) || (i == 8) ||(i == 9) || (i == 10)) m_nPreferredPlaceBet = i;
+          else throw CrapSimException("Strategy::SetPlacePreferred", std::to_string(i));  }
+        void SetPlaceBetUnits(int i)
+            { if (i >= 1) m_nPlaceBetUnits = i;
+              else throw CrapSimException("Strategy::SetPlaceBetUnits", std::to_string(i)); }
         // Set one roll bet specifics
         void SetFieldBetAllowed(bool b)     { m_bFieldBetsAllowed = b; }
-        void SetFieldBetUnits(int i)        { if (i >= 1) m_nFieldBetUnits = i; else throw std::domain_error("Strategy::SetFieldBetUnits"); }
+        void SetFieldBetUnits(int i)
+            { if (i >= 1) m_nFieldBetUnits = i;
+              else throw CrapSimException("Strategy::SetFieldBetUnits", std::to_string(i)); }
         void SetAny7BetAllowed(bool b)      { m_bAny7BetAllowed = b; }
         void SetAnyCrapsBetAllowed(bool b)  { m_bAnyCrapsBetAllowed = b; }
         void SetCraps2BetAllowed(bool b)    { m_bCraps2BetAllowed = b; }
@@ -99,7 +117,9 @@ class Strategy
         // Set Big 6 or 8 bet specifics
         void SetBig6BetAllowed(bool b)      { m_bBig6BetAllowed = b; }
         void SetBig8BetAllowed(bool b)      { m_bBig8BetAllowed = b; }
-        void SetStandardOdds(float f)       { if ( f >= 1.0 || f == 0.0) m_fStandardOdds = m_fOdds = f; else throw std::domain_error("Strategy::SetStandardOdds"); }
+        void SetStandardOdds(float f)
+            { if ( f >= 1.0 || f == 0.0) m_fStandardOdds = m_fOdds = f;
+              else throw CrapSimException("Strategy::SetStandardOdds", std::to_string(f)); }
         // Set significant winnings multiple and absolute figures (see Money.h)
         void SetSignificantWinningsMultiple(float f) { m_cMoney.SetSignificantWinningsMultiple(f); }
         void SetSignificantWinnings(int i)           { m_cMoney.SetSignificantWinnings(i); }
@@ -111,7 +131,10 @@ class Strategy
         // Odds methods
         void SetOddsProgressionMethod(std::string sMethod);
         void SetComeOddsWorking(bool b)     { m_bComeOddsWorking = b; }
-        void IncreaseOdds()                 { if (IsArithmeticOddsProgression()) m_fOdds += 1; else if (IsGeometricOddsProgression()) m_fOdds *= 2; else throw std::domain_error("Strategy::IncreaseOdds"); }
+        void IncreaseOdds()
+            { if (IsArithmeticOddsProgression()) m_fOdds += 1;
+              else if (IsGeometricOddsProgression()) m_fOdds *= 2;
+              else throw CrapSimException("Strategy::IncreaseOdds: unknown odds progression method"); }
         void ResetOdds()                    { m_fOdds = m_fStandardOdds; }
         // Wager methods
         void SetWagerProgressionMethod(std::string sMethod) { m_cWager.SetMethod(sMethod); }

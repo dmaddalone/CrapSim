@@ -26,7 +26,7 @@
 #ifndef MONEY_H
 #define MONEY_H
 
-#include <stdexcept>
+#include "CrapSimException.h"
 #include <climits>
 #include <iostream>
 
@@ -61,11 +61,15 @@ class Money
         // Return the significant winning multiple
         float SignificantWinningsMultiple() const    { return (m_fSignificantWinningsMultiple); }
         // Set the significant winning multiple
-        void SetSignificantWinningsMultiple(float f) { if (f >= 1.0) m_fSignificantWinningsMultiple = f; else throw std::domain_error("Money::SetSignificantWinningsMultiple"); }
+        void SetSignificantWinningsMultiple(float f)
+            { if (f >= 1.0) m_fSignificantWinningsMultiple = f;
+              else throw CrapSimException("Money::SetSignificantWinningsMultiple:", std::to_string(f)); }
         // Return the significant winnings absolute amount
         int SignificantWinnings() const              { return (m_nSignificantWinnings); }
         // Set the significant winnings absolute amount
-        void SetSignificantWinnings(int i)           { if (i >= 1) m_nSignificantWinnings = i; else throw std::domain_error("Money::SetSignificantWinnings"); }
+        void SetSignificantWinnings(int i)
+            { if (i >= 1) m_nSignificantWinnings = i;
+              else throw CrapSimException("Money::SetSignificantWinnings", std::to_string(i)); }
         // Return whether the significant winnings has been attained
         bool HasSignificantWinnings() const;
 
