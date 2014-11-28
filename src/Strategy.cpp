@@ -290,6 +290,8 @@ void Strategy::MakeBets(const Table &cTable)
 
         MakePlaceBets(cTable);
 
+        MakePutBet(cTable);
+
         MakeHardWayBets();
 
         MakeBigBets();
@@ -341,7 +343,10 @@ void Strategy::ResolveBets(const Table &cTable, const Dice &cDice)
 
             if (it->IsPlaceBet())        ResolvePlace(it, cTable, cDice);
 
-            if (it->IsHardBet())         ResolveHardWayBets(it, cTable, cDice);
+            if (it->IsPutBet())          ResolvePut(it, cDice);
+            if (it->IsPutOddsBet())      ResolvePutOdds(it, cDice);
+
+            if (it->IsHardBet())         ResolveHardWayBets(it, cDice);
 
             if (it->IsBigBet())          ResolveBig(it, cDice);
 
@@ -524,7 +529,7 @@ void Strategy::MakeOddsBet(const Table &cTable)
     for (std::list<Bet>::iterator it = m_lBets.begin();it != m_lBets.end(); it++)
     {
         // Pass Bet or Dont Pass Bet
-        if (it->IsPassBet() || it->IsDontPassBet() || it->IsComeBet() || it->IsDontComeBet())
+        if (it->IsPassBet() || it->IsDontPassBet() || it->IsComeBet() || it->IsDontComeBet() || it->IsPutBet())
         {
             // Not on the come out for the bet
             if (!it->OnTheComeOut())
@@ -543,8 +548,13 @@ void Strategy::MakeOddsBet(const Table &cTable)
                     // Generate a new bet
                     Bet cBet;
 
-                    // Methods for Pass or DontpassBet
-                    if (it->IsPassBet() || it->IsDontPassBet())
+                    // Methods for Put
+                    if (it->IsPutBet())
+                    {
+                        // Create Bet as Put Odds
+                        cBet.MakePutOddsBet(nWager, it->Point());
+                    }
+                    else if (it->IsPassBet() || it->IsDontPassBet())
                     {
                         // First, create Bet as Pass Odds
                         cBet.MakePassOddsBet(nWager, it->Point());
@@ -732,6 +742,36 @@ bool Strategy::SixOrEightCovered()
 }
 
 /**
+  * Make a Put Bet.
+  *
+  * After Table is coming out, make a Put bet, and an Odds Bet, and add it
+  * to bets container.
+  *
+  * INI File:
+  * PutBet=true|false
+  *
+  *\param cTable The Table.
+  */
+
+void Strategy::MakePutBet(const Table &cTable)
+{
+    if (!cTable.IsComingOutRoll() && m_bPutBetsAllowed && !m_bPutBetMade)
+    {
+        // If money is not available to bet, do not make a bet
+        int nWager = m_cWager.BetWager(m_cMoney.Bankroll());
+        if (nWager < 1) return;
+
+        Bet cBet;
+        cBet.MakePutBet(nWager, cTable.Point());
+        m_cMoney.Decrement(nWager);
+        m_bPutBetMade = true;
+        m_lBets.push_back(cBet);
+
+        MakeOddsBet(cTable); // Take Odds on Put Bet
+    }
+}
+
+/**
   * Make a Hard Way Bet.
   *
   * Make a Hard 4, 6, 8, and/or 10 and add it to bets container.
@@ -818,7 +858,6 @@ void Strategy::MakeBigBets()
 
         Bet cBet;
         cBet.MakeBig6Bet(nWager);
-        ////cBet.MakeBigBet(nWager, 6);
         m_cMoney.Decrement(nWager);
         ++m_nNumberOfBig6BetsMade;
         m_lBets.push_back(cBet);
@@ -833,7 +872,6 @@ void Strategy::MakeBigBets()
 
         Bet cBet;
         cBet.MakeBig8Bet(nWager);
-        ////cBet.MakeBigBet(nWager, 8);
         m_cMoney.Decrement(nWager);
         ++m_nNumberOfBig8BetsMade;
         m_lBets.push_back(cBet);
@@ -1147,6 +1185,29 @@ void Strategy::ResolveDontCome(std::list<Bet>::iterator &it, const Dice &cDice)
 }
 
 /**
+  * Resolve Put Bet.
+  *
+  * Resolve the Put bet based on the state of the bet and the dice.
+  *
+  *\param cDice The Dice.
+  */
+
+void Strategy::ResolvePut(std::list<Bet>::iterator &it, const Dice &cDice)
+{
+    if (cDice.IsSeven())                                    // Put Bet and a Seven Roll?
+    {
+        m_bPutBetMade = false;
+        it->SetLost();
+    }
+    else if (it->Point() == cDice.RollValue())              // Put Bet and Hit the Point?
+    {
+        m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
+        m_bPutBetMade = false;
+        it->SetWon();
+    }
+}
+
+/**
   * Resolve Pass Odds Bet.
   *
   * Loop through all bets looking for a Pass Odds Bet.  Resolve based on
@@ -1282,11 +1343,33 @@ void Strategy::ResolveDontComeOdds(std::list<Bet>::iterator &it, const Dice &cDi
     }
  }
 
+ /**
+  * Resolve Put Odds Bet.
+  *
+  * Resolve Put Odds bet based on the state of the bet, the table, and the dice.
+  *
+  *\param cTable The Table.
+  *\param cDice The Dice.
+  */
+
+void Strategy::ResolvePutOdds(std::list<Bet>::iterator &it, const Dice &cDice)
+{
+    if (cDice.IsSeven())                                    // Put Odds Bets and a Seven Roll?
+    {
+        it->SetLost();
+    }
+    else if (it->Point() == cDice.RollValue())               // Paut Odds Bet and Hit the Point?
+    {
+        m_cMoney.Increment(it->Wager() + it->CalculatePayoff());// Payoff
+        it->SetWon();
+    }
+}
+
+
 /**
   * Resolve Place Bets.
   *
-  * Loop through all bets looking for Place Bets.  Resolve based on
-  * the state of the bet, the table, and the dice.
+  * Resolve all Place Bets based on the state of the bet, the table, and the dice.
   *
   *\param cTable The Table.
   *\param cDice The Dice.
@@ -1294,7 +1377,7 @@ void Strategy::ResolveDontComeOdds(std::list<Bet>::iterator &it, const Dice &cDi
 
 void Strategy::ResolvePlace(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice)
 {
-    if (!cTable.IsComingOutRoll())                          // Place Bets and not a come out roll for the table (Place bets are turned off on the come out roll)
+    if (!cTable.IsComingOutRoll() || m_bPlaceWorking)       // Place Bets are off on the Table come out roll unless explicitly turned on
     {
         if (cDice.IsSeven())                                    // Place Bet and not a come out roll and a Seven Roll?
         {
@@ -1325,47 +1408,43 @@ void Strategy::ResolvePlace(std::list<Bet>::iterator &it, const Table &cTable, c
   *\param cDice The Dice.
   */
 
-void Strategy::ResolveHardWayBets(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice)
+void Strategy::ResolveHardWayBets(std::list<Bet>::iterator &it, const Dice &cDice)
 {
-    if (!cTable.IsComingOutRoll())
+    if (cDice.IsSeven() || !cDice.IsHard())
     {
-        if (cDice.IsSeven() || !cDice.IsHard())
-        {
-            it->SetLost();
-            if (it->IsHard4Bet())  --m_nNumberOfHard4BetsMade;
-            if (it->IsHard6Bet())  --m_nNumberOfHard6BetsMade;
-            if (it->IsHard8Bet())  --m_nNumberOfHard8BetsMade;
-            if (it->IsHard10Bet()) --m_nNumberOfHard10BetsMade;
-        }
+        it->SetLost();
+        if (it->IsHard4Bet())  --m_nNumberOfHard4BetsMade;
+        if (it->IsHard6Bet())  --m_nNumberOfHard6BetsMade;
+        if (it->IsHard8Bet())  --m_nNumberOfHard8BetsMade;
+        if (it->IsHard10Bet()) --m_nNumberOfHard10BetsMade;
+    }
 
-        if (cDice.IsFour() && it->IsHard4Bet())
-        {
-            m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
-            it->SetWon();
-            --m_nNumberOfHard4BetsMade;
-        }
+    if (cDice.IsFour() && it->IsHard4Bet())
+    {
+        m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
+        it->SetWon();
+        --m_nNumberOfHard4BetsMade;
+    }
 
-        if (cDice.IsSix() && it->IsHard6Bet())
-        {
-            m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
-            it->SetWon();
-            --m_nNumberOfHard6BetsMade;
-        }
+    if (cDice.IsSix() && it->IsHard6Bet())
+    {
+        m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
+        it->SetWon();
+        --m_nNumberOfHard6BetsMade;
+    }
 
-        if (cDice.IsEight() && it->IsHard8Bet())
-        {
-            m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
-            it->SetWon();
-            --m_nNumberOfHard8BetsMade;
+    if (cDice.IsEight() && it->IsHard8Bet())
+    {
+        m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
+        it->SetWon();
+        --m_nNumberOfHard8BetsMade;
+    }
 
-        }
-
-        if (cDice.IsTen() && it->IsHard10Bet())
-        {
-            m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
-            it->SetWon();
-            --m_nNumberOfHard10BetsMade;
-        }
+    if (cDice.IsTen() && it->IsHard10Bet())
+    {
+        m_cMoney.Increment(it->Wager() + it->CalculatePayoff());
+        it->SetWon();
+        --m_nNumberOfHard10BetsMade;
     }
 }
 
@@ -1545,16 +1624,6 @@ void Strategy::UpdateStatistics()
 
 void Strategy::Reset()
 {
-    //// Should not need these
-    ////m_nNumberOfPassBetsMade  = 0;
-    ////m_nNumberOfComeBetsMade  = 0;
-    ////
-    ////m_nNumberOfDontPassBetsMade  = 0;
-    ////m_nNumberOfDontComeBetsMade  = 0;
-    ////
-    ////m_nNumberOfPlaceBetsMade = 0;
-    ////
-
     m_nNumberOfRolls         = 0;
 
     m_fOdds  = m_fStandardOdds;

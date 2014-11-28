@@ -411,3 +411,5 @@ PlaceBetUnits=2
 QualifiedShooterMethod=AFTER_POINT_ESTABLISHED
 ;WagerProgressionMethod=Regression?
 ;TakeDownBetsMethod=Classic_Regression?
+;WagerProgressionMethod=Reduce?
+;

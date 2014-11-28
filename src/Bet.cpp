@@ -37,8 +37,12 @@ int Bet::CalculatePayoff ()
         case BetType::TYPE_COME:                        // 1:1
             return (m_nWager);
 
+        case BetType::TYPE_PUT:                         // 1:1
+            return (m_nWager);
+
         case BetType::TYPE_PASS_ODDS:                   // 2:1 on 4 and 0; 3:2 on 5 and 9; 6:5 on 6 and 8
         case BetType::TYPE_COME_ODDS:
+        case BetType::TYPE_PUT_ODDS:
             switch (Point())
             {
                 case 4:

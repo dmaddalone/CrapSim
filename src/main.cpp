@@ -79,6 +79,9 @@ void CreateStrategy(const std::string sStrategy, CDataFile &cConfigFile, const i
     std::string sPlaceAfterCome         = cConfigFile.GetString("PlaceAfterCome", sStrategy); // Needed for Predefined strategies
     int         nPlacePreferred         = cConfigFile.GetInt("PlacePreferred");
     int         nPlaceBetUnits          = cConfigFile.GetInt("PlaceBetUnits",sStrategy);
+    bool        bPlaceWorking           = cConfigFile.GetBool("PlaceWorking", sStrategy);
+
+    bool        bPutBet                 = cConfigFile.GetBool("PutBet", sStrategy);
 
     bool        bFieldBet               = cConfigFile.GetBool("FieldBet", sStrategy);
     int         nFieldBetUnits          = cConfigFile.GetInt("FieldBetUnits",sStrategy);
@@ -184,6 +187,12 @@ void CreateStrategy(const std::string sStrategy, CDataFile &cConfigFile, const i
 
     // If the number of bet units for Place bets has been set, pass to Strategy
     if (nPlaceBetUnits != INT_MIN) cStrategy.SetPlaceBetUnits(nPlaceBetUnits);
+
+    // Pass Place bets working to Strategy
+    cStrategy.SetPlaceWorking(bPlaceWorking);
+
+    // Pass Put Bet to Strategy; default is false
+    cStrategy.SetPutBetsAllowed(bPutBet);
 
     // Pass Field Bet to Strategy; default is false
     cStrategy.SetFieldBetAllowed(bFieldBet);
@@ -309,9 +318,6 @@ int CrapsSimulation(std::string sINIFile)
         if (cConfigFile.CheckSectionName(sStrategyName))
             CreateStrategy(sStrategyName, cConfigFile, nDefaultInitBank, nDefaultStdWager, fDefaultSWM, nDefaultSigWin, cSim);
     }
-
-    //// Stop CDataFile cConfigFile from Save() and writing out (aka corrupting) the file
-    ////cConfigFile.Clear();
 
     // Run the Simulation.
     cSim.Run(nNumberOfRuns, bMusterReport, bTally);

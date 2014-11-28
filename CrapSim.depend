@@ -43,19 +43,19 @@
 	"CrapSimException.h"
 	"Dice.h"
 
-1417115004 source:/home/maddalone/CCPP/CrapSim/src/Bet.cpp
+1417206563 source:/home/maddalone/CCPP/CrapSim/src/Bet.cpp
 	"Bet.h"
 
-1417114940 /home/maddalone/CCPP/CrapSim/include/Bet.h
+1417206563 /home/maddalone/CCPP/CrapSim/include/Bet.h
 	"CrapSimException.h"
 
-1417117535 source:/home/maddalone/CCPP/CrapSim/src/Strategy.cpp
+1417208228 source:/home/maddalone/CCPP/CrapSim/src/Strategy.cpp
 	"Strategy.h"
 	<fstream>
 	<iostream>
 	<iomanip>
 
-1417114261 /home/maddalone/CCPP/CrapSim/include/Strategy.h
+1417208228 /home/maddalone/CCPP/CrapSim/include/Strategy.h
 	<algorithm>
 	<climits>
 	<string>
@@ -137,10 +137,10 @@
 	"Dice.h"
 	"Table.h"
 
-1417107766 /home/maddalone/CCPP/CrapSim/include/CrapSimVersion.h
+1417205889 /home/maddalone/CCPP/CrapSim/include/CrapSimVersion.h
 	<string>
 
-1417112889 source:/home/maddalone/CCPP/CrapSim/src/main.cpp
+1417215405 source:/home/maddalone/CCPP/CrapSim/src/main.cpp
 	<iostream>
 	<climits>
 	<cfloat>

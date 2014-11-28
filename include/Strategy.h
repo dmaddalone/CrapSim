@@ -89,10 +89,13 @@ class Strategy
         void SetNumberOfDontComeBets(int i)
             { if ((i >= 0) && (i <= 6)) m_nNumberOfDontComeBetsAllowed = i;
               else throw CrapSimException("Strategy::SetNumberOfDontComeBets", std::to_string(i)); }
+
+        void SetPutBetsAllowed(bool b)      { m_bPutBetsAllowed = b; }
+
+        // Set Place bet specifics
         void SetNumberOfPlaceBets(int i)
             { if ((i >= 0) && (i <= 6)) m_nNumberOfPlaceBetsAllowed = i;
               else throw CrapSimException("Strategy::SetNumberOfPlaceBets:", std::to_string(i)); }
-        // Set Place bet specifics
         void SetNumberOfPlaceBetsMadeAtOnce(int i)
             { if ((i >= 0) && (i <= 6)) m_nNumberOfPlaceBetsMadeAtOnce = i;
               else throw CrapSimException("Strategy::SetNumberOfPlaceBetsMadeAtOnce", std::to_string(i)); }
@@ -103,6 +106,8 @@ class Strategy
         void SetPlaceBetUnits(int i)
             { if (i >= 1) m_nPlaceBetUnits = i;
               else throw CrapSimException("Strategy::SetPlaceBetUnits", std::to_string(i)); }
+        void SetPlaceWorking(bool b)        { m_bPlaceWorking = b; }
+
         // Set one roll bet specifics
         void SetFieldBetAllowed(bool b)     { m_bFieldBetsAllowed = b; }
         void SetFieldBetUnits(int i)
@@ -170,6 +175,7 @@ class Strategy
         void MakeDontPassBet(const Table &cTable);
         void MakeDontComeBet(const Table &cTable);
         void MakeOddsBet(const Table &cTable);
+        void MakePutBet(const Table &cTable);
         void MakeHardWayBets();
         void MakeBigBets();
         void MakeOneRollBets();
@@ -195,7 +201,9 @@ class Strategy
         void ResolveDontCome(std::list<Bet>::iterator &it, const Dice &cDice);
         void ResolveDontComeOdds(std::list<Bet>::iterator &it, const Dice &cDice);
         void ResolvePlace(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice);
-        void ResolveHardWayBets(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice);
+        void ResolvePut(std::list<Bet>::iterator &it, const Dice &cDice);
+        void ResolvePutOdds(std::list<Bet>::iterator &it, const Dice &cDice);
+        void ResolveHardWayBets(std::list<Bet>::iterator &it, const Dice &cDice);
         void ResolveBig(std::list<Bet>::iterator &it, const Dice &cDice);
         void ResolveOneRollBets(std::list<Bet>::iterator &it, const Dice &cDice);
 
@@ -229,24 +237,26 @@ class Strategy
         int  m_nNumberOfComeBetsAllowed      = 0;
         int  m_nNumberOfDontPassBetsAllowed  = 0;
         int  m_nNumberOfDontComeBetsAllowed  = 0;
+        bool m_bPutBetsAllowed               = false;
         bool m_bBig6BetAllowed               = false;
         bool m_bBig8BetAllowed               = false;
         bool m_bHard4BetAllowed              = false;
         bool m_bHard6BetAllowed              = false;
         bool m_bHard8BetAllowed              = false;
         bool m_bHard10BetAllowed             = false;
-        bool m_bFieldBetsAllowed            = false;
-        bool m_bAny7BetAllowed              = false;
-        bool m_bAnyCrapsBetAllowed          = false;
-        bool m_bCraps2BetAllowed            = false;
-        bool m_bCraps3BetAllowed            = false;
-        bool m_bYo11BetAllowed              = false;
-        bool m_bCraps12BetAllowed           = false;
+        bool m_bFieldBetsAllowed             = false;
+        bool m_bAny7BetAllowed               = false;
+        bool m_bAnyCrapsBetAllowed           = false;
+        bool m_bCraps2BetAllowed             = false;
+        bool m_bCraps3BetAllowed             = false;
+        bool m_bYo11BetAllowed               = false;
+        bool m_bCraps12BetAllowed            = false;
 
         int m_nNumberOfPassBetsMade         = 0;
         int m_nNumberOfComeBetsMade         = 0;
         int m_nNumberOfDontPassBetsMade     = 0;
         int m_nNumberOfDontComeBetsMade     = 0;
+        bool m_bPutBetMade                  = false;
         int m_nNumberOfBig6BetsMade         = 0;
         int m_nNumberOfBig8BetsMade         = 0;
         int m_nNumberOfHard4BetsMade        = 0;
@@ -265,6 +275,7 @@ class Strategy
         float m_fStandardOdds               = 1.0;
         float m_fOdds                       = 1.0;
         bool  m_bComeOddsWorking            = false;
+        bool  m_bPlaceWorking               = false;
         OddsProgressionMethod m_ecOddsProgressionMethod = OddsProgressionMethod::NO_METHOD;
         WagerProgressionMethod m_ecWagerProgressionMethod = WagerProgressionMethod::WP_NO_METHOD;
         int m_nPreferredPlaceBet            = 8;
