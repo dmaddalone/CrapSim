@@ -37,7 +37,8 @@ class Dice
 {
     public:
         // Create nDice number of dice with nFaces number of faces
-        Dice(int nDice, int nFaces);
+        //Dice(int nDice, int nFaces);
+        Dice();
         // Copy constructor
         Dice(const Dice& cSource);
         // Assignment constructor
@@ -64,7 +65,7 @@ class Dice
         bool  IsBar() const                    { return (m_nRollValue == 12); }
         bool  IsField() const                  { return (std::count(m_anFieldNumbers.begin(), m_anFieldNumbers.end(), m_nRollValue)) ? true : false; }
         bool  IsAPointNumber() const           { return (std::count(m_anPointNumbers.begin(), m_anPointNumbers.end(), m_nRollValue)) ? true : false; }
-        bool  IsHard() const;
+        bool  IsHard() const                   { return (m_cDie1.RollValue() == m_cDie2.RollValue()); }
         // Return the number times a value has been rolled
         int   RollValueCount(int i) const      { return (m_pnDiceRollValues[i - 1]); }
         // Return the total number of rolls
@@ -73,8 +74,12 @@ class Dice
         float RollValuePercentage(int i) const { return ((float)RollValueCount(i) / TotalRolls() * 100); }
 
     private:
-        // Container of dice
-        std::list<Die> m_lDice;
+        //// Container of dice
+        ////std::list<Die> m_lDice;
+        // Dice
+        Die m_cDie1;
+        Die m_cDie2;
+
         // Set counters to zero
         int  m_nTotalDiceRolls         = 0;
         int  m_nRollValue              = 0;

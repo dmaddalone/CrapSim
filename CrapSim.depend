@@ -23,11 +23,11 @@
 	<algorithm>
 	<iterator>
 
-1417041651 source:/home/maddalone/CCPP/CrapSim/src/Dice.cpp
+1417298254 source:/home/maddalone/CCPP/CrapSim/src/Dice.cpp
 	<iostream>
 	"Dice.h"
 
-1417042058 /home/maddalone/CCPP/CrapSim/include/Dice.h
+1417298189 /home/maddalone/CCPP/CrapSim/include/Dice.h
 	<algorithm>
 	<array>
 	<list>
@@ -36,7 +36,7 @@
 1417117710 source:/home/maddalone/CCPP/CrapSim/src/Table.cpp
 	"Table.h"
 
-1417114405 /home/maddalone/CCPP/CrapSim/include/Table.h
+1417298156 /home/maddalone/CCPP/CrapSim/include/Table.h
 	<map>
 	<string>
 	<locale>
@@ -49,7 +49,7 @@
 1417206563 /home/maddalone/CCPP/CrapSim/include/Bet.h
 	"CrapSimException.h"
 
-1417208228 source:/home/maddalone/CCPP/CrapSim/src/Strategy.cpp
+1417215696 source:/home/maddalone/CCPP/CrapSim/src/Strategy.cpp
 	"Strategy.h"
 	<fstream>
 	<iostream>
@@ -88,7 +88,7 @@
 1417021832 source:/home/maddalone/CCPP/CrapSim/src/Money.cpp
 	"Money.h"
 
-1417112903 source:/home/maddalone/CCPP/CDataFile/src/CDataFile.cpp
+1417218543 source:/home/maddalone/CCPP/CDataFile/src/CDataFile.cpp
 	<vector>
 	<string>
 	<ctype.h>
@@ -104,7 +104,7 @@
 	<windows.h>
 	"CDataFile.h"
 
-1417112889 /home/maddalone/CCPP/CDataFile/include/CDataFile.h
+1417218537 /home/maddalone/CCPP/CDataFile/include/CDataFile.h
 	<vector>
 	<fstream>
 	<string>

@@ -28,9 +28,14 @@
   */
 
 Simulation::Simulation() :
-    m_cDice(2, 6),
+    m_cDice(),
     m_cTable(5, 5000)
 {}
+
+////Simulation::Simulation() :
+////    m_cDice(2, 6),
+////    m_cTable(5, 5000)
+////{}
 
 /**
   * Run the simulatioms.

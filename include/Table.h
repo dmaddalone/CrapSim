@@ -69,6 +69,7 @@ class Table
         // Return whether the puck is on
         bool   IsPuckOn() const         { return m_bPuckOn; }
         // Set and return whether a new shooter
+        // A new shooter is true from a new shooter's come out roll until she hits her first point.
         void   SetNewShooter(bool b)    { m_bNewShooter = b; }
         bool   NewShooter() const       { return (m_bNewShooter); }
         // Return whether the table is coming out
