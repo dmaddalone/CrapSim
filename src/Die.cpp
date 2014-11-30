@@ -30,13 +30,20 @@
   * nFaces number of values.  Using Mersenne Twister Engine, seeded with
   * std::random_device.
   *
-  * \param nFaces Specifices the number of faces of the die
+  * \param nFaces Specifies the number of faces of the die
   */
 
 Die::Die(int nFaces)
 {
+#if defined(_WIN32)
+    static unsigned seed  = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    ++seed;
+    std::mt19937 generator{seed};
+#else
     std::random_device rdev{};
     std::mt19937 generator{rdev()};
+#endif // defined
+
     std::uniform_int_distribution<int> distribution(1, nFaces);
     rollDie            = std::bind(distribution, generator);
     m_nFaces           = nFaces;

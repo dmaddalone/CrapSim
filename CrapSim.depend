@@ -205,3 +205,155 @@
 	<stdexcept>
 	<string>
 
+1417375611 source:c:\users\maddalone\ccpp\cdatafile\src\cdatafile.cpp
+	<vector>
+	<string>
+	<ctype.h>
+	<cctype>
+	<cstdio>
+	<cstdarg>
+	<fstream>
+	<cfloat>
+	<cstring>
+	<ios>
+	<iostream>
+	<climits>
+	<windows.h>
+	"CDataFile.h"
+
+1417375611 c:\users\maddalone\ccpp\cdatafile\include\cdatafile.h
+	<vector>
+	<fstream>
+	<string>
+	<locale>
+
+1417380074 source:c:\users\maddalone\ccpp\crapsim\src\bet.cpp
+	"Bet.h"
+
+1417380074 c:\users\maddalone\ccpp\crapsim\include\bet.h
+	"CrapSimException.h"
+
+1417380074 c:\users\maddalone\ccpp\crapsim\include\crapsimexception.h
+	<stdexcept>
+	<string>
+
+1417380074 source:c:\users\maddalone\ccpp\crapsim\src\dice.cpp
+	<iostream>
+	"Dice.h"
+
+1417380074 c:\users\maddalone\ccpp\crapsim\include\dice.h
+	<algorithm>
+	<array>
+	<list>
+	"Die.h"
+
+1417388178 c:\users\maddalone\ccpp\crapsim\include\die.h
+	<chrono>
+	<functional>
+	<algorithm>
+	<iterator>
+
+1417380074 source:c:\users\maddalone\ccpp\crapsim\src\die.cpp
+	"Die.h"
+
+1417380074 source:c:\users\maddalone\ccpp\crapsim\src\main.cpp
+	<iostream>
+	<climits>
+	<cfloat>
+	"CrapSimException.h"
+	"Die.h"
+	"Dice.h"
+	"Table.h"
+	"Money.h"
+	"Bet.h"
+	"Strategy.h"
+	"Simulation.h"
+	"CDataFile.h"
+	"CrapSimVersion.h"
+
+1417380074 c:\users\maddalone\ccpp\crapsim\include\table.h
+	<map>
+	<string>
+	<locale>
+	"CrapSimException.h"
+	"Dice.h"
+
+1417380074 c:\users\maddalone\ccpp\crapsim\include\money.h
+	"CrapSimException.h"
+	<climits>
+	<iostream>
+
+1417380074 c:\users\maddalone\ccpp\crapsim\include\strategy.h
+	<algorithm>
+	<climits>
+	<string>
+	<list>
+	<vector>
+	"CrapSimException.h"
+	"Table.h"
+	"Bet.h"
+	"Money.h"
+	"Wager.h"
+	"QualifiedShooter.h"
+	"StrategyTracker.h"
+
+1417380074 c:\users\maddalone\ccpp\crapsim\include\wager.h
+	<list>
+	<locale>
+	<map>
+	<string>
+	"CrapSimException.h"
+	"Bet.h"
+
+1417380074 c:\users\maddalone\ccpp\crapsim\include\qualifiedshooter.h
+	<locale>
+	<map>
+	<string>
+	"CrapSimException.h"
+	"Dice.h"
+	"Table.h"
+
+1417380074 c:\users\maddalone\ccpp\crapsim\include\strategytracker.h
+	<string>
+	<fstream>
+	"Strategy.h"
+	"Table.h"
+	"Bet.h"
+
+1417380074 c:\users\maddalone\ccpp\crapsim\include\simulation.h
+	"Dice.h"
+	"Table.h"
+	"Strategy.h"
+	<vector>
+
+1417380074 c:\users\maddalone\ccpp\crapsim\include\crapsimversion.h
+	<string>
+
+1417380074 source:c:\users\maddalone\ccpp\crapsim\src\money.cpp
+	"Money.h"
+
+1417380074 source:c:\users\maddalone\ccpp\crapsim\src\qualifiedshooter.cpp
+	<iostream>
+	"QualifiedShooter.h"
+
+1417380074 source:c:\users\maddalone\ccpp\crapsim\src\simulation.cpp
+	"Simulation.h"
+	<iostream>
+	<iomanip>
+
+1417380074 source:c:\users\maddalone\ccpp\crapsim\src\strategy.cpp
+	"Strategy.h"
+	<fstream>
+	<iostream>
+	<iomanip>
+
+1417380074 source:c:\users\maddalone\ccpp\crapsim\src\strategytracker.cpp
+	<iostream>
+	"StrategyTracker.h"
+
+1417380074 source:c:\users\maddalone\ccpp\crapsim\src\table.cpp
+	"Table.h"
+
+1417380074 source:c:\users\maddalone\ccpp\crapsim\src\wager.cpp
+	"Wager.h"
+

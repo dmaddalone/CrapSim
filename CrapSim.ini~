@@ -118,7 +118,7 @@ StandardWager=5
 InitialBankroll=500
 SWM=1.5
 ;SignificantWinnings=1000
-PlayForNumberOfRolls=102
+;PlayForNumberOfRolls=102
 ;
 ;Section:       Strategy
 ;Description:   Sets default attributes for infividual strategies.  Up to 

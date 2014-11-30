@@ -27,7 +27,7 @@
 #ifndef DIE_H
 #define DIE_H
 
-#include <random>
+#include <chrono>
 #include <functional>
 #include <algorithm>
 #include <iterator>
