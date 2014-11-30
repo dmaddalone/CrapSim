@@ -58,7 +58,7 @@ QualifiedShooter::QualifiedShooter()
 void QualifiedShooter::SetMethod(std::string sMethod)
 {
     std::locale loc;
-    for (std::string::size_type iii = 0; iii < sMethod.length(); iii++)
+    for (std::string::size_type iii = 0; iii < sMethod.length(); ++iii)
         sMethod[iii] = std::toupper(sMethod[iii], loc);
 
     std::map<std::string, QualificationMethod>::iterator it = m_mQualificationMethod.find(sMethod);
@@ -87,7 +87,9 @@ std::string QualifiedShooter::Method() const
 {
     std::string sMethod("Unknown");
 
-    for (std::map<std::string, QualificationMethod>::const_iterator it = m_mQualificationMethod.begin(); it != m_mQualificationMethod.end(); it++)
+    for (std::map<std::string, QualificationMethod>::const_iterator it = m_mQualificationMethod.begin();
+         it != m_mQualificationMethod.end();
+         ++it)
     {
         if (m_ecQualificationMethod == it->second)
         {
@@ -203,14 +205,14 @@ bool QualifiedShooter::Method5Count(const Table &cTable, const Dice &cDice)
     }
     else if ((m_nCounter >= 1) && (m_nCounter < 4))
     {
-        if (!cDice.IsSeven()) m_nCounter++;
-        if (cDice.IsSeven() && cTable.IsComingOutRoll()) m_nCounter++;
+        if (!cDice.IsSeven()) ++m_nCounter;
+        if (cDice.IsSeven() && cTable.IsComingOutRoll()) ++m_nCounter;
     }
     else if (m_nCounter == 4)
     {
         if (cDice.IsAPointNumber())
         {
-            m_nCounter++;
+            ++m_nCounter;
             m_bShooterQualified = true;
         }
     }
@@ -297,7 +299,7 @@ bool QualifiedShooter::MethodAfterLosingFieldThreeTimesInARow(const Table &cTabl
     {
         if (cDice.IsSeven())
         {
-            m_nCounter++;
+            ++m_nCounter;
         }
         else if (cDice.IsField())
         {
@@ -305,7 +307,7 @@ bool QualifiedShooter::MethodAfterLosingFieldThreeTimesInARow(const Table &cTabl
         }
         else
         {
-            m_nCounter++;
+            ++m_nCounter;
         }
     }
     else if (cTable.NewShooter() && !cTable.IsComingOutRoll())
@@ -320,14 +322,14 @@ bool QualifiedShooter::MethodAfterLosingFieldThreeTimesInARow(const Table &cTabl
         }
         else
         {
-            m_nCounter++;
+            ++m_nCounter;
         }
     }
     else if (!cTable.NewShooter() && cTable.IsComingOutRoll())
     {
         if (cDice.IsSeven())
         {
-            m_nCounter++;
+            ++m_nCounter;
         }
         else if (cDice.IsField())
         {
@@ -335,7 +337,7 @@ bool QualifiedShooter::MethodAfterLosingFieldThreeTimesInARow(const Table &cTabl
         }
         else
         {
-            m_nCounter++;
+            ++m_nCounter;
         }
     }
     else
@@ -350,7 +352,7 @@ bool QualifiedShooter::MethodAfterLosingFieldThreeTimesInARow(const Table &cTabl
         }
         else
         {
-            m_nCounter++;
+            ++m_nCounter;
         }
     }
 
@@ -378,7 +380,7 @@ bool QualifiedShooter::MethodAfterFiveNon7Rolls(const Dice &cDice)
 
     if (!cDice.IsSeven())
     {
-        m_nCounter++;
+        ++m_nCounter;
     }
     else
     {
@@ -421,7 +423,7 @@ bool QualifiedShooter::MethodAfterNXRollsInARow(const Table &cTable, const Dice 
     // If number hit, count it.
     if (cDice.RollValue() == nNumber)
     {
-        m_nCounter++;
+        ++m_nCounter;
     }
     // Else if not the number AND shooter sevens out, reset counter
     else if (cDice.IsSeven() && cTable.Point() != 0)

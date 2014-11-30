@@ -59,7 +59,7 @@ Die::Die(const Die& cSource)
     if (cSource.m_pnDieRollValues)
     {
         m_pnDieRollValues = new int[m_nFaces];
-        for (int iii = 0; iii < m_nFaces; iii++)
+        for (int iii = 0; iii < m_nFaces; ++iii)
         {
             m_pnDieRollValues[iii] = cSource.m_pnDieRollValues[iii];
         }
@@ -91,7 +91,7 @@ Die& Die::operator=(const Die& cSource)
     if (cSource.m_pnDieRollValues)
         {
             m_pnDieRollValues = new int[m_nFaces];
-            for (int iii = 0; iii < m_nFaces; iii++)
+            for (int iii = 0; iii < m_nFaces; ++iii)
             {
                 m_pnDieRollValues[iii] = cSource.m_pnDieRollValues[iii];
             }
@@ -127,6 +127,6 @@ int Die::Roll()
 {
     m_nLastDieRollValue = rollDie();
     m_pnDieRollValues[m_nLastDieRollValue - 1]++;
-    m_nTotalDieRolls++;
+    ++m_nTotalDieRolls;
     return(m_nLastDieRollValue);
 }

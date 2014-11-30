@@ -131,7 +131,7 @@ void CreateStrategy(const std::string sStrategy, CDataFile &cConfigFile, const i
     {
         // TODO: make this a utility
         std::locale loc;
-        for (std::string::size_type iii = 0; iii < sPredefined.length(); iii++)
+        for (std::string::size_type iii = 0; iii < sPredefined.length(); ++iii)
             sPredefined[iii] = std::toupper(sPredefined[iii], loc);
 
         if      (sPredefined == "ELEMENTARY")   cStrategy.SetElementary();
@@ -326,7 +326,7 @@ int CrapsSimulation(std::string sINIFile)
     // Loop though possible Strategy sections (StrategyXX).  If it exists,
     // call function to create it.
     std::string sStrategyName;
-    for (int iii = 1; iii <= 24; iii++)
+    for (int iii = 1; iii <= 24; ++iii)
     {
         sStrategyName = "Strategy" + std::to_string(iii);
         if (cConfigFile.CheckSectionName(sStrategyName))
@@ -350,6 +350,8 @@ int CrapsSimulation(std::string sINIFile)
   * Check for a configuration file then call the CrapSimulation driver.
   *
   */
+
+bool Strategy::m_bReportHeaderPrinted = false;
 
 int main(int argc, char* argv[])
 {

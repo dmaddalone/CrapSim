@@ -19,13 +19,14 @@
 ;Required:      No
 ;
 ;Key:           Tally
-;Description:   Generates a running tally for the number of completed simulation runs.
+;Description:   Generates a running tally for the number of completed simulation 
+;               runs.
 ;Values:        true or false
 ;Default value: false
 ;Required:       No
 ;
 [Simulation]
-Runs=100
+Runs=2
 Muster=true
 Tally=true
 
@@ -143,7 +144,8 @@ PlayForNumberOfRolls=102
 ;Required:      Yes, if [DefaultStrategy] StandardWager is not set.
 ;
 ;Key:           FullWager
-;Description:   If true, updates wager to full payoff amount before making a bet.
+;Description:   If true, updates wager to full payoff amount before making a 
+;               bet.
 ;Values:        true or false
 ;Default value: false
 ;Required:      No

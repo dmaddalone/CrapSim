@@ -172,6 +172,9 @@ class Strategy
         // Report summary of Strategy's results over the Simulation
         void  Report();
 
+        // Static variables
+        static bool m_bReportHeaderPrinted;
+
     private:
         // Make different types of bets
         void MakePassBet(const Table &cTable);
@@ -256,10 +259,12 @@ class Strategy
         bool m_bYo11BetAllowed               = false;
         bool m_bCraps12BetAllowed            = false;
 
+        // Bet Counters - Sync with Strategy::Reset()
         int m_nNumberOfPassBetsMade         = 0;
         int m_nNumberOfComeBetsMade         = 0;
         int m_nNumberOfDontPassBetsMade     = 0;
         int m_nNumberOfDontComeBetsMade     = 0;
+        int m_nNumberOfPlaceBetsMade        = 0;
         bool m_bPutBetMade                  = false;
         int m_nNumberOfBig6BetsMade         = 0;
         int m_nNumberOfBig8BetsMade         = 0;
@@ -269,12 +274,11 @@ class Strategy
         int m_nNumberOfHard10BetsMade       = 0;
 
         int m_nNumberOfPlaceBetsAllowed     = 0;
-        int m_nNumberOfPlaceBetsMade        = 0;
         int m_nNumberOfPlaceBetsMadeAtOnce  = 0;
         bool m_bPlaceAfterCome              = false;
         int m_nPlaceBetUnits                = 1;
         int m_nPreferredPlaceBet            = 8;
-        bool  m_bPlaceWorking               = false;
+        bool m_bPlaceWorking                = false;
 
         bool m_bFieldBetsAllowed            = false;
         int m_nFieldBetUnits                = 1;
@@ -300,12 +304,18 @@ class Strategy
         int m_nLossRollsMax                 = INT_MIN;
         int m_nLossRollsTotal               = 0;
         int m_nPlayForNumberOfRolls         = 0;
+        int m_nWinBankrollMin               = INT_MAX;
+        int m_nWinBankrollMax               = INT_MIN;
+        int m_nWinBankrollTotal             = 0;
+        int m_nLossBankrollMin              = INT_MAX;
+        int m_nLossBankrollMax              = INT_MIN;
+        int m_nLossBankrollTotal            = 0;
 
         // Don't track results by default
         bool m_bTrace                       = false;
 
         // Container for bets
-        std::list<Bet>       m_lBets;
+        std::list<Bet>       m_lBets;;
 };
 
 #endif // STRATEGY_H

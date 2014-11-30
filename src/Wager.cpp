@@ -49,6 +49,62 @@ void Wager::Initialize(const int nStdWager)
 }
 
 /**
+  * Set the wager progression method.
+  *
+  * Based on a passed string, sets the wager progression method.
+  * The string is set in the map of strings and WagerProgressionMethod types.
+  *
+  * \param sMethod The wager progression method, e.g., 1-3-2-5, Martingale.
+  *
+  */
+
+void Wager::SetMethod(std::string sMethod)
+{
+    std::locale loc;
+    for (std::string::size_type iii = 0; iii < sMethod.length(); ++iii)
+        sMethod[iii] = std::toupper(sMethod[iii], loc);
+
+    std::map<std::string, WagerProgressionMethod>::iterator it = m_mWagerProgressionMethod.find(sMethod);
+
+    if (it != m_mWagerProgressionMethod.end())
+    {
+        m_ecWagerProgressionMethod = it->second;
+    }
+    else
+    {
+        throw CrapSimException("Wager::SetMethod unknown method", sMethod);
+    }
+}
+
+/**
+  * Return the wager progression method for a shooter in string format.
+  *
+  * Loops the known wager progression methods and compares to this Strategy's
+  * wager progression method.  When found, return correspnding string. The
+  * string is set in the map of strings and WagerProgressionMethod types.
+  *
+  * \return String representing the wager progression method.
+  */
+
+std::string Wager::Method() const
+{
+    std::string sMethod("Unknown");
+
+    for (std::map<std::string, WagerProgressionMethod>::const_iterator it = m_mWagerProgressionMethod.begin();
+         it != m_mWagerProgressionMethod.end();
+         ++it)
+    {
+        if (m_ecWagerProgressionMethod == it->second)
+        {
+            sMethod = it->first;
+            break;
+        }
+    }
+
+    return(sMethod);
+}
+
+/**
   * Record the table limits.
   *
   * Capture the table limits and compare to the standard wager.
@@ -88,6 +144,10 @@ void Wager::CheckWager(const int nBankroll)
     // If wager is more than bankroll, set to the max of the standard wager or the bankroll
     if (m_nWager > nBankroll)
         m_nWager = std::max(m_nStandardWager, nBankroll);
+
+    // If wager is still more than bankroll, set it to the bankroll amount
+    if (m_nWager > nBankroll)
+        m_nWager = nBankroll;
 }
 
 /**
@@ -271,60 +331,6 @@ void Wager::PlaceBetFullPayoffWager(const int nPlaceNumber)
     nModulo = m_nWager % nMultiple;
     if (nModulo != 0)
         m_nWager = m_nWager + nMultiple - nModulo; // TODO: is this right?
-}
-
-/**
-  * Set the wager progression method.
-  *
-  * Based on a passed string, sets the wager progression method.
-  * The string is set in the map of strings and WagerProgressionMethod types.
-  *
-  * \param sMethod The wager progression method, e.g., 1-3-2-5, Martingale.
-  *
-  */
-
-void Wager::SetMethod(std::string sMethod)
-{
-    std::locale loc;
-    for (std::string::size_type iii = 0; iii < sMethod.length(); iii++)
-        sMethod[iii] = std::toupper(sMethod[iii], loc);
-
-    std::map<std::string, WagerProgressionMethod>::iterator it = m_mWagerProgressionMethod.find(sMethod);
-
-    if (it != m_mWagerProgressionMethod.end())
-    {
-        m_ecWagerProgressionMethod = it->second;
-    }
-    else
-    {
-        throw CrapSimException("Wager::SetMethod unknown method", sMethod);
-    }
-}
-
-/**
-  * Return the wager progression method for a shooter in string format.
-  *
-  * Loops the known wager progression methods and compares to this Strategy's
-  * wager progression method.  When found, return correspnding string. The
-  * string is set in the map of strings and WagerProgressionMethod types.
-  *
-  * \return String representing the wager progression method.
-  */
-
-std::string Wager::Method() const
-{
-    std::string sMethod("Unknown");
-
-    for (std::map<std::string, WagerProgressionMethod>::const_iterator it = m_mWagerProgressionMethod.begin(); it != m_mWagerProgressionMethod.end(); it++)
-    {
-        if (m_ecWagerProgressionMethod == it->second)
-        {
-            sMethod = it->first;
-            break;
-        }
-    }
-
-    return(sMethod);
 }
 
 /**

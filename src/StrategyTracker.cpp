@@ -26,7 +26,7 @@ StrategyTracker::StrategyTracker(Strategy *pcStrategy)
     std::string sStrategyName(pcStrategy->Name());
     std::string chars = " ~!@#$%^&*()-'=+{}[]|\\/?<>,.;:";
 
-    for (size_t iii = 0; iii < chars.length(); iii++)
+    for (size_t iii = 0; iii < chars.length(); ++iii)
     {
         sStrategyName.erase(std::remove(sStrategyName.begin(), sStrategyName.end(), chars[iii]), sStrategyName.end());
     }
@@ -126,7 +126,7 @@ StrategyTracker::~StrategyTracker()
 void StrategyTracker::RecordNew(const Strategy *pcStrategy, const Table &cTable)
 {
     // Increment sequence number
-    m_nSequence++;
+    ++m_nSequence;
     // Record current bankroll
     m_nBeginningBankroll = pcStrategy->Bankroll();
     // Record current odds multiple
@@ -142,7 +142,7 @@ void StrategyTracker::RecordBetsBeforeRoll(const Strategy *pcStrategy, const std
     // Clear struct before recording bets
     m_stBeforeSingleBets = {};
 
-    for (std::list<Bet>::const_iterator it = lBets.begin(); it != lBets.end(); it++)
+    for (std::list<Bet>::const_iterator it = lBets.begin(); it != lBets.end(); ++it)
     {
         if ((*it).IsPassBet())
         {
@@ -185,7 +185,7 @@ void StrategyTracker::RecordBetsAfterRoll(const Strategy *pcStrategy, const std:
     // Clear struct before recording bets
     m_stAfterSingleBets = {};
 
-    for (std::list<Bet>::const_iterator it = lBets.begin(); it != lBets.end(); it++)
+    for (std::list<Bet>::const_iterator it = lBets.begin(); it != lBets.end(); ++it)
     {
         if ((*it).IsPassBet())
         {

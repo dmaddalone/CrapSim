@@ -131,7 +131,7 @@ bool Table::SetTableType(std::string sTableType)
         return (false);
 
     std::locale loc;
-    for (std::string::size_type iii = 0; iii < sTableType.length(); iii++)
+    for (std::string::size_type iii = 0; iii < sTableType.length(); ++iii)
         sTableType[iii] = std::toupper(sTableType[iii], loc);
 
     std::map<std::string, TableOdds>::iterator it = m_mTableOdds.find(sTableType);
@@ -157,7 +157,7 @@ std::string Table::TableType()
 {
     std::string sTableType("Unknown");
 
-    for (std::map<std::string, TableOdds>::iterator it = m_mTableOdds.begin(); it != m_mTableOdds.end(); it++)
+    for (std::map<std::string, TableOdds>::iterator it = m_mTableOdds.begin(); it != m_mTableOdds.end(); ++it)
     {
         if (m_ecTableOdds == it->second)
         {

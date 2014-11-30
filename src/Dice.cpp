@@ -59,7 +59,7 @@ Dice::Dice(const Dice& cSource) : m_cDie1(cSource.m_cDie1), m_cDie2(cSource.m_cD
     if (cSource.m_pnDiceRollValues)
     {
         m_pnDiceRollValues = new int[2 * 6];
-        for (std::list<Die>::size_type iii = 0; iii < 2 * 6; iii++)
+        for (std::list<Die>::size_type iii = 0; iii < 2 * 6; ++iii)
         {
             m_pnDiceRollValues[iii] = cSource.m_pnDiceRollValues[iii];
         }
@@ -92,7 +92,7 @@ Dice& Dice::operator=(const Dice& cSource)
     if (cSource.m_pnDiceRollValues)
     {
         m_pnDiceRollValues = new int[2 * 6];
-        for (std::list<Die>::size_type iii = 0; iii < 2 * 6; iii++)
+        for (std::list<Die>::size_type iii = 0; iii < 2 * 6; ++iii)
         {
             m_pnDiceRollValues[iii] = cSource.m_pnDiceRollValues[iii];
         }
@@ -132,11 +132,7 @@ int Dice::Roll()
     m_pnDiceRollValues[m_nRollValue - 1]++;
 
     // Increment the total number of throws
-    m_nTotalDiceRolls++;
+    ++m_nTotalDiceRolls;
 
     return(m_nRollValue);
 }
-
-
-
-
