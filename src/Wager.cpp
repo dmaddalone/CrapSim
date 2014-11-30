@@ -45,7 +45,7 @@ Wager::Wager()
 void Wager::Initialize(const int nStdWager)
 {
     if (nStdWager > 0) m_nStandardWager = m_nWager = nStdWager;
-    else throw CrapSimException("Wager::Initialize: standard wager less than or equal to 0", std::to_string(nStdWager));
+    else throw CrapSimException("Wager::Initialize standard wager less than or equal to 0", std::to_string(nStdWager));
 }
 
 /**
@@ -65,10 +65,10 @@ void Wager::SetTableLimits(const int nMin, const int nMax)
 
     // Ensure that Strategy's standard wager is no less than Table minimum and no more than Table maximum
     if (m_nStandardWager < m_nTableMinimum)
-        throw CrapSimException("Wager::SetTableLimits: standard wager less than table minimum", std::to_string(m_nStandardWager));
+        throw CrapSimException("Wager::SetTableLimits standard wager less than table minimum", std::to_string(m_nStandardWager));
 
     if (m_nStandardWager > m_nTableMaximum)
-        throw CrapSimException("Wager::SetTableLimits : standard wager greater than table maximum", std::to_string(m_nStandardWager));
+        throw CrapSimException("Wager::SetTableLimits standard wager greater than table maximum", std::to_string(m_nStandardWager));
 }
 
 /**
@@ -297,7 +297,7 @@ void Wager::SetMethod(std::string sMethod)
     }
     else
     {
-        throw CrapSimException("Wager::SetMethod: unknown method", sMethod);
+        throw CrapSimException("Wager::SetMethod unknown method", sMethod);
     }
 }
 
@@ -359,7 +359,7 @@ int Wager::WagerUnits(const std::list<Bet>::iterator &it)
             return (MethodParoli(it));
             break;
         default:
-            throw CrapSimException("Progression::Wager: unknown WagerProgressionMethod");
+            throw CrapSimException("Progression::Wager unknown WagerProgressionMethod");
             break;
     }
 }
@@ -432,7 +432,7 @@ int Wager::Method1_3_2_6(const std::list<Bet>::iterator &it)
                 m_nUnits = 1;
                 break;
             default:
-                throw CrapSimException("Progression::Method1_3_2_6: unknown number of units", std::to_string(m_nUnits));
+                throw CrapSimException("Progression::Method1_3_2_6 unknown number of units", std::to_string(m_nUnits));
                 break;
         }
     }
@@ -495,6 +495,16 @@ int Wager::MethodParoli(const std::list<Bet>::iterator &it)
     else
     {
         m_nUnits += 1;
+    }
+
+    return (m_nUnits);
+}
+
+int Wager::Method2_to_1(const std::list<Bet>::iterator &it)
+{
+    if (it->Lost())
+    {
+        m_nUnits = 1;
     }
 
     return (m_nUnits);

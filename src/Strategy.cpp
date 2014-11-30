@@ -189,7 +189,7 @@ void Strategy::SetOddsProgressionMethod(std::string sOddsProgressionMethod)
 
     if (sOddsProgressionMethod == "ARITHMETIC")     m_ecOddsProgressionMethod = OddsProgressionMethod::ARITHMETIC;
     else if (sOddsProgressionMethod == "GEOMETRIC") m_ecOddsProgressionMethod = OddsProgressionMethod::GEOMETRIC;
-    else throw CrapSimException("Strategy::SetOddsProgressionMethod: unknown odds progression method");
+    else throw CrapSimException("Strategy::SetOddsProgressionMethod unknown odds progression method");
 }
 
 /**
@@ -669,7 +669,7 @@ void Strategy::MakePlaceBets(const Table &cTable)
   * Make a Place bet and add it to bets container.
   *
   * INI File:
-  * PlaceBetUnits=[1-infinity]
+  * PlaceBetUnits=[1-6]
   */
 
 void Strategy::MakePlaceBet()
@@ -1220,7 +1220,7 @@ void Strategy::ResolvePut(std::list<Bet>::iterator &it, const Dice &cDice)
 void Strategy::ResolvePassOdds(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice)
 {
     if (cTable.IsComingOutRoll() == true)             // There should not be a Pass Odds bet if this is coming out roll
-        throw CrapSimException("Strategy::ResolvePassOdds: called when Table is coming out");
+        throw CrapSimException("Strategy::ResolvePassOdds called when Table is coming out");
 
     if (cDice.IsSeven())                                    // Pass Odds Bets and a Seven Roll?
     {
@@ -1246,7 +1246,7 @@ void Strategy::ResolvePassOdds(std::list<Bet>::iterator &it, const Table &cTable
 void Strategy::ResolveDontPassOdds(std::list<Bet>::iterator &it, const Table &cTable, const Dice &cDice)
 {
     if (cTable.IsComingOutRoll() == true)             // There should not be a Don't Pass Odds bet if this is coming out roll
-        throw CrapSimException("Strategy::ResolveDontPassOdds: called when Table is coming out");
+        throw CrapSimException("Strategy::ResolveDontPassOdds called when Table is coming out");
 
     if (cDice.IsSeven())                                    // Dont Pass Odds Bets and a Seven Roll?
     {
@@ -1576,13 +1576,30 @@ void Strategy::ResolveOneRollBets(std::list<Bet>::iterator &it, const Dice &cDic
 
 bool Strategy::StillPlaying() const
 {
-    if ((m_cMoney.Bankroll() < m_cWager.StandardWager()) && (m_lBets.empty()))
-        return (false);
+    bool bStillPlaying = true;
 
-    if ((m_cMoney.HasSignificantWinnings()) && (m_lBets.empty()))
-        return (false);
+    // If using the PlayForNumberRolls configuration, play until number of
+    // rolls acheived
+    if (m_nPlayForNumberOfRolls > 0)
+    {
+        if (m_nPlayForNumberOfRolls == m_nNumberOfRolls)
+            bStillPlaying = false;
+    }
+    // Else play until bankroll meets targes
+    else
+    {
+        // If bankroll is out of money and no more bets are on the table,
+        // then stop playing
+        if ((m_cMoney.Bankroll() < m_cWager.StandardWager()) && (m_lBets.empty()))
+            bStillPlaying = false;
 
-    return (true);
+        // If bankroll has significant winnings and no more bets are on the table,
+        // then stop playing
+        if ((m_cMoney.HasSignificantWinnings()) && (m_lBets.empty()))
+            bStillPlaying = false;
+    }
+
+    return (bStillPlaying);
 }
 
 /**
@@ -1596,21 +1613,46 @@ void Strategy::UpdateStatistics()
 {
     m_nTimesStrategyRun++;
 
-    if (m_cMoney.Bankroll() > m_cWager.StandardWager())
+    // If using the PlayForNumberRolls configuration, a win is defined as the
+    // current bankroll is greater than the initial bankroll
+    if (m_nPlayForNumberOfRolls > 0)
     {
-        m_nTimesStrategyWon++;
+        if (m_cMoney.Bankroll() >= m_cMoney.InitialBankroll())
+        {
+            m_nTimesStrategyWon++;
 
-        m_nWinRollsTotal += m_nNumberOfRolls;
-        if (m_nNumberOfRolls < m_nWinRollsMin) m_nWinRollsMin = m_nNumberOfRolls;
-        if (m_nNumberOfRolls > m_nWinRollsMax) m_nWinRollsMax = m_nNumberOfRolls;
+            m_nWinRollsTotal += m_nNumberOfRolls;
+            if (m_nNumberOfRolls < m_nWinRollsMin) m_nWinRollsMin = m_nNumberOfRolls;
+            if (m_nNumberOfRolls > m_nWinRollsMax) m_nWinRollsMax = m_nNumberOfRolls;
+        }
+        else
+        {
+            m_nTimesStrategyLost++;
+
+            m_nLossRollsTotal += m_nNumberOfRolls;
+            if (m_nNumberOfRolls < m_nLossRollsMin) m_nLossRollsMin = m_nNumberOfRolls;
+            if (m_nNumberOfRolls > m_nLossRollsMax) m_nLossRollsMax = m_nNumberOfRolls;
+        }
     }
+    // Else if Strategy still has money, consider it a win.
     else
     {
-        m_nTimesStrategyLost++;
+        if (m_cMoney.Bankroll() > m_cWager.StandardWager())
+        {
+            m_nTimesStrategyWon++;
 
-        m_nLossRollsTotal += m_nNumberOfRolls;
-        if (m_nNumberOfRolls < m_nLossRollsMin) m_nLossRollsMin = m_nNumberOfRolls;
-        if (m_nNumberOfRolls > m_nLossRollsMax) m_nLossRollsMax = m_nNumberOfRolls;
+            m_nWinRollsTotal += m_nNumberOfRolls;
+            if (m_nNumberOfRolls < m_nWinRollsMin) m_nWinRollsMin = m_nNumberOfRolls;
+            if (m_nNumberOfRolls > m_nWinRollsMax) m_nWinRollsMax = m_nNumberOfRolls;
+        }
+        else
+        {
+            m_nTimesStrategyLost++;
+
+            m_nLossRollsTotal += m_nNumberOfRolls;
+            if (m_nNumberOfRolls < m_nLossRollsMin) m_nLossRollsMin = m_nNumberOfRolls;
+            if (m_nNumberOfRolls > m_nLossRollsMax) m_nLossRollsMax = m_nNumberOfRolls;
+        }
     }
 }
 
@@ -1673,10 +1715,16 @@ void Strategy::Muster() const
         std::cout << std::setw(left) << std::right << "Field Bets: "          << std::boolalpha << m_bFieldBetsAllowed    <<
                      std::setw(right) << std::right << "  Trace Results: "     << std::boolalpha << m_bTrace              << std::endl;
 
-        std::cout << std::setw(left) << std::right << "Sig. Win. Mult.: "     << m_cMoney.SignificantWinningsMultiple()   << std::endl;
+        std::cout << std::setw(left) << std::right << "Play For Number of Rolls: " << m_nPlayForNumberOfRolls            << std::endl;
+
+        std::cout << std::setw(left) << std::right << "Sig. Win. Mult.: ";
+        if (m_nPlayForNumberOfRolls < 1 )
+            std::cout << m_cMoney.SignificantWinningsMultiple() << std::endl;
+        else
+            std::cout << "NOT USED" << std::endl;
 
         int nSigWin = m_cMoney.SignificantWinnings();
-        if (nSigWin > 0)
+        if (nSigWin > 0 && m_nPlayForNumberOfRolls < 1)
         {
             std::cout << std::setw(left) << std::right << "Sig. Winnings: "       << m_cMoney.SignificantWinnings()       << std::endl;
         }

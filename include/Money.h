@@ -63,7 +63,7 @@ class Money
         // Set the significant winning multiple
         void SetSignificantWinningsMultiple(float f)
             { if (f >= 1.0) m_fSignificantWinningsMultiple = f;
-              else throw CrapSimException("Money::SetSignificantWinningsMultiple:", std::to_string(f)); }
+              else throw CrapSimException("Money::SetSignificantWinningsMultiple", std::to_string(f)); }
         // Return the significant winnings absolute amount
         int SignificantWinnings() const              { return (m_nSignificantWinnings); }
         // Set the significant winnings absolute amount

@@ -32,11 +32,6 @@ Simulation::Simulation() :
     m_cTable(5, 5000)
 {}
 
-////Simulation::Simulation() :
-////    m_cDice(2, 6),
-////    m_cTable(5, 5000)
-////{}
-
 /**
   * Run the simulatioms.
   *
@@ -50,18 +45,6 @@ Simulation::Simulation() :
 
 void Simulation::Run(int nNumberOfRuns, bool bMusterReport, bool bTally)
 {
-    std::cout << "Table" << std::endl;
-    std::cout << "\tType:\t\t" << m_cTable.TableType() << std::endl;
-    std::cout << "\tMinimum Wager:\t" << m_cTable.MinimumBet() << std::endl;
-    std::cout << "\tMaximum Wager:\t" << m_cTable.MaximumBet() << std::endl;
-    std::cout << "\tBar:\t\t" << m_cTable.Bar() << std::endl;
-
-    std::cout << "Strategies" << std::endl;
-    std::cout << "\tNumber of strategies:\t" << m_vStrategies.size() << std::endl;
-
-    std::cout << "Simulation" << std::endl;
-    std::cout << "\tNumber of runs:\t" << nNumberOfRuns << std::endl;
-
     // Ensure that each Strategy conforms to the environment
     std::cout << "Sanity-checking the Strategies." << std::endl;
     for (std::vector<Strategy>::iterator it = m_vStrategies.begin(); it != m_vStrategies.end(); it++)
@@ -72,6 +55,18 @@ void Simulation::Run(int nNumberOfRuns, bool bMusterReport, bool bTally)
 
     // Write Muster
     if (bMusterReport) Muster();
+
+    std::cout << "\nTable" << std::endl;
+    std::cout << "\tType:\t\t" << m_cTable.TableType() << std::endl;
+    std::cout << "\tMinimum Wager:\t" << m_cTable.MinimumBet() << std::endl;
+    std::cout << "\tMaximum Wager:\t" << m_cTable.MaximumBet() << std::endl;
+    std::cout << "\tBar:\t\t" << m_cTable.Bar() << std::endl;
+
+    std::cout << "Strategies" << std::endl;
+    std::cout << "\tNumber of strategies:\t" << m_vStrategies.size() << std::endl;
+
+    std::cout << "Simulation" << std::endl;
+    std::cout << "\tNumber of runs:\t" << nNumberOfRuns << std::endl;
 
     std::cout << "\nStarting Simulation" << std::endl;
     for (int iii = 0; iii < nNumberOfRuns; iii++)
@@ -227,4 +222,11 @@ void Simulation::Report()
     {
         it->Report();
     }
+
+    std::cout << "\nDice History" << std::endl;
+    for (int iii = 2; iii <= (2 * 6); iii++)
+    {
+        std::cout << "\tValue " << iii << " rolled " << m_cDice.RollValueCount(iii) << " times (" << m_cDice.RollValuePercentage(iii) << "%)" << std::endl;
+    }
+    std::cout << "\tTotal Rolls for all Simluations: " << m_cDice.TotalRolls() << std::endl;
 }

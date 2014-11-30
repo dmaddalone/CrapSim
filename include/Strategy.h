@@ -79,13 +79,13 @@ class Strategy
         // of bets used (e.g., Come bets)
         void SetPassBet(int i)
             { if ((i == 0) || (i == 1)) m_nNumberOfPassBetsAllowed = i;
-              else throw CrapSimException("Strategy::SetPassBet:", std::to_string(i)); }
+              else throw CrapSimException("Strategy::SetPassBet", std::to_string(i)); }
         void SetNumberOfComeBets(int i)
             { if ((i >= 0) && (i <= 6)) m_nNumberOfComeBetsAllowed = i;
               else throw CrapSimException("Strategy::SetNumberOfComeBets", std::to_string(i)); }
         void SetDontPassBet(int i)
             { if ((i == 0) || (i == 1)) m_nNumberOfDontPassBetsAllowed = i;
-              else throw CrapSimException("Strategy::SetDontPassBet:", std::to_string(i)); }
+              else throw CrapSimException("Strategy::SetDontPassBet", std::to_string(i)); }
         void SetNumberOfDontComeBets(int i)
             { if ((i >= 0) && (i <= 6)) m_nNumberOfDontComeBetsAllowed = i;
               else throw CrapSimException("Strategy::SetNumberOfDontComeBets", std::to_string(i)); }
@@ -95,7 +95,7 @@ class Strategy
         // Set Place bet specifics
         void SetNumberOfPlaceBets(int i)
             { if ((i >= 0) && (i <= 6)) m_nNumberOfPlaceBetsAllowed = i;
-              else throw CrapSimException("Strategy::SetNumberOfPlaceBets:", std::to_string(i)); }
+              else throw CrapSimException("Strategy::SetNumberOfPlaceBets", std::to_string(i)); }
         void SetNumberOfPlaceBetsMadeAtOnce(int i)
             { if ((i >= 0) && (i <= 6)) m_nNumberOfPlaceBetsMadeAtOnce = i;
               else throw CrapSimException("Strategy::SetNumberOfPlaceBetsMadeAtOnce", std::to_string(i)); }
@@ -128,6 +128,10 @@ class Strategy
         // Set significant winnings multiple and absolute figures (see Money.h)
         void SetSignificantWinningsMultiple(float f) { m_cMoney.SetSignificantWinningsMultiple(f); }
         void SetSignificantWinnings(int i)           { m_cMoney.SetSignificantWinnings(i); }
+        // Set the number of rolls to play to
+        void SetPlayForNumberOfRolls(int i)
+            { if (i >= 1) m_nPlayForNumberOfRolls = i;
+              else throw CrapSimException("Strategy::SetPlayForNumberOfRolls", std::to_string(i));}
         // Default betting strategies
         void SetElementary();
         void SetConservative();
@@ -244,7 +248,7 @@ class Strategy
         bool m_bHard6BetAllowed              = false;
         bool m_bHard8BetAllowed              = false;
         bool m_bHard10BetAllowed             = false;
-        bool m_bFieldBetsAllowed             = false;
+
         bool m_bAny7BetAllowed               = false;
         bool m_bAnyCrapsBetAllowed           = false;
         bool m_bCraps2BetAllowed             = false;
@@ -263,22 +267,26 @@ class Strategy
         int m_nNumberOfHard6BetsMade        = 0;
         int m_nNumberOfHard8BetsMade        = 0;
         int m_nNumberOfHard10BetsMade       = 0;
+
         int m_nNumberOfPlaceBetsAllowed     = 0;
         int m_nNumberOfPlaceBetsMade        = 0;
         int m_nNumberOfPlaceBetsMadeAtOnce  = 0;
         bool m_bPlaceAfterCome              = false;
         int m_nPlaceBetUnits                = 1;
+        int m_nPreferredPlaceBet            = 8;
+        bool  m_bPlaceWorking               = false;
 
+        bool m_bFieldBetsAllowed            = false;
         int m_nFieldBetUnits                = 1;
 
         bool m_bFullWager                   = false;
+
         float m_fStandardOdds               = 1.0;
         float m_fOdds                       = 1.0;
         bool  m_bComeOddsWorking            = false;
-        bool  m_bPlaceWorking               = false;
+
         OddsProgressionMethod m_ecOddsProgressionMethod = OddsProgressionMethod::NO_METHOD;
         WagerProgressionMethod m_ecWagerProgressionMethod = WagerProgressionMethod::WP_NO_METHOD;
-        int m_nPreferredPlaceBet            = 8;
 
         // Set counters to zero or defaults
         int m_nTimesStrategyRun             = 0;
@@ -291,6 +299,7 @@ class Strategy
         int m_nLossRollsMin                 = INT_MAX;
         int m_nLossRollsMax                 = INT_MIN;
         int m_nLossRollsTotal               = 0;
+        int m_nPlayForNumberOfRolls         = 0;
 
         // Don't track results by default
         bool m_bTrace                       = false;

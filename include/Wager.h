@@ -85,6 +85,10 @@ class Wager
         void OddsBetFullPayoffWager(const int nPointNumber);
         // Update the wager amount for an Place bet for full payoff amount
         void PlaceBetFullPayoffWager(const int nPlaceNumber);
+
+        //
+        // Wager Progression Methods
+        //
         // The 1-3-2-6 method
         int Method1_3_2_6(const std::list<Bet>::iterator &it);
         // The Fibonacci method
@@ -93,6 +97,12 @@ class Wager
         int MethodMartingale(const std::list<Bet>::iterator &it);
         // The Paroli method
         int MethodParoli(const std::list<Bet>::iterator &it);
+
+        //
+        // Wager Regression Methods
+        //
+        // The 2:1 Method
+        int Method2_to_1(const std::list<Bet>::iterator &it);
 
         // Set defaults
         int m_nStandardWager  {0};

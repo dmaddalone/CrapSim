@@ -44,19 +44,6 @@ Dice::Dice() : m_cDie1(6), m_cDie2(6)
   * \param nDice Specifices the number of dice
   * \param nFaces Specifices the number of faces of the die
   */
-/*
-Dice::Dice(int nDice, int nFaces)
-{
-    // TODO: Check nDice and nfaces values
-
-    m_pnDiceRollValues  = new int[nDice * nFaces]();
-
-    for (int iii = 0; iii < nDice; iii++)
-    {
-        m_lDice.emplace_back(nFaces);
-    }
-}
-*/
 
 /**
   * Copy constructor for Dice.
@@ -82,26 +69,7 @@ Dice::Dice(const Dice& cSource) : m_cDie1(cSource.m_cDie1), m_cDie2(cSource.m_cD
         m_pnDiceRollValues = 0;
     }
 }
-/*
-Dice::Dice(const Dice& cSource) : m_lDice(cSource.m_lDice)
-{
-    m_nTotalDiceRolls         = cSource.m_nTotalDiceRolls;
-    m_nRollValue              = cSource.m_nRollValue;
 
-    if (cSource.m_pnDiceRollValues)
-    {
-        m_pnDiceRollValues = new int[m_lDice.size() * m_lDice.front().Faces()];
-        for (std::list<Die>::size_type iii = 0; iii < m_lDice.size() * m_lDice.front().Faces(); iii++)
-        {
-            m_pnDiceRollValues[iii] = cSource.m_pnDiceRollValues[iii];
-        }
-    }
-    else
-    {
-        m_pnDiceRollValues = 0;
-    }
-}
-*/
 /**
   * Copy assignment constructor for Dice.
   *
@@ -136,35 +104,6 @@ Dice& Dice::operator=(const Dice& cSource)
 
     return (*this);
 }
-/*
-Dice& Dice::operator=(const Dice& cSource)
-{
-    if (this == &cSource)
-        return (*this);
-
-    m_lDice = cSource.m_lDice;
-
-    m_nTotalDiceRolls         = cSource.m_nTotalDiceRolls;
-    m_nRollValue              = cSource.m_nRollValue;
-
-    delete[] m_pnDiceRollValues;
-
-    if (cSource.m_pnDiceRollValues)
-    {
-        m_pnDiceRollValues = new int[m_lDice.size() * m_lDice.front().Faces()];
-        for (std::list<Die>::size_type iii = 0; iii < m_lDice.size() * m_lDice.front().Faces(); iii++)
-        {
-            m_pnDiceRollValues[iii] = cSource.m_pnDiceRollValues[iii];
-        }
-    }
-    else
-    {
-        m_pnDiceRollValues = 0;
-    }
-
-    return (*this);
-}
-*/
 
 /**
   * Destructor for Die.
@@ -198,52 +137,6 @@ int Dice::Roll()
     return(m_nRollValue);
 }
 
-/*
-int Dice::Roll()
-{
-    m_nRollValue = 0;
 
-    // Roll the dice
-    std::list<Die>::iterator it;
-    it = m_lDice.begin();
-    while (it != m_lDice.end())
-    {
-        // Record the roll value
-        m_nRollValue += it->Roll();
-        it++;
-    }
 
-    // Increment the dice value count
-    m_pnDiceRollValues[m_nRollValue - 1]++;
 
-    // Increment the total number of throws
-    m_nTotalDiceRolls++;
-
-    return(m_nRollValue);
-}
-*/
-
-/**
-  * Check for a hard way.
-  *
-  * Check last values of the dice and return true if they are equal to
-  * each other.
-  *
-  *\return True if Die values are equal, false oherwise
-  */
-
-/*
-bool Dice::IsHard() const
-{
-    bool bHard = false;
-
-    const Die &cFirstDie = m_lDice.front();
-    int nFirstValue = cFirstDie.RollValue();
-
-    const Die &cSecondDie = m_lDice.back();
-    if (nFirstValue == cSecondDie.RollValue())
-        bHard = true;
-
-    return(bHard);
-}
-*/

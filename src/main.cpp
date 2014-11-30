@@ -47,7 +47,9 @@
   *\param cSim The Simulation class
   */
 
-void CreateStrategy(const std::string sStrategy, CDataFile &cConfigFile, const int nDefaultInitBank, const int nDefaultStdWager, const float fDefaultSWM, const int nDefaultSigWin, Simulation &cSim)
+void CreateStrategy(const std::string sStrategy, CDataFile &cConfigFile, const int nDefaultInitBank,
+                    const int nDefaultStdWager, const float fDefaultSWM, const int nDefaultSigWin,
+                    const int nDefaultPlayForNumberOfRolls, Simulation &cSim)
 {
     //
     // Read config file for parameters this Strategy
@@ -63,6 +65,7 @@ void CreateStrategy(const std::string sStrategy, CDataFile &cConfigFile, const i
     int         nInitialBankroll        = cConfigFile.GetInt("InitialBankroll", sStrategy);
     int         nSignificantWinnings    = cConfigFile.GetInt("SignificantWinnings", sStrategy);
     float       fSWM                    = cConfigFile.GetFloat("SWM", sStrategy);
+    int         nPlayForNumberOfRolls  = cConfigFile.GetInt("PlayForNumberOfRolls", sStrategy);
 
     // Predefined Strategies
     std::string sPredefined             = cConfigFile.GetString("Predefined", sStrategy);
@@ -146,8 +149,9 @@ void CreateStrategy(const std::string sStrategy, CDataFile &cConfigFile, const i
     // If Name is blank, use the Strategy section name
     if (cStrategy.Name() == "") cStrategy.SetName(sStrategy);
 
-    // Pass choice to make Full Wagers to Strategy
-    cStrategy.SetFullWager(bFullWager);
+
+    //
+    // Pass Default configuration parameters if not overridden
     // Set significant winnings multiple.  Use DefaultStrategy setting if individual strategy's SWM is not set.
     if (fSWM == FLT_MIN) fSWM = fDefaultSWM;
     // If Significant Winngings Multiple has been set, pass to Strategy
@@ -156,6 +160,15 @@ void CreateStrategy(const std::string sStrategy, CDataFile &cConfigFile, const i
     if (nSignificantWinnings == INT_MIN) nSignificantWinnings = nDefaultSigWin;
     // If Significant Winngings Multiple has been set, pass to Strategy
     if (nSignificantWinnings != INT_MIN) cStrategy.SetSignificantWinnings(nSignificantWinnings);
+    // Set number of rolls to play.  Use DefaultStrategy setting if individual strategy's Play Number Of Rolls is not set.
+    if (nPlayForNumberOfRolls == INT_MIN) nPlayForNumberOfRolls = nDefaultPlayForNumberOfRolls;
+    // If Significant Winngings Multiple has been set, pass to Strategy
+    if (nPlayForNumberOfRolls != INT_MIN) cStrategy.SetPlayForNumberOfRolls(nPlayForNumberOfRolls);
+
+    // Pass choice to make Full Wagers to Strategy
+    cStrategy.SetFullWager(bFullWager);
+
+
 
     // If Pass Bet has been set, pass to Strategy
     if (nPassBet != INT_MIN) cStrategy.SetPassBet(nPassBet);
@@ -276,10 +289,11 @@ int CrapsSimulation(std::string sINIFile)
     int nMinimumWager      = cConfigFile.GetInt("MinimumWager", "Table");
     int nMaximumWager      = cConfigFile.GetInt("MaximumWager", "Table");
 
-    int nDefaultInitBank   = cConfigFile.GetInt("InitialBankroll", "DefaultStrategy");
-    int nDefaultStdWager   = cConfigFile.GetInt("StandardWager", "DefaultStrategy");
-    float fDefaultSWM      = cConfigFile.GetFloat("SWM", "DefaultStrategy");
-    int nDefaultSigWin     = cConfigFile.GetInt("SignificantWinnings", "DefaultStrategy");
+    int   nDefaultInitBank             = cConfigFile.GetInt("InitialBankroll", "DefaultStrategy");
+    int   nDefaultStdWager             = cConfigFile.GetInt("StandardWager", "DefaultStrategy");
+    float fDefaultSWM                  = cConfigFile.GetFloat("SWM", "DefaultStrategy");
+    int   nDefaultSigWin               = cConfigFile.GetInt("SignificantWinnings", "DefaultStrategy");
+    int   nDefaultPlayForNumberOfRolls = cConfigFile.GetInt("PlayForNumberOfRolls", "DefaultStrategy");
 
     int nNumberOfRuns      = cConfigFile.GetInt("Runs", "Simulation");
     bool bMusterReport     = cConfigFile.GetBool("Muster", "Simulation");
@@ -316,7 +330,9 @@ int CrapsSimulation(std::string sINIFile)
     {
         sStrategyName = "Strategy" + std::to_string(iii);
         if (cConfigFile.CheckSectionName(sStrategyName))
-            CreateStrategy(sStrategyName, cConfigFile, nDefaultInitBank, nDefaultStdWager, fDefaultSWM, nDefaultSigWin, cSim);
+            CreateStrategy(sStrategyName, cConfigFile, nDefaultInitBank,
+                           nDefaultStdWager, fDefaultSWM, nDefaultSigWin,
+                           nDefaultPlayForNumberOfRolls, cSim);
     }
 
     // Run the Simulation.

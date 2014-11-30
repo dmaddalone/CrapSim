@@ -56,7 +56,7 @@ Table::Table(int nMin, int nMax)
 float Table::MaxOdds(int nPoint) const
 {
     if ((nPoint != 4) && (nPoint != 5) && (nPoint != 6) && (nPoint != 8) && (nPoint != 9) && (nPoint !=10))
-        throw CrapSimException("Table::MaxOdds: unknown point", std::to_string(Point()));
+        throw CrapSimException("Table::MaxOdds unknown point", std::to_string(Point()));
 
     switch (m_ecTableOdds)
     {
@@ -107,7 +107,7 @@ float Table::MaxOdds(int nPoint) const
             return (100.0);
             break;
         default:
-            throw CrapSimException("Table::MaxOdds: unknown TableOdds");
+            throw CrapSimException("Table::MaxOdds unknown TableOdds");
             break;
     }
 

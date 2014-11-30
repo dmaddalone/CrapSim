@@ -74,15 +74,13 @@ class Dice
         float RollValuePercentage(int i) const { return ((float)RollValueCount(i) / TotalRolls() * 100); }
 
     private:
-        //// Container of dice
-        ////std::list<Die> m_lDice;
         // Dice
         Die m_cDie1;
         Die m_cDie2;
 
         // Set counters to zero
-        int  m_nTotalDiceRolls         = 0;
-        int  m_nRollValue              = 0;
+        int  m_nTotalDiceRolls = 0;
+        int  m_nRollValue      = 0;
 
         // Pointer / array to roll values
         int  *m_pnDiceRollValues;
