@@ -22,16 +22,25 @@
 /**
   * Construct a Progression.
   *
-  * Sets up a map of strings and wager progression methods.
+  * Sets up a maps for wager progression and bet modification methods.
   */
 
 Wager::Wager()
 {
-    m_mWagerProgressionMethod["NO_METHOD"]  = WagerProgressionMethod::WP_NO_METHOD;
-    m_mWagerProgressionMethod["1_3_2_6"]    = WagerProgressionMethod::WP_1_3_2_6;
-    m_mWagerProgressionMethod["FIBONACCI"]  = WagerProgressionMethod::WP_FIBONACCI;
-    m_mWagerProgressionMethod["MARTINGALE"] = WagerProgressionMethod::WP_MARTINGALE;
-    m_mWagerProgressionMethod["PAROLI"]     = WagerProgressionMethod::WP_PAROLI;
+    m_mWagerProgressionMethod["NO_METHOD"]  = WagerProgressionMethods::WP_NO_METHOD;
+    m_mWagerProgressionMethod["1_3_2_6"]    = WagerProgressionMethods::WP_1_3_2_6;
+    m_mWagerProgressionMethod["FIBONACCI"]  = WagerProgressionMethods::WP_FIBONACCI;
+    m_mWagerProgressionMethod["MARTINGALE"] = WagerProgressionMethods::WP_MARTINGALE;
+    m_mWagerProgressionMethod["PAROLI"]     = WagerProgressionMethods::WP_PAROLI;
+
+    m_mBetModificationMethod["NO_METHOD"]                  = BetModificationMethods::BM_NO_METHOD;
+    m_mBetModificationMethod["COLLECT_PRESS_REGRESS"]      = BetModificationMethods::BM_COLLECT_PRESS_REGRESS;
+    m_mBetModificationMethod["CLASSIC_REGRESSION"]         = BetModificationMethods::BM_CLASSIC_REGRESSION;
+    m_mBetModificationMethod["PRESS_ONCE"]                 = BetModificationMethods::BM_PRESS_ONCE;
+    m_mBetModificationMethod["PRESS_TWICE"]                = BetModificationMethods::BM_PRESS_TWICE;
+    m_mBetModificationMethod["TAKE_DOWN_AFTER_ONE_HIT"]    = BetModificationMethods::BM_TAKE_DOWN_AFTER_ONE_HIT;
+    m_mBetModificationMethod["TAKE_DOWN_AFTER_TWO_HITS"]   = BetModificationMethods::BM_TAKE_DOWN_AFTER_TWO_HITS;
+    m_mBetModificationMethod["TAKE_DOWN_AFTER_THREE_HITS"] = BetModificationMethods::BM_TAKE_DOWN_AFTER_THREE_HITS;
 }
 
 /**
@@ -58,13 +67,13 @@ void Wager::Initialize(const int nStdWager)
   *
   */
 
-void Wager::SetMethod(std::string sMethod)
+void Wager::SetWagerProgressionMethod(std::string sMethod)
 {
     std::locale loc;
     for (std::string::size_type iii = 0; iii < sMethod.length(); ++iii)
         sMethod[iii] = std::toupper(sMethod[iii], loc);
 
-    std::map<std::string, WagerProgressionMethod>::iterator it = m_mWagerProgressionMethod.find(sMethod);
+    std::map<std::string, WagerProgressionMethods>::iterator it = m_mWagerProgressionMethod.find(sMethod);
 
     if (it != m_mWagerProgressionMethod.end())
     {
@@ -72,7 +81,7 @@ void Wager::SetMethod(std::string sMethod)
     }
     else
     {
-        throw CrapSimException("Wager::SetMethod unknown method", sMethod);
+        throw CrapSimException("Wager::SetWagerProgressionMethod unknown method", sMethod);
     }
 }
 
@@ -86,15 +95,71 @@ void Wager::SetMethod(std::string sMethod)
   * \return String representing the wager progression method.
   */
 
-std::string Wager::Method() const
+std::string Wager::WagerProgressionMethod() const
 {
     std::string sMethod("Unknown");
 
-    for (std::map<std::string, WagerProgressionMethod>::const_iterator it = m_mWagerProgressionMethod.begin();
+    for (std::map<std::string, WagerProgressionMethods>::const_iterator it = m_mWagerProgressionMethod.begin();
          it != m_mWagerProgressionMethod.end();
          ++it)
     {
         if (m_ecWagerProgressionMethod == it->second)
+        {
+            sMethod = it->first;
+            break;
+        }
+    }
+
+    return(sMethod);
+}
+
+/**
+  * Set the bet modification method.
+  *
+  * Based on a passed string, sets the bet modification method.
+  * The string is set in the map of strings and BetModificationMethod types.
+  *
+  * \param sMethod The wager progression method, e.g., Classic_Regression, Press_Once
+  *
+  */
+
+void Wager::SetBetModificationMethod(std::string sMethod)
+{
+    std::locale loc;
+    for (std::string::size_type iii = 0; iii < sMethod.length(); ++iii)
+        sMethod[iii] = std::toupper(sMethod[iii], loc);
+
+    std::map<std::string, BetModificationMethods>::iterator it = m_mBetModificationMethod.find(sMethod);
+
+    if (it != m_mBetModificationMethod.end())
+    {
+        m_ecBetModificationMethod = it->second;
+    }
+    else
+    {
+        throw CrapSimException("Wager::SetBetModificationMethod unknown method", sMethod);
+    }
+}
+
+/**
+  * Return the bet modification method in string format.
+  *
+  * Loops the known bet modification methods and compares to this Strategy's
+  * bet modification method.  When found, return corresponding string. The
+  * string is set in the map of strings and BetModificationMethod types.
+  *
+  * \return String representing the bet modification method.
+  */
+
+std::string Wager::BetModificationMethod() const
+{
+    std::string sMethod("Unknown");
+
+    for (std::map<std::string, BetModificationMethods>::const_iterator it = m_mBetModificationMethod.begin();
+         it != m_mBetModificationMethod.end();
+         ++it)
+    {
+        if (m_ecBetModificationMethod == it->second)
         {
             sMethod = it->first;
             break;
@@ -164,7 +229,7 @@ void Wager::CheckWager(const int nBankroll)
 
 int Wager::BetWager(const int nBankroll)
 {
-    // Set wager to standard waager multpled by number of units
+    // Set wager to standard wager multiplied by number of units
     m_nWager = m_nStandardWager * m_nUnits;
 
     CheckWager(nBankroll);
@@ -349,23 +414,23 @@ int Wager::WagerUnits(const std::list<Bet>::iterator &it)
 {
     switch (m_ecWagerProgressionMethod)
     {
-        case WagerProgressionMethod::WP_NO_METHOD:
+        case WagerProgressionMethods::WP_NO_METHOD:
             return (1);
             break;
-        case WagerProgressionMethod::WP_MARTINGALE:
+        case WagerProgressionMethods::WP_MARTINGALE:
             return (MethodMartingale(it));
             break;
-        case WagerProgressionMethod::WP_FIBONACCI:
+        case WagerProgressionMethods::WP_FIBONACCI:
             return (MethodFibonacci(it));
             break;
-        case WagerProgressionMethod::WP_1_3_2_6:
+        case WagerProgressionMethods::WP_1_3_2_6:
             return (Method1_3_2_6(it));
             break;
-        case WagerProgressionMethod::WP_PAROLI:
+        case WagerProgressionMethods::WP_PAROLI:
             return (MethodParoli(it));
             break;
         default:
-            throw CrapSimException("Progression::Wager unknown WagerProgressionMethod");
+            throw CrapSimException("Wager::WagerUnits unknown Wager Progression Method");
             break;
     }
 }
@@ -506,14 +571,219 @@ int Wager::MethodParoli(const std::list<Bet>::iterator &it)
     return (m_nUnits);
 }
 
-int Wager::Method2_to_1(const std::list<Bet>::iterator &it)
+/**
+  * Modify the existing bets.
+  *
+  * Depending on the set bet modification method, calls the corresponding
+  * bet modification method.  The bet modifications methods operate from the
+  * Strategy's list of bets.
+  *
+  * \param cBet The Bet.
+  *
+  */
+
+bool Wager::ModifyBets(Money &cMoney, const Table &cTable, const Dice &cDice, std::list<Bet> &lBets)
 {
-    if (it->Lost())
+    if (lBets.empty()) return (false);
+
+    switch (m_ecBetModificationMethod)
     {
-        m_nUnits = 1;
+        case BetModificationMethods::BM_NO_METHOD:
+            return (false);
+            break;
+        case BetModificationMethods::BM_COLLECT_PRESS_REGRESS:
+            return (MethodCollectPressRegress(cTable, cDice, lBets));
+            break;
+        case BetModificationMethods::BM_CLASSIC_REGRESSION:
+            return (MethodClassicRegression(cMoney, cTable, cDice, lBets));
+            break;
+        case BetModificationMethods::BM_PRESS_ONCE:
+            return (MethodPress(cTable, cDice, lBets, 1));
+            break;
+        case BetModificationMethods::BM_PRESS_TWICE:
+            return (MethodPress(cTable, cDice, lBets, 2));
+            break;
+        case BetModificationMethods::BM_TAKE_DOWN_AFTER_ONE_HIT:
+            return (MethodTakeDownAfterHits(cTable, cDice, lBets,1));
+            break;
+        case BetModificationMethods::BM_TAKE_DOWN_AFTER_TWO_HITS:
+            return (MethodTakeDownAfterHits(cTable, cDice, lBets,2));
+            break;
+        case BetModificationMethods::BM_TAKE_DOWN_AFTER_THREE_HITS:
+            return (MethodTakeDownAfterHits(cTable, cDice, lBets,3));
+            break;
+        default:
+            throw CrapSimException("Wager::ModifyBets unknown Bet Modification Method");
+            break;
+    }
+}
+
+/**
+  * The Collect, Press, Regress method.
+  *
+  * Blah, blah, Establish a standard wager of one unit.  If the bet wins, increase
+  * unit by one. If any bet loses, return to a single unit for the next bet.
+  *
+  * \param cBet The Bet.
+  * \param Blah
+  */
+
+bool Wager::MethodCollectPressRegress(const Table &cTable, const Dice &cDice, std::list<Bet> &lBets)
+{
+    bool bStopMakingBets = false;
+
+    return (bStopMakingBets);
+}
+
+/**
+  * The Classic Regression method.
+  *
+  * After first win, reduce all bet wagers by half.  After second win, take
+  * down all bets.  Usually used with Place bets of two units on first bet.
+  *
+  * The method expects Won bets to have been resolved and winnings already
+  * pocketed (aka, Money.Increment() already called.)
+  *
+  * \param cMoney The bankroll
+  * \param cTable The table
+  * \param cDice The dice
+  * \param lBets The list container of bets
+  *
+  * \return True if no more bets should be made, false otherwise
+  */
+
+bool Wager::MethodClassicRegression(Money &cMoney, const Table &cTable, const Dice &cDice, std::list<Bet> &lBets)
+{
+    bool bStopMakingBets = false;
+
+    // If table is coming out, reset counter
+    if (cTable.NewShooter() && cTable.IsComingOutRoll())
+    {
+        m_nBetModCounter = 0;
     }
 
-    return (m_nUnits);
+    // Loop through bets and find a winner
+    // Set flag, increment by one,and break
+    bool bWon = false;
+
+    for (std::list<Bet>::iterator it = lBets.begin(); it != lBets.end(); ++it)
+    {
+        if (it->Won())
+        {
+            bWon = true;
+            ++m_nBetModCounter;
+            break;
+        }
+    }
+
+    // If a bet won and counter is 1, a this is our first regression.
+    // 1) Loop through bets, find those that can be taken down but are not
+    // lost.
+    // 2) Reduce their wager amount by half, if possible
+    // 3) Set their state to Unresolved
+    int nOldWager = 0;
+    int nNewWager = 0;
+
+    if (bWon && m_nBetModCounter == 1)
+    {
+        for (std::list<Bet>::iterator it = lBets.begin(); it != lBets.end(); ++it)
+        {
+            // If bet is modifiable
+            if (it->Modifiable())
+            {
+                // If bet won or is unresolved
+                if (it->Won() || !it->Resolved())
+                {
+                    // Calculate new wager amount
+                    nOldWager = it->Wager();
+                    if (nOldWager >= m_nStandardWager * 2)
+                    {
+                        nNewWager = it->Wager() / 2;
+                    }
+                    else
+                    {
+                        nNewWager = m_nStandardWager;
+                    }
+
+                    // If won, make a new bet at half the original wager
+                    if (it->Won())
+                    {
+                        it->SetWager(nNewWager);
+                        cMoney.Decrement(nNewWager);
+                        it->SetUnresolved();
+                    }
+
+                    // If not resolved, reduce current wager to half
+                    else if (!it->Resolved())
+                    {
+                        it->SetWager(nNewWager);
+                        cMoney.Increment(nOldWager - nNewWager);
+                        it->SetUnresolved();
+                    }
+                }
+            }
+        }
+    }
+
+    // If a bet won and counter is 2, this is our second regression.
+    // 1) Loop through bets, find those that can be taken down and are not
+    // resolved.
+    // 2) Reduce their wager to zero
+    // 3) Set their state to Returned
+    // 4) Return true to stop making further bets
+
+    if (bWon && m_nBetModCounter == 2)
+    {
+        for (std::list<Bet>::iterator it = lBets.begin(); it != lBets.end(); ++it)
+        {
+            if (it->Modifiable())
+            {
+                if (!it->Resolved())
+                {
+                    cMoney.Increment(it->Wager());
+                    it->SetReturned();
+                }
+            }
+        }
+
+        bStopMakingBets = true;
+    }
+
+    return (bStopMakingBets);
+}
+
+/**
+  * The Press method.
+  *
+  * Blah, blah, Establish a standard wager of one unit.  If the bet wins, increase
+  * unit by one. If any bet loses, return to a single unit for the next bet.
+  *
+  * \param cBet The Bet.
+  * \param Blah
+  */
+
+bool Wager::MethodPress(const Table &cTable, const Dice &cDice, std::list<Bet> &lBets, int nTimes)
+{
+    bool bStopMakingBets = false;
+
+    return (bStopMakingBets);
+}
+
+/**
+  * The Take Down After Hits method.
+  *
+  * Blah, blah, Establish a standard wager of one unit.  If the bet wins, increase
+  * unit by one. If any bet loses, return to a single unit for the next bet.
+  *
+  * \param cBet The Bet.
+  * \param Blah
+  */
+
+bool Wager::MethodTakeDownAfterHits(const Table &cTable, const Dice &cDice, std::list<Bet> &lBets, int nTimes)
+{
+    bool bStopMakingBets = false;
+
+    return (bStopMakingBets);
 }
 
 /**
@@ -528,4 +798,5 @@ void Wager::Reset()
     m_nUnits          = 1;
     m_nPreviousUnits1 = 1;
     m_nPreviousUnits2 = 0;
+    m_nBetModCounter  = 0;
 }

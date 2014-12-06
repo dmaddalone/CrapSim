@@ -27,15 +27,31 @@
 
 #include "CrapSimException.h"
 #include "Bet.h"
+#include "Dice.h"
+#include "Money.h"
+#include "Table.h"
 
 // Wager progression method
-enum class WagerProgressionMethod
+enum class WagerProgressionMethods
 {
     WP_NO_METHOD,
     WP_1_3_2_6,
     WP_FIBONACCI,
     WP_MARTINGALE,
     WP_PAROLI
+};
+
+// Bet Modification method
+enum class BetModificationMethods
+{
+    BM_NO_METHOD,
+    BM_COLLECT_PRESS_REGRESS,
+    BM_CLASSIC_REGRESSION,
+    BM_PRESS_ONCE,
+    BM_PRESS_TWICE,
+    BM_TAKE_DOWN_AFTER_ONE_HIT,
+    BM_TAKE_DOWN_AFTER_TWO_HITS,
+    BM_TAKE_DOWN_AFTER_THREE_HITS
 };
 
 class Wager
@@ -68,11 +84,18 @@ class Wager
         // Update the wager amount for a bet with a set number of units
         int PlaceBetUnitsWager(const int nBankroll, const int nUnits, const int nPoint);
 
-        // Set and return the wager progression method
-        void SetMethod(std::string sMethod);
-        std::string Method() const;
+        // Modify Bets
+        bool ModifyBets(Money &cMoney, const Table &cTable, const Dice &cDice, std::list<Bet> &lBets);
 
-        bool WagerProgressionMethodSet() { return (m_ecWagerProgressionMethod != WagerProgressionMethod::WP_NO_METHOD); }
+        // Set and return the wager progression method
+        void SetWagerProgressionMethod(std::string sMethod);
+        std::string WagerProgressionMethod() const;
+        bool WagerProgressionMethodSet() { return (m_ecWagerProgressionMethod != WagerProgressionMethods::WP_NO_METHOD); }
+
+        // Set and return the bet modification method
+        void SetBetModificationMethod(std::string sMethod);
+        std::string BetModificationMethod() const;
+        bool BetModificationMethodSet() { return (m_ecBetModificationMethod != BetModificationMethods::BM_NO_METHOD); }
 
         // Reset the class - meant to be called before a new Simulation run
         void Reset();
@@ -99,10 +122,16 @@ class Wager
         int MethodParoli(const std::list<Bet>::iterator &it);
 
         //
-        // Wager Regression Methods
+        // Bet Modification Methods
         //
-        // The 2:1 Method
-        int Method2_to_1(const std::list<Bet>::iterator &it);
+        // Collect, Press, Regress method
+        bool MethodCollectPressRegress(const Table &cTable, const Dice &cDice, std::list<Bet> &lBets);
+        // Classic Regression
+        bool MethodClassicRegression(Money &cMoney, const Table &cTable, const Dice &cDice, std::list<Bet> &lBets);
+        // Press method
+        bool MethodPress(const Table &cTable, const Dice &cDice, std::list<Bet> &lBets, int nTimes);
+        // Take Down After Hits method
+        bool MethodTakeDownAfterHits(const Table &cTable, const Dice &cDice, std::list<Bet> &lBets, int nTimes);
 
         // Set defaults
         int m_nStandardWager  {0};
@@ -110,14 +139,17 @@ class Wager
         int m_nTableMinimum   {0};
         int m_nTableMaximum   {0};
         bool m_bFullWager     {false};
+        WagerProgressionMethods m_ecWagerProgressionMethod = WagerProgressionMethods::WP_NO_METHOD;
+        BetModificationMethods  m_ecBetModificationMethod  = BetModificationMethods::BM_NO_METHOD;
 
-        WagerProgressionMethod m_ecWagerProgressionMethod = WagerProgressionMethod::WP_NO_METHOD;
         int m_nUnits          {1};
         int m_nPreviousUnits1 {1};
         int m_nPreviousUnits2 {0};
+        int m_nBetModCounter  {0};
 
         // Map to associate the strings with the enum values
-        std::map<std::string, WagerProgressionMethod> m_mWagerProgressionMethod;
+        std::map<std::string, WagerProgressionMethods> m_mWagerProgressionMethod;
+        std::map<std::string, BetModificationMethods> m_mBetModificationMethod;
 };
 
 #endif // WAGER_H

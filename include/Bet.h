@@ -78,9 +78,9 @@ class Bet
         bool IsDontPassOddsBet() const          { return (m_ecType == BetType::TYPE_DONT_PASS_ODDS); }
         bool IsDontComeBet() const              { return (m_ecType == BetType::TYPE_DONT_COME); }
         bool IsDontComeOddsBet() const          { return (m_ecType == BetType::TYPE_DONT_COME_ODDS); }
-        bool IsPlaceBet() const                 { return (m_ecType == BetType::TYPE_PLACE); }
         bool IsPutBet() const                   { return (m_ecType == BetType::TYPE_PUT); }
         bool IsPutOddsBet() const               { return (m_ecType == BetType::TYPE_PUT_ODDS); }
+        bool IsPlaceBet() const                 { return (m_ecType == BetType::TYPE_PLACE); }
         bool IsBigBet() const                   { return (m_ecType == BetType::TYPE_BIG); }
         bool IsBig6Bet() const                  { return (m_ecType == BetType::TYPE_BIG && m_nPoint == 6); }
         bool IsBig8Bet() const                  { return (m_ecType == BetType::TYPE_BIG && m_nPoint == 8); }
@@ -103,6 +103,7 @@ class Bet
                                                             IsCraps3Bet() ||
                                                             IsYo11Bet() ||
                                                             IsCraps12Bet()); }
+        bool Modifiable() const                 { return (m_bModifiable == true); }
 
         // Set and return whether come odds are working on the come out
         bool ComeOddsAreWorking() const         { return (m_bComeOddsAreWorking); }
@@ -110,32 +111,33 @@ class Bet
 
         // Make bets
         void MakePassBet(int w)                 { m_ecType = BetType::TYPE_PASS; m_nWager = w; }
-        void MakePassOddsBet(int w, int p)      { m_ecType = BetType::TYPE_PASS_ODDS; m_nWager = w; m_nPoint = p; }
+        void MakePassOddsBet(int w, int p)      { m_ecType = BetType::TYPE_PASS_ODDS; m_nWager = w; m_nPoint = p; m_bModifiable = false; }
         void MakeComeBet(int w)                 { m_ecType = BetType::TYPE_COME; m_nWager = w; }
-        void MakeComeOddsBet(int w, int p)      { m_ecType = BetType::TYPE_COME_ODDS; m_nWager = w; m_nPoint = p; }
-        void MakeDontPassBet(int w)             { m_ecType = BetType::TYPE_DONT_PASS; m_nWager = w; }
-        void MakeDontPassOddsBet(int w, int p)  { m_ecType = BetType::TYPE_DONT_PASS_ODDS; m_nWager = w; m_nPoint = p; }
-        void MakeDontComeBet(int w)             { m_ecType = BetType::TYPE_DONT_COME; m_nWager = w; }
-        void MakeDontComeOddsBet(int w, int p)  { m_ecType = BetType::TYPE_DONT_COME_ODDS; m_nWager = w; m_nPoint = p; }
-        void MakePlaceBet(int w, int p)         { m_ecType = BetType::TYPE_PLACE; m_nWager = w; m_nPoint = p; }
+        void MakeComeOddsBet(int w, int p)      { m_ecType = BetType::TYPE_COME_ODDS; m_nWager = w; m_nPoint = p; m_bModifiable = false; }
+        void MakeDontPassBet(int w)             { m_ecType = BetType::TYPE_DONT_PASS; m_nWager = w; m_bModifiable = false; }
+        void MakeDontPassOddsBet(int w, int p)  { m_ecType = BetType::TYPE_DONT_PASS_ODDS; m_nWager = w; m_nPoint = p; m_bModifiable = false; }
+        void MakeDontComeBet(int w)             { m_ecType = BetType::TYPE_DONT_COME; m_nWager = w; m_bModifiable = false; }
+        void MakeDontComeOddsBet(int w, int p)  { m_ecType = BetType::TYPE_DONT_COME_ODDS; m_nWager = w; m_nPoint = p; m_bModifiable = true; }
+        void MakePlaceBet(int w, int p)         { m_ecType = BetType::TYPE_PLACE; m_nWager = w; m_nPoint = p; m_bModifiable = true; }
         void MakePutBet(int w, int p)           { m_ecType = BetType::TYPE_PUT; m_nWager = w; m_nPoint = p; }
-        void MakePutOddsBet(int w, int p)       { m_ecType = BetType::TYPE_PUT_ODDS; m_nWager = w; m_nPoint = p; }
-        void MakeFieldBet(int w)                { m_ecType = BetType::TYPE_FIELD; m_nWager = w; }
-        void MakeBig6Bet(int w)                 { m_ecType = BetType::TYPE_BIG; m_nWager = w; m_nPoint = 6; }
-        void MakeBig8Bet(int w)                 { m_ecType = BetType::TYPE_BIG; m_nWager = w; m_nPoint = 8; }
-        void MakeHard4Bet(int w)                { m_ecType = BetType::TYPE_HARD; m_nWager = w; m_nPoint = 4; }
-        void MakeHard6Bet(int w)                { m_ecType = BetType::TYPE_HARD; m_nWager = w; m_nPoint = 6; }
-        void MakeHard8Bet(int w)                { m_ecType = BetType::TYPE_HARD; m_nWager = w; m_nPoint = 8; }
-        void MakeHard10Bet(int w)               { m_ecType = BetType::TYPE_HARD; m_nWager = w; m_nPoint = 10; }
-        void MakeAny7Bet(int w)                 { m_ecType = BetType::TYPE_ANY_7; m_nWager = w; }
-        void MakeAnyCrapsBet(int w)             { m_ecType = BetType::TYPE_ANY_CRAPS; m_nWager = w; }
-        void MakeCraps2Bet(int w)               { m_ecType = BetType::TYPE_CRAPS_2; m_nWager = w; }
-        void MakeCraps3Bet(int w)               { m_ecType = BetType::TYPE_CRAPS_3; m_nWager = w; }
-        void MakeYo11Bet(int w)                 { m_ecType = BetType::TYPE_YO_11; m_nWager = w; }
-        void MakeCraps12Bet(int w)              { m_ecType = BetType::TYPE_CRAPS_12; m_nWager = w; }
+        void MakePutOddsBet(int w, int p)       { m_ecType = BetType::TYPE_PUT_ODDS; m_nWager = w; m_nPoint = p; m_bModifiable = true; }
+        void MakeFieldBet(int w)                { m_ecType = BetType::TYPE_FIELD; m_nWager = w; m_bModifiable = true; }
+        void MakeBig6Bet(int w)                 { m_ecType = BetType::TYPE_BIG; m_nWager = w; m_nPoint = 6; m_bModifiable = true; }
+        void MakeBig8Bet(int w)                 { m_ecType = BetType::TYPE_BIG; m_nWager = w; m_nPoint = 8; m_bModifiable = true; }
+        void MakeHard4Bet(int w)                { m_ecType = BetType::TYPE_HARD; m_nWager = w; m_nPoint = 4; m_bModifiable = true; }
+        void MakeHard6Bet(int w)                { m_ecType = BetType::TYPE_HARD; m_nWager = w; m_nPoint = 6; m_bModifiable = true; }
+        void MakeHard8Bet(int w)                { m_ecType = BetType::TYPE_HARD; m_nWager = w; m_nPoint = 8; m_bModifiable = true; }
+        void MakeHard10Bet(int w)               { m_ecType = BetType::TYPE_HARD; m_nWager = w; m_nPoint = 10; m_bModifiable = true; }
+        void MakeAny7Bet(int w)                 { m_ecType = BetType::TYPE_ANY_7; m_nWager = w; m_bModifiable = true; }
+        void MakeAnyCrapsBet(int w)             { m_ecType = BetType::TYPE_ANY_CRAPS; m_nWager = w; m_bModifiable = true; }
+        void MakeCraps2Bet(int w)               { m_ecType = BetType::TYPE_CRAPS_2; m_nWager = w; m_bModifiable = true;}
+        void MakeCraps3Bet(int w)               { m_ecType = BetType::TYPE_CRAPS_3; m_nWager = w; m_bModifiable = true;}
+        void MakeYo11Bet(int w)                 { m_ecType = BetType::TYPE_YO_11; m_nWager = w; m_bModifiable = true;}
+        void MakeCraps12Bet(int w)              { m_ecType = BetType::TYPE_CRAPS_12; m_nWager = w; m_bModifiable = true;}
 
-        // Return the bet's wager amount
-        int Wager() const                       { return (m_nWager); }
+        // Return and set the bet's wager amount
+        int  Wager() const                      { return (m_nWager); }
+        void SetWager(int w)                    { m_nWager = w; }
         // Set and return the point for the bet (Pass, Don't Pass, Place)
         void SetPoint(int p)                    { m_nPoint = p; }
         int  Point() const                      { return (m_nPoint); }
@@ -144,7 +146,7 @@ class Bet
         // Set and return whether the bet has an associated odds bet
         bool IsOddsBetMade() const              { return (m_bOddsBetMade); }
         void SetOddsBetMade()                   { m_bOddsBetMade = true; }
-        // Calulate the payoff
+        // Calculate the payoff
         int  CalculatePayoff();
         // Set the state of bet to Won
         void SetWon()                           { m_ecState = BetState::WON; }
@@ -158,6 +160,8 @@ class Bet
         void SetUnresolved()                    { m_ecState = BetState::UNRESOLVED; }
         // Check resolved state of the bet
         bool Resolved() const                   { if (m_ecState == BetState::UNRESOLVED) return (false); else return (true); }
+        // Check returned state of the bet
+        bool Returned() const                   { if (m_ecState == BetState::RETURNED) return (true); else return (false); }
         // Check pushed state of the bet
         bool Pushed() const                     { if (m_ecState == BetState::PUSHED) return (true); else return (false); }
         // Check won state of the bet
@@ -173,6 +177,7 @@ class Bet
         bool m_bOddsBetMade        {false};
         bool m_bComeOddsAreWorking {false};
         BetState m_ecState         {BetState::UNRESOLVED};
+        bool m_bModifiable         {false};
 };
 
 #endif // BET_H

@@ -70,16 +70,18 @@ void Simulation::Run(int nNumberOfRuns, bool bMusterReport, bool bTally)
     std::cout << "\tNumber of runs:\t" << nNumberOfRuns << std::endl;
 
     std::cout << "\nStarting Simulation" << std::endl;
+
+    // Loop through the number of runs
     for (int iii = 0; iii < nNumberOfRuns; ++iii)
     {
-        m_cTable.Reset();
-
         do
         {
             MakeBets();
             m_cDice.Roll();
             ResolveBets();
             QualifyTheShooter();
+            ModifyBets();
+            FinalizeBets();
             m_cTable.Update(m_cDice);
         }
         while (PlayersStillLeft());
@@ -127,7 +129,7 @@ void Simulation::ResolveBets()
 }
 
 /**
-  * Qualifty The Shooter.
+  * Qualify The Shooter.
   *
   * Loop through Strategies and direct them to qualify the shooter.
   *
@@ -138,6 +140,36 @@ void Simulation::QualifyTheShooter()
     for (Strategy &cStrategy : m_vStrategies)
     {
         cStrategy.QualifyTheShooter(m_cTable, m_cDice);
+    }
+}
+
+/**
+  * Modify Bets.
+  *
+  * Loop through Strategies and direct them to modify their bets.
+  *
+  */
+
+void Simulation::ModifyBets()
+{
+    for (Strategy &cStrategy : m_vStrategies)
+    {
+        cStrategy.ModifyBets(m_cTable, m_cDice);
+    }
+}
+
+/**
+  * Finalize Bets.
+  *
+  * Loop through Strategies and direct them to finalize their bets.
+  *
+  */
+
+void Simulation::FinalizeBets()
+{
+    for (Strategy &cStrategy : m_vStrategies)
+    {
+        cStrategy.FinalizeBets();
     }
 }
 
@@ -174,12 +206,14 @@ void Simulation::UpdateStatisticsAndReset()
         cStrategy.UpdateStatistics();
         cStrategy.Reset();
     }
+
+    m_cTable.Reset();
 }
 
 /**
   * Print muster report.
   *
-  * Loop through Strateges and direct them to print a muster.
+  * Loop through Strategies and direct them to print a muster.
   *
   */
 

@@ -60,6 +60,10 @@ class Simulation
         void ResolveBets();
         // Direct the Strategies to qualify the shooter
         void QualifyTheShooter();
+        // Direct the Strategies to qualify the shooter
+        void ModifyBets();
+        // Direct the Strategies to qualify the shooter
+        void FinalizeBets();
         // Check if Strategies (Players) are still playing
         bool PlayersStillLeft();
         // Capture stats

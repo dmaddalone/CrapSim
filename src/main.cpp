@@ -44,6 +44,7 @@
   *\param nDefaultStdWager Default standard wager
   *\param fDefaultSWM Default significant winnings multiple
   *\param nDefaultSigWin Default significant winnings amount
+  *\param nDefaultPlayForNumberOfRolls Default number of rolls to play before ending the simulation run
   *\param cSim The Simulation class
   */
 
@@ -103,12 +104,15 @@ void CreateStrategy(const std::string sStrategy, CDataFile &cConfigFile, const i
     bool        bComeOddsWorking        = cConfigFile.GetBool("ComeOddsWorking", sStrategy);
     std::string sOddsProgressionMethod  = cConfigFile.GetString("OddsProgressionMethod", sStrategy);
 
-    // Wager progression settings
+    // Wager progression method
     std::string sWagerProgressionMethod = cConfigFile.GetString("WagerProgressionMethod", sStrategy);
 
-    // Shooter qualification methods
+    // Shooter qualification method
     std::string sQualifiedShooterMethod = cConfigFile.GetString("QualifiedShooterMethod", sStrategy);
     int         nQualifiedShooterMethodCount = cConfigFile.GetInt("QualifiedShooterMethodCount", sStrategy);
+
+    // Bet modification method
+    std::string sBetModificationMethod = cConfigFile.GetString("BetModificationMethod", sStrategy);
 
     // Tracking results (used for debugging)
     bool        bTrace                  = cConfigFile.GetBool("Trace", sStrategy);
@@ -238,13 +242,16 @@ void CreateStrategy(const std::string sStrategy, CDataFile &cConfigFile, const i
     // If OddsProgression was set then updated Strategy
     if (!sOddsProgressionMethod.empty()) cStrategy.SetOddsProgressionMethod(sOddsProgressionMethod);
 
-    // If WagerProgressionOnLossMethod was set then update Strategy
+    // If WagerProgressionMethod was set then update Strategy
     if (!sWagerProgressionMethod.empty()) cStrategy.SetWagerProgressionMethod(sWagerProgressionMethod);
 
     // If Qualified Shooter Method was set then update Strategy
     if (!sQualifiedShooterMethod.empty()) cStrategy.SetQualifiedShooterMethod(sQualifiedShooterMethod);
 
     if (nQualifiedShooterMethodCount != INT_MIN) cStrategy.SetQualifiedShooterMethodCount(nQualifiedShooterMethodCount);
+
+    // If BetModificationMethod was set then update Strategy
+    if (!sBetModificationMethod.empty()) cStrategy.SetBetModificationMethod(sBetModificationMethod);
 
     // Add Strategy to Simulation
     cSim.AddStrategy(cStrategy);

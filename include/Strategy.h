@@ -44,23 +44,9 @@ class StrategyTracker;
 // Odds progression method
 enum class OddsProgressionMethod
 {
-    NO_METHOD,
-    ARITHMETIC,
-    GEOMETRIC
-};
-
-// Odds progression triggers
-enum class OddsProgressionTrigger
-{
-    TRIGGER_SINGLE_WIN,
-    TRIGGER_1X_WAGER,
-    TRIGGER_2X_WAGER
-};
-
-// Odds regression triggers
-enum class OddsRegressionTrigger
-{
-    TRIGGER_SINGLE_LOSS
+    OP_NO_METHOD,
+    OP_ARITHMETIC,
+    OP_GEOMETRIC
 };
 
 class Strategy
@@ -145,19 +131,23 @@ class Strategy
               else if (IsGeometricOddsProgression()) m_fOdds *= 2;
               else throw CrapSimException("Strategy::IncreaseOdds: unknown odds progression method"); }
         void ResetOdds()                    { m_fOdds = m_fStandardOdds; }
-        // Wager methods
-        void SetWagerProgressionMethod(std::string sMethod) { m_cWager.SetMethod(sMethod); }
+        // Wager Progression methods
+        void SetWagerProgressionMethod(std::string sMethod) { m_cWager.SetWagerProgressionMethod(sMethod); }
         // Qualified Shooter methods
         void SetQualifiedShooterMethod(std::string);
         void SetQualifiedShooterMethodCount(int n) { m_cQualifiedShooter.SetCount(n); }
         void QualifyTheShooter(const Table &cTable, const Dice &cDice) { m_cQualifiedShooter.QualifyTheShooter(cTable, cDice); }
         bool ShooterQualified()             { return (m_cQualifiedShooter.ShooterQualified()); }
+        // Bet Modification methods
+        void SetBetModificationMethod(std::string sMethod) { m_cWager.SetBetModificationMethod(sMethod); }
         // Used before simulations are run to ensure that Strategies fit to Table settings
         void SanityCheck(const Table &cTable);
 
         // Main drivers of the Strategy
         void MakeBets(const Table &cTable);
         void ResolveBets(const Table &cTable, const Dice &cDice);
+        void ModifyBets(const Table &cTable, const Dice &cDice);
+        void FinalizeBets();
         bool StillPlaying() const;
         // Return Strategy state
         int   Bankroll() const      { return m_cMoney.Bankroll(); }
@@ -217,9 +207,11 @@ class Strategy
         // Check to see if a current bet covers 6 or 8
         bool SixOrEightCovered();
         // Checks for odds progression
-        bool IsUsingOddsProgession() const       {return (m_ecOddsProgressionMethod != OddsProgressionMethod::NO_METHOD); }
-        bool IsArithmeticOddsProgression() const { return (m_ecOddsProgressionMethod == OddsProgressionMethod::ARITHMETIC); }
-        bool IsGeometricOddsProgression() const  { return (m_ecOddsProgressionMethod == OddsProgressionMethod::GEOMETRIC); }
+        bool IsUsingOddsProgession() const       {return (m_ecOddsProgressionMethod != OddsProgressionMethod::OP_NO_METHOD); }
+        bool IsArithmeticOddsProgression() const { return (m_ecOddsProgressionMethod == OddsProgressionMethod::OP_ARITHMETIC); }
+        bool IsGeometricOddsProgression() const  { return (m_ecOddsProgressionMethod == OddsProgressionMethod::OP_GEOMETRIC); }
+        // Checks for bet modification methods
+        //bool IsUsingBetModification() const      { return (m_ecBetModificationMethod != BetModificationMethod::BM_NO_METHOD); }
 
         // Name and description
         std::string m_sName;
@@ -289,8 +281,7 @@ class Strategy
         float m_fOdds                       = 1.0;
         bool  m_bComeOddsWorking            = false;
 
-        OddsProgressionMethod m_ecOddsProgressionMethod = OddsProgressionMethod::NO_METHOD;
-        WagerProgressionMethod m_ecWagerProgressionMethod = WagerProgressionMethod::WP_NO_METHOD;
+        OddsProgressionMethod m_ecOddsProgressionMethod   = OddsProgressionMethod::OP_NO_METHOD;
 
         // Set counters to zero or defaults
         int m_nTimesStrategyRun             = 0;
