@@ -146,7 +146,7 @@ class Strategy
         // Main drivers of the Strategy
         void MakeBets(const Table &cTable);
         void ResolveBets(const Table &cTable, const Dice &cDice);
-        void ModifyBets(const Table &cTable, const Dice &cDice);
+        void ModifyBets(const Table &cTable);
         void FinalizeBets();
         bool StillPlaying() const;
         // Return Strategy state

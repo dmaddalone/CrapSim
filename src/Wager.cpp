@@ -582,9 +582,9 @@ int Wager::MethodParoli(const std::list<Bet>::iterator &it)
   *
   */
 
-bool Wager::ModifyBets(Money &cMoney, const Table &cTable, const Dice &cDice, std::list<Bet> &lBets)
+bool Wager::ModifyBets(Money &cMoney, const Table &cTable, std::list<Bet> &lBets)
 {
-    if (lBets.empty()) return (false);
+    ////if (lBets.empty()) return (false);
 
     switch (m_ecBetModificationMethod)
     {
@@ -592,25 +592,25 @@ bool Wager::ModifyBets(Money &cMoney, const Table &cTable, const Dice &cDice, st
             return (false);
             break;
         case BetModificationMethods::BM_COLLECT_PRESS_REGRESS:
-            return (MethodCollectPressRegress(cTable, cDice, lBets));
+            return (MethodCollectPressRegress(cMoney, cTable, lBets));
             break;
         case BetModificationMethods::BM_CLASSIC_REGRESSION:
-            return (MethodClassicRegression(cMoney, cTable, cDice, lBets));
+            return (MethodClassicRegression(cMoney, cTable, lBets));
             break;
         case BetModificationMethods::BM_PRESS_ONCE:
-            return (MethodPress(cTable, cDice, lBets, 1));
+            return (MethodPress(cMoney, cTable, lBets, 1));
             break;
         case BetModificationMethods::BM_PRESS_TWICE:
-            return (MethodPress(cTable, cDice, lBets, 2));
+            return (MethodPress(cMoney, cTable, lBets, 2));
             break;
         case BetModificationMethods::BM_TAKE_DOWN_AFTER_ONE_HIT:
-            return (MethodTakeDownAfterHits(cTable, cDice, lBets,1));
+            return (MethodTakeDownAfterHits(cMoney, cTable, lBets,1));
             break;
         case BetModificationMethods::BM_TAKE_DOWN_AFTER_TWO_HITS:
-            return (MethodTakeDownAfterHits(cTable, cDice, lBets,2));
+            return (MethodTakeDownAfterHits(cMoney, cTable, lBets,2));
             break;
         case BetModificationMethods::BM_TAKE_DOWN_AFTER_THREE_HITS:
-            return (MethodTakeDownAfterHits(cTable, cDice, lBets,3));
+            return (MethodTakeDownAfterHits(cMoney, cTable, lBets,3));
             break;
         default:
             throw CrapSimException("Wager::ModifyBets unknown Bet Modification Method");
@@ -619,20 +619,120 @@ bool Wager::ModifyBets(Money &cMoney, const Table &cTable, const Dice &cDice, st
 }
 
 /**
-  * The Collect, Press, Regress method.
+  * BetModificationSetup
   *
-  * Blah, blah, Establish a standard wager of one unit.  If the bet wins, increase
-  * unit by one. If any bet loses, return to a single unit for the next bet.
+  * Reset counter if coming out and no bets are currently laid.
+  * Loop through bets and check for a won bet.  If found, set flag to true.
   *
-  * \param cBet The Bet.
-  * \param Blah
+  * \param lBets The list container of bets
+  *
   */
 
-bool Wager::MethodCollectPressRegress(const Table &cTable, const Dice &cDice, std::list<Bet> &lBets)
+void Wager::BetModificationSetup(const Table &cTable, const std::list<Bet> &lBets)
 {
-    bool bStopMakingBets = false;
+    // If table is coming out and no bets exist, reset counter
+    if (cTable.IsComingOutRoll() && lBets.empty())  // This counts all bets  TODO: count only modifiable bets
+    {
+        m_nBetModCounter = 0;
+    }
 
-    return (bStopMakingBets);
+    // Loop through bets and find a winner
+    // If found, increment by one
+    m_bWon = false;
+
+    for (std::list<Bet>::const_iterator it = lBets.begin(); it != lBets.end(); ++it)
+    {
+        if (it->Won())
+        {
+            m_bWon = true;
+            break;
+        }
+    }
+}
+
+/**
+  * The Collect, Press, Regress method.
+  *
+  * After first win, collect winnings and make the same bet.  After second
+  * win, press the bet.  After third win, reduce bet to original wager.
+  * Usually used with Place bets.
+  *
+  * The method expects Won bets to have been resolved and winnings already
+  * pocketed (aka, Money.Increment() already called.)
+  *
+  * \param cMoney The bankroll
+  * \param cTable The table
+  * \param cDice The dice
+  * \param lBets The list container of bets
+  *
+  * \return True if no more bets should be made, false otherwise
+  */
+
+bool Wager::MethodCollectPressRegress(Money &cMoney, const Table &cTable, std::list<Bet> &lBets)
+{
+    BetModificationSetup(cTable, lBets);
+    if (m_bWon) ++m_nBetModCounter;
+
+    // If a bet won and counter is 1, a this is the Collect.
+    // 1) Loop through bets, find those that are modifiable and have won.
+    // 2) Set their state to Unresolved
+
+    if (m_bWon && m_nBetModCounter == 1)
+    {
+        for (std::list<Bet>::iterator it = lBets.begin(); it != lBets.end(); ++it)
+        {
+            if (it->Modifiable() && it->Won())
+            {
+                cMoney.Decrement(it->Wager());
+                it->SetUnresolved();
+            }
+        }
+    }
+
+    // If a bet won and counter is 2, this is the Press.
+    // 1) Loop through bets, find those that are modifiable and have won.
+    // 2) Make a new bet at two times the original wager.
+    // 3) Set their state to Unresolved.
+
+    int nNewWager = 0;
+
+    if (m_bWon && m_nBetModCounter == 2)
+    {
+        for (std::list<Bet>::iterator it = lBets.begin(); it != lBets.end(); ++it)
+        {
+            if (it->Modifiable()  && it->Won())
+            {
+                nNewWager = it->Wager() * 2;
+                cMoney.Decrement(nNewWager);
+                it->SetWager(nNewWager);
+                it->SetUnresolved();
+            }
+        }
+    }
+
+    // If a bet won and counter is 3, this is the Regress.
+    // 1) Loop through bets, find those that are modifiable and have won.
+    // 2) Make a new bet at half the original wager.
+    // 3) Set their state to Unresolved.
+    // 4) Reset the counter
+
+    if (m_bWon && m_nBetModCounter == 3)
+    {
+        for (std::list<Bet>::iterator it = lBets.begin(); it != lBets.end(); ++it)
+        {
+            if (it->Modifiable()  && it->Won())
+            {
+                nNewWager = it->Wager() / 2;
+                cMoney.Decrement(nNewWager);
+                it->SetWager(nNewWager);
+                it->SetUnresolved();
+
+                m_nBetModCounter = 0;
+            }
+        }
+    }
+
+    return (false);
 }
 
 /**
@@ -652,29 +752,12 @@ bool Wager::MethodCollectPressRegress(const Table &cTable, const Dice &cDice, st
   * \return True if no more bets should be made, false otherwise
   */
 
-bool Wager::MethodClassicRegression(Money &cMoney, const Table &cTable, const Dice &cDice, std::list<Bet> &lBets)
+bool Wager::MethodClassicRegression(Money &cMoney, const Table &cTable, std::list<Bet> &lBets)
 {
     bool bStopMakingBets = false;
 
-    // If table is coming out, reset counter
-    if (cTable.NewShooter() && cTable.IsComingOutRoll())
-    {
-        m_nBetModCounter = 0;
-    }
-
-    // Loop through bets and find a winner
-    // Set flag, increment by one,and break
-    bool bWon = false;
-
-    for (std::list<Bet>::iterator it = lBets.begin(); it != lBets.end(); ++it)
-    {
-        if (it->Won())
-        {
-            bWon = true;
-            ++m_nBetModCounter;
-            break;
-        }
-    }
+    BetModificationSetup(cTable, lBets);
+    if (m_bWon) ++m_nBetModCounter;
 
     // If a bet won and counter is 1, a this is our first regression.
     // 1) Loop through bets, find those that can be taken down but are not
@@ -684,7 +767,7 @@ bool Wager::MethodClassicRegression(Money &cMoney, const Table &cTable, const Di
     int nOldWager = 0;
     int nNewWager = 0;
 
-    if (bWon && m_nBetModCounter == 1)
+    if (m_bWon && m_nBetModCounter == 1)
     {
         for (std::list<Bet>::iterator it = lBets.begin(); it != lBets.end(); ++it)
         {
@@ -713,7 +796,8 @@ bool Wager::MethodClassicRegression(Money &cMoney, const Table &cTable, const Di
                         it->SetUnresolved();
                     }
 
-                    // If not resolved, reduce current wager to half
+                    // If not resolved, reduce current wager to half the
+                    // original wager
                     else if (!it->Resolved())
                     {
                         it->SetWager(nNewWager);
@@ -730,9 +814,9 @@ bool Wager::MethodClassicRegression(Money &cMoney, const Table &cTable, const Di
     // resolved.
     // 2) Reduce their wager to zero
     // 3) Set their state to Returned
-    // 4) Return true to stop making further bets
+    // 4) Return true to stop making further bets, until a new qualification is achieved
 
-    if (bWon && m_nBetModCounter == 2)
+    if (m_bWon && m_nBetModCounter == 2)
     {
         for (std::list<Bet>::iterator it = lBets.begin(); it != lBets.end(); ++it)
         {
@@ -755,36 +839,116 @@ bool Wager::MethodClassicRegression(Money &cMoney, const Table &cTable, const Di
 /**
   * The Press method.
   *
-  * Blah, blah, Establish a standard wager of one unit.  If the bet wins, increase
-  * unit by one. If any bet loses, return to a single unit for the next bet.
+  * Press the bet for a number of times in a row.
   *
-  * \param cBet The Bet.
-  * \param Blah
+  * The method expects Won bets to have been resolved and winnings already
+  * pocketed (aka, Money.Increment() already called.)  Usually used with
+  * Place bets.
+  *
+  * \param cMoney The bankroll
+  * \param cTable The table
+  * \param cDice The dice
+  * \param lBets The list container of bets
+  * \param nTimes The numbers of times to press
+  *
+  * \return True if no more bets should be made, false otherwise
   */
 
-bool Wager::MethodPress(const Table &cTable, const Dice &cDice, std::list<Bet> &lBets, int nTimes)
+bool Wager::MethodPress(Money &cMoney, const Table &cTable, std::list<Bet> &lBets, const int nTimes)
 {
-    bool bStopMakingBets = false;
+    BetModificationSetup(cTable, lBets);
+    if (m_bWon) ++m_nBetModCounter;
 
-    return (bStopMakingBets);
+    // If a bet won and counter is less than or equal to nTimes, Press the bet.
+    // 1) Loop through bets, find those that are modifiable and have won.
+    // 2) Double their wager
+    // 3) Set their state to Unresolved
+
+    int nNewWager = 0;
+
+    if (m_bWon)
+    {
+        if (m_nBetModCounter <= nTimes)
+        {
+            for (std::list<Bet>::iterator it = lBets.begin(); it != lBets.end(); ++it)
+            {
+                if (it->Modifiable() && it->Won())
+                {
+                    nNewWager = it->Wager() * 2;
+                    cMoney.Decrement(nNewWager);
+                    it->SetWager(nNewWager);
+                    it->SetUnresolved();
+                }
+            }
+        }
+        else
+        {
+            m_nBetModCounter = 0;
+        }
+    }
+
+    return (false);
 }
 
 /**
   * The Take Down After Hits method.
   *
-  * Blah, blah, Establish a standard wager of one unit.  If the bet wins, increase
-  * unit by one. If any bet loses, return to a single unit for the next bet.
+  * Take down bets after a number of wins.
   *
-  * \param cBet The Bet.
-  * \param Blah
+  * The method expects Won bets to have been resolved and winnings already
+  * pocketed (aka, Money.Increment() already called.)  Usually used with
+  * Place bets.
+  *
+  * \param cMoney The bankroll
+  * \param cTable The table
+  * \param cDice The dice
+  * \param lBets The list container of bets
+  * \param nTimes The numbers of times to press
+  *
+  * \return True if no more bets should be made, false otherwise
   */
 
-bool Wager::MethodTakeDownAfterHits(const Table &cTable, const Dice &cDice, std::list<Bet> &lBets, int nTimes)
+bool Wager::MethodTakeDownAfterHits(Money &cMoney, const Table &cTable, std::list<Bet> &lBets, const int nTimes)
 {
-    bool bStopMakingBets = false;
+    BetModificationSetup(cTable, lBets);
+    if (m_bWon) ++m_nBetModCounter;
 
-    return (bStopMakingBets);
+    // If a bet won and counter is less than or equal to nTimes, Press the bet.
+    // 1) Loop through bets, find those that are modifiable and have won.
+    // 2) Make a new bet at the same wager.
+    // 3) Set their state to Unresolved
+
+    if (m_bWon)
+    {
+        if (m_nBetModCounter <= nTimes)
+        {
+            for (std::list<Bet>::iterator it = lBets.begin(); it != lBets.end(); ++it)
+            {
+                if (it->Modifiable() && it->Won())
+                {
+                    cMoney.Decrement(it->Wager());
+                    it->SetUnresolved();
+                }
+            }
+        }
+        // Else remove all modifiable unresolved bets and reset thge counter
+        else
+        {
+            for (std::list<Bet>::iterator it = lBets.begin(); it != lBets.end(); ++it)
+            {
+                if (it->Modifiable() && !it->Resolved())
+                {
+                    cMoney.Increment(it->Wager());
+                    it->SetReturned();
+                }
+            }
+            m_nBetModCounter = 0;
+        }
+    }
+
+    return (false);
 }
+
 
 /**
   * Reset the class.
@@ -799,4 +963,5 @@ void Wager::Reset()
     m_nPreviousUnits1 = 1;
     m_nPreviousUnits2 = 0;
     m_nBetModCounter  = 0;
+    m_bWon            = false;
 }

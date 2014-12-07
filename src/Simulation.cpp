@@ -78,8 +78,8 @@ void Simulation::Run(int nNumberOfRuns, bool bMusterReport, bool bTally)
         {
             MakeBets();
             m_cDice.Roll();
-            ResolveBets();
             QualifyTheShooter();
+            ResolveBets();
             ModifyBets();
             FinalizeBets();
             m_cTable.Update(m_cDice);
@@ -154,7 +154,7 @@ void Simulation::ModifyBets()
 {
     for (Strategy &cStrategy : m_vStrategies)
     {
-        cStrategy.ModifyBets(m_cTable, m_cDice);
+        cStrategy.ModifyBets(m_cTable);
     }
 }
 

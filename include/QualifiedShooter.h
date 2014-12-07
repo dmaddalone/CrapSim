@@ -78,6 +78,9 @@ class QualifiedShooter
         // Check if shooter has been qualified
         bool ShooterQualified() const           { return (m_bShooterQualified); }
 
+        // Wait for new qualification
+        void WaitForNewQualification()          { m_bWaitForNewQualification = true; }
+
         // Reset the class - meant to be called before a new Simulation run
         void Reset();
 
@@ -88,6 +91,7 @@ class QualifiedShooter
         int  m_nQualificationCount                  = 1;
         bool m_bQualificationStopsWithShooter       = true;
         int  m_nCounter                             = 0;
+        bool m_bWaitForNewQualification             = false;
 
         // Map to associate the strings with the enum values
         std::map<std::string, QualificationMethod> m_mQualificationMethod;

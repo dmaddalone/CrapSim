@@ -106,7 +106,7 @@ std::string QualifiedShooter::Method() const
   *
   * Depending on the set qualification method, calls the corresponding
   * qualification method.  The qualification methods are based  on the Table
-  * class, specifically NewShooter(), and the Dice class.
+  * class BEFORE being updated byu the Dice class, specifically NewShooter().
   *
   * \param cTable The Table.
   * \param cDice The Dice.
@@ -186,7 +186,10 @@ void QualifiedShooter::QualifyTheShooter(const Table &cTable, const Dice &cDice)
   * this is the 5-count.  If a point number is not rolled, hold at the 4-count
   * until a point number is rolled.  If the new shooter sevens out, go to
   * step 1.
-  * 4) If the 5-count is reached, the shooter is qualified.
+  * 4) If the 5-count is reached, the shooter is qualified
+  *
+  * The shooter remains qualified unless specifically requested to wait for a
+  * new qualification.
   *
   * \param cTable The Table.
   * \param cDice The Dice.
@@ -198,7 +201,13 @@ bool QualifiedShooter::Method5Count(const Table &cTable, const Dice &cDice)
 {
     m_bShooterQualified = false;
 
-    if (cTable.NewShooter() && cTable.IsComingOutRoll())
+    if (m_bWaitForNewQualification)
+    {
+        m_bWaitForNewQualification = false;
+        m_nCounter = 0;
+        if (cDice.IsAPointNumber()) m_nCounter++;
+    }
+    else if (cTable.NewShooter() && cTable.IsComingOutRoll())
     {
         m_nCounter = 0;
         if (cDice.IsAPointNumber()) m_nCounter++;
@@ -229,7 +238,8 @@ bool QualifiedShooter::Method5Count(const Table &cTable, const Dice &cDice)
   * Consider a new shooter qualified after she has established a point.
   *
   * Method:
-  * Once a shooter establishes the point, the shooter is qualified.
+  * Once a shooter establishes the point, the shooter remains qualified,
+  * unless specifically requested to wait for a new qualification.
   *
   * \param cTable The Table.
   *
@@ -241,7 +251,15 @@ bool QualifiedShooter::MethodAfterPointEstablished(const Table &cTable, const Di
     m_bShooterQualified = false;
 
     // If puck is OFF and Dice is a point number, shooter has established a point
+    // This is a new qualification, so set m_bWaitForNewWQualification to false
     if (!cTable.IsPuckOn() && cDice.IsAPointNumber())
+    {
+        m_bShooterQualified = true;
+        m_bWaitForNewQualification = false;
+    }
+
+    // If puck is On and Dice is not a seven, shooter remains qualified
+    if (cTable.IsPuckOn() && !cDice.IsSeven() && !m_bWaitForNewQualification)
         m_bShooterQualified = true;
 
     return (m_bShooterQualified);
@@ -251,7 +269,8 @@ bool QualifiedShooter::MethodAfterPointEstablished(const Table &cTable, const Di
   * Consider a new shooter qualified after she has made her first point.
   *
   * Method:
-  * Once a shooter establishes and hits the point, the shooter is qualified.
+  * Once a shooter establishes and hits the point, the shooter remains
+  * qualified, unless specifically requested to wait for a new qualification.
   *
   * \param cTable The Table.
   *
@@ -262,11 +281,14 @@ bool QualifiedShooter::MethodAfterPointMade(const Table &cTable, const Dice &cDi
 {
     m_bShooterQualified = false;
 
+    // If new shooter hits the point, she is qualified
+    // This is a new qualification, so set m_bWaitForNewWQualification to false
     if (cTable.NewShooter())
     {
         if (cTable.Point() == cDice.RollValue()) m_bShooterQualified = true;
+        m_bWaitForNewQualification = false;
     }
-    else
+    else if (!m_bWaitForNewQualification)
     {
         if (cTable.IsComingOutRoll()) m_bShooterQualified = true;
         if (!cTable.IsComingOutRoll() && !cDice.IsSeven()) m_bShooterQualified = true;
@@ -294,6 +316,12 @@ bool QualifiedShooter::MethodAfterPointMade(const Table &cTable, const Dice &cDi
 bool QualifiedShooter::MethodAfterLosingFieldThreeTimesInARow(const Table &cTable, const Dice &cDice)
 {
     m_bShooterQualified = false;
+
+    if (m_bWaitForNewQualification)
+    {
+        m_nCounter = 0;
+        m_bWaitForNewQualification = false;
+    }
 
     if (cTable.NewShooter() && cTable.IsComingOutRoll())
     {
@@ -378,6 +406,12 @@ bool QualifiedShooter::MethodAfterFiveNon7Rolls(const Dice &cDice)
 {
     m_bShooterQualified = false;
 
+    if (m_bWaitForNewQualification)
+    {
+        m_nCounter = 0;
+        m_bWaitForNewQualification = false;
+    }
+
     if (!cDice.IsSeven())
     {
         ++m_nCounter;
@@ -397,7 +431,7 @@ bool QualifiedShooter::MethodAfterFiveNon7Rolls(const Dice &cDice)
   * all values except 7.
   *
   * Method:
-  * 1) If a X value is rolled, begin counting.
+  * 1) If an X value is rolled, begin counting.
   * 2) If N number of X values are rolled in a row, the shooter is qualified.
   *
   * Qualification Methiod uses the m_bQualificationStopsWithShooter flag.  If
@@ -413,6 +447,12 @@ bool QualifiedShooter::MethodAfterFiveNon7Rolls(const Dice &cDice)
 bool QualifiedShooter::MethodAfterNXRollsInARow(const Table &cTable, const Dice &cDice, int nNumber)
 {
     m_bShooterQualified = false;
+
+    if (m_bWaitForNewQualification)
+    {
+        m_nCounter = 0;
+        m_bWaitForNewQualification = false;
+    }
 
     // If a new shooter on the come out, reset counter.
     if (cTable.NewShooter() && cTable.IsComingOutRoll())

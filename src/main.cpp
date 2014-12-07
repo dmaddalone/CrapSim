@@ -17,19 +17,50 @@
     along with CrapSim.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <iostream>
 #include <climits>
 #include <cfloat>
+#include <getopt.h>
+#include <iostream>
 #include "CrapSimException.h"
+#include "CrapSimVersion.h"
+#include "Bet.h"
 #include "Die.h"
 #include "Dice.h"
 #include "Table.h"
 #include "Money.h"
-#include "Bet.h"
-#include "Strategy.h"
 #include "Simulation.h"
+#include "Strategy.h"
 #include "CDataFile.h"
-#include "CrapSimVersion.h"
+
+/**
+  * ShowUsage
+  *
+  * Print command line arguments
+  *
+  * \param sName Name of the executing program.
+  */
+
+static void ShowUsage(std::string sName)
+{
+    std::cerr << "Usage: " << sName << " [OPTION] [FILE]\n"
+              << "Run a Craps Simulation based on settings in the FILE\n\n"
+              << "Options:\n"
+              << "    -h, --help     Show this help message and exit\n"
+              << "    -v, --version  Show version and exit\n"
+              << std::endl;
+}
+
+/**
+  * ShowVersion
+  *
+  * Print version
+  *
+  */
+
+static void ShowVersion()
+{
+    std::cerr << "Craps Simulation version " << CrapSimVersion::SemanticVersion() << " " << CrapSimVersion::DateVersion() << std::endl;
+}
 
 /**
   * Create a Strategy.
@@ -144,15 +175,12 @@ void CreateStrategy(const std::string sStrategy, CDataFile &cConfigFile, const i
         else if (sPredefined == "AGGRESSIVE")   cStrategy.SetAggressive();
         else  // Don't know what the Predefined parameter is.  Exit with error.
         {
-            std::cerr << "ERROR (main): Unknown Predefined setting: " << sPredefined << std::endl;
-            std::cerr << "Exiting" << std::endl;
-            exit (EXIT_FAILURE);
+            throw CrapSimException("main Unknown Predefined setting:", sPredefined);
         }
     }
 
     // If Name is blank, use the Strategy section name
     if (cStrategy.Name() == "") cStrategy.SetName(sStrategy);
-
 
     //
     // Pass Default configuration parameters if not overridden
@@ -171,8 +199,6 @@ void CreateStrategy(const std::string sStrategy, CDataFile &cConfigFile, const i
 
     // Pass choice to make Full Wagers to Strategy
     cStrategy.SetFullWager(bFullWager);
-
-
 
     // If Pass Bet has been set, pass to Strategy
     if (nPassBet != INT_MIN) cStrategy.SetPassBet(nPassBet);
@@ -270,7 +296,7 @@ void CreateStrategy(const std::string sStrategy, CDataFile &cConfigFile, const i
 
 int CrapsSimulation(std::string sINIFile)
 {
-    std::cout << "Craps Simulation version " << CrapSimVersion::SemanticVersion() << " " << CrapSimVersion::DateVersion() << std::endl;
+    ShowVersion();
 
     // Construct Simualtion and Table
     Simulation  cSim;
@@ -279,10 +305,7 @@ int CrapsSimulation(std::string sINIFile)
     // No config file, no simulation.
     if (sINIFile.empty())
     {
-        // TODO: Make a utility or expand into exception management
-        std::cerr << "ERROR (main): No configuration file." << std::endl;
-        std::cerr << "Exiting" << std::endl;
-        exit (EXIT_FAILURE);
+        throw CrapSimException("main No configuration file");
     }
 
     // Open the configuration file and load the configuration.
@@ -309,9 +332,7 @@ int CrapsSimulation(std::string sINIFile)
     // No simulation runs, no simulation,
     if (nNumberOfRuns <= 0)
     {
-        std::cerr << "ERROR (main): Number of simulation runs not set." << std::endl;
-        std::cerr << "Exiting" << std::endl;
-        exit (EXIT_FAILURE);
+        throw CrapSimException("main Number of simulation runs not set");
     }
 
     // Set Table attributes and add it to the Simulation.
@@ -322,9 +343,7 @@ int CrapsSimulation(std::string sINIFile)
     {
         if (!cTable.SetTableType(sTableType))
         {
-            std::cerr << "ERROR (main): Unknown Table Type: " << sTableType << std::endl;
-            std::cerr << "Exiting" << std::endl;
-            exit (EXIT_FAILURE);
+            throw CrapSimException("main Unknown table type", sTableType);
         }
     }
 
@@ -362,12 +381,44 @@ bool Strategy::m_bReportHeaderPrinted = false;
 
 int main(int argc, char* argv[])
 {
-    if (argc > 2)
+    // Check for command line arguments
+    if (argc < 2)
     {
-        std::cerr << "Usage: CrapSim [FILE]" << std::endl;
+        ShowUsage(argv[0]);
         exit (EXIT_FAILURE);
     }
 
+    // Set up and execute getopt_long
+    static struct option stLongOptions[] =
+    {
+        {"help",    no_argument, nullptr, 'h'},
+        {"version", no_argument, nullptr, 'v'},
+        {NULL,      0,           nullptr,  0}
+    };
+
+    int nC = 0;
+    int nOptionIndex = 0;
+    while ((nC = getopt_long(argc, argv, "hv", stLongOptions, &nOptionIndex)) != -1)
+    {
+        switch (nC)
+        {
+            case 'h':
+                ShowUsage(argv[0]);
+                exit(EXIT_SUCCESS);
+            case 'v':
+                ShowVersion();
+                exit(EXIT_SUCCESS);
+            case '?':
+                ShowUsage(argv[0]);
+                exit(EXIT_SUCCESS);
+            default:
+                throw CrapSimException("main getopt returned character code ", std::to_string(nC));
+                break;
+        }
+    }
+
+
+    // Execute the simulation
     try
     {
         return (CrapsSimulation(argv[1]));
@@ -379,5 +430,4 @@ int main(int argc, char* argv[])
         std::cerr << "Terminating" << std::endl;
         exit(EXIT_FAILURE);
     }
-
 }

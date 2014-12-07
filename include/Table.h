@@ -52,17 +52,17 @@ class Table
         // Create a table with minimum and maximum wager limits
         Table(int nMin, int nMax);
 
-        // Set and return the minimum and maximum bet wagers
+        // Set and return the minimum bet wagers
         void   SetMinimumBet(int i)
             { if (i > 0) m_nMinimumBet = i;
               else throw CrapSimException("Table::SetMinimumBet", std::to_string(i)); }
         int    MinimumBet() const       { return (m_nMinimumBet); }
+        // Set and return the maximum bet wagers
         void   SetMaximumBet(int i)
             { if (i > 0) m_nMaximumBet = i;
               else throw CrapSimException("Table::SetMaximumBet", std::to_string(i)); }
         int    MaximumBet() const       { return (m_nMaximumBet); }
-        // Set and return the table point
-        void   SetPoint(int p)          { m_bPuckOn = true; m_nPoint = p; }
+        // Return the table point
         int    Point() const            { return (m_nPoint); }
         // Set puck off
         void   SetPuckOff()             { m_bPuckOn = false; m_nPoint = 0; }
@@ -87,6 +87,9 @@ class Table
         std::string Bar()               { return "Bar 12"; }
 
     private:
+        // Set the table point
+        void   SetPoint(int p)          { m_bPuckOn = true; m_nPoint = p; }
+
         // Set table defaults
         TableOdds   m_ecTableOdds   = TableOdds::TYPE_3X_4X_5X;
         int         m_nMinimumBet   = 5;

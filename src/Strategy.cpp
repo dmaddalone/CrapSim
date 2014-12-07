@@ -389,12 +389,12 @@ void Strategy::ResolveBets(const Table &cTable, const Dice &cDice)
   *\param cDice The Dice.
   */
 
-void Strategy::ModifyBets(const Table &cTable, const Dice &cDice)
+void Strategy::ModifyBets(const Table &cTable)
 {
     if (!StillPlaying()) return;
 
-    if (m_cWager.ModifyBets(m_cMoney, cTable, cDice, m_lBets))
-        m_cQualifiedShooter.Reset();
+    if (m_cWager.ModifyBets(m_cMoney, cTable, m_lBets))
+        m_cQualifiedShooter.WaitForNewQualification();
 
     // Mark ending bankroll
     //m_cMoney.MarkAfterResolvingBets();
@@ -413,9 +413,9 @@ void Strategy::FinalizeBets()
     {
         if (it->Resolved())
         {
-            if (it->IsPassBet()) --m_nNumberOfPassBetsMade;
+            if (it->IsPassBet()) --m_nNumberOfPassBetsMade;  //TODO make this true or false
             //if (it->IsPassOddsBet()) {}
-            if (it->IsDontPassBet()) --m_nNumberOfDontPassBetsMade;
+            if (it->IsDontPassBet()) --m_nNumberOfDontPassBetsMade; //TODO make this true or false
             //if (it->IsDontPassOddsBet()) {}
             if (it->IsComeBet()) --m_nNumberOfComeBetsMade;
             //if (it->IsComeOddsBet()) {}

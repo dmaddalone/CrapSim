@@ -85,7 +85,7 @@ class Wager
         int PlaceBetUnitsWager(const int nBankroll, const int nUnits, const int nPoint);
 
         // Modify Bets
-        bool ModifyBets(Money &cMoney, const Table &cTable, const Dice &cDice, std::list<Bet> &lBets);
+        bool ModifyBets(Money &cMoney, const Table &cTable, std::list<Bet> &lBets);
 
         // Set and return the wager progression method
         void SetWagerProgressionMethod(std::string sMethod);
@@ -124,14 +124,16 @@ class Wager
         //
         // Bet Modification Methods
         //
+        // Set up for bet modification methods
+        void BetModificationSetup(const Table &cTable, const std::list<Bet> &lBets);
         // Collect, Press, Regress method
-        bool MethodCollectPressRegress(const Table &cTable, const Dice &cDice, std::list<Bet> &lBets);
+        bool MethodCollectPressRegress(Money &cMoney, const Table &cTable, std::list<Bet> &lBets);
         // Classic Regression
-        bool MethodClassicRegression(Money &cMoney, const Table &cTable, const Dice &cDice, std::list<Bet> &lBets);
+        bool MethodClassicRegression(Money &cMoney, const Table &cTable, std::list<Bet> &lBets);
         // Press method
-        bool MethodPress(const Table &cTable, const Dice &cDice, std::list<Bet> &lBets, int nTimes);
+        bool MethodPress(Money &cMoney, const Table &cTable, std::list<Bet> &lBets, const int nTimes);
         // Take Down After Hits method
-        bool MethodTakeDownAfterHits(const Table &cTable, const Dice &cDice, std::list<Bet> &lBets, int nTimes);
+        bool MethodTakeDownAfterHits(Money &cMoney, const Table &cTable, std::list<Bet> &lBets, const int nTimes);
 
         // Set defaults
         int m_nStandardWager  {0};
@@ -146,6 +148,7 @@ class Wager
         int m_nPreviousUnits1 {1};
         int m_nPreviousUnits2 {0};
         int m_nBetModCounter  {0};
+        bool m_bWon           {false};
 
         // Map to associate the strings with the enum values
         std::map<std::string, WagerProgressionMethods> m_mWagerProgressionMethod;

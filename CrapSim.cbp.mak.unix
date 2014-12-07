@@ -18,7 +18,7 @@ LIBDIR =
 LIB = 
 LDFLAGS = 
 
-INC_DEBUG = $(INC) -Iinclude -I../CDataFile/include
+INC_DEBUG = $(INC) -Iinclude -I../CDataFile/include -ICrapSim/include
 CFLAGS_DEBUG = $(CFLAGS) -std=c++11 -Wextra -Wall -g
 RESINC_DEBUG = $(RESINC)
 RCFLAGS_DEBUG = $(RCFLAGS)
@@ -29,7 +29,7 @@ OBJDIR_DEBUG = obj/Debug
 DEP_DEBUG = 
 OUT_DEBUG = bin/Debug/CrapSim
 
-INC_RELEASE = $(INC) -Iinclude -I../CDataFile/include
+INC_RELEASE = $(INC) -Iinclude -I../CDataFile/include -ICrapSim/include
 CFLAGS_RELEASE = $(CFLAGS) -O2 -std=c++11 -Wextra -Wall
 RESINC_RELEASE = $(RESINC)
 RCFLAGS_RELEASE = $(RCFLAGS)
@@ -40,9 +40,9 @@ OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
 OUT_RELEASE = bin/Release/CrapSim
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/src/Table.o $(OBJDIR_DEBUG)/src/StrategyTracker.o $(OBJDIR_DEBUG)/src/Strategy.o $(OBJDIR_DEBUG)/src/Simulation.o $(OBJDIR_DEBUG)/src/QualifiedShooter.o $(OBJDIR_DEBUG)/src/Money.o $(OBJDIR_DEBUG)/src/Die.o $(OBJDIR_DEBUG)/src/Dice.o $(OBJDIR_DEBUG)/src/Bet.o $(OBJDIR_DEBUG)/main.o $(OBJDIR_DEBUG)/__/CDataFile/src/CDataFile.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)/src/main.o $(OBJDIR_DEBUG)/src/Wager.o $(OBJDIR_DEBUG)/src/Table.o $(OBJDIR_DEBUG)/src/StrategyTracker.o $(OBJDIR_DEBUG)/src/Strategy.o $(OBJDIR_DEBUG)/src/Simulation.o $(OBJDIR_DEBUG)/src/QualifiedShooter.o $(OBJDIR_DEBUG)/src/Money.o $(OBJDIR_DEBUG)/src/Die.o $(OBJDIR_DEBUG)/src/Dice.o $(OBJDIR_DEBUG)/src/Bet.o $(OBJDIR_DEBUG)/__/CDataFile/src/CDataFile.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/src/Table.o $(OBJDIR_RELEASE)/src/StrategyTracker.o $(OBJDIR_RELEASE)/src/Strategy.o $(OBJDIR_RELEASE)/src/Simulation.o $(OBJDIR_RELEASE)/src/QualifiedShooter.o $(OBJDIR_RELEASE)/src/Money.o $(OBJDIR_RELEASE)/src/Die.o $(OBJDIR_RELEASE)/src/Dice.o $(OBJDIR_RELEASE)/src/Bet.o $(OBJDIR_RELEASE)/main.o $(OBJDIR_RELEASE)/__/CDataFile/src/CDataFile.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)/src/main.o $(OBJDIR_RELEASE)/src/Wager.o $(OBJDIR_RELEASE)/src/Table.o $(OBJDIR_RELEASE)/src/StrategyTracker.o $(OBJDIR_RELEASE)/src/Strategy.o $(OBJDIR_RELEASE)/src/Simulation.o $(OBJDIR_RELEASE)/src/QualifiedShooter.o $(OBJDIR_RELEASE)/src/Money.o $(OBJDIR_RELEASE)/src/Die.o $(OBJDIR_RELEASE)/src/Dice.o $(OBJDIR_RELEASE)/src/Bet.o $(OBJDIR_RELEASE)/__/CDataFile/src/CDataFile.o
 
 all: debug release
 
@@ -51,7 +51,6 @@ clean: clean_debug clean_release
 before_debug: 
 	test -d bin/Debug || mkdir -p bin/Debug
 	test -d $(OBJDIR_DEBUG)/src || mkdir -p $(OBJDIR_DEBUG)/src
-	test -d $(OBJDIR_DEBUG) || mkdir -p $(OBJDIR_DEBUG)
 	test -d $(OBJDIR_DEBUG)/__/CDataFile/src || mkdir -p $(OBJDIR_DEBUG)/__/CDataFile/src
 
 after_debug: 
@@ -60,6 +59,12 @@ debug: before_debug out_debug after_debug
 
 out_debug: before_debug $(OBJ_DEBUG) $(DEP_DEBUG)
 	$(LD) $(LIBDIR_DEBUG) -o $(OUT_DEBUG) $(OBJ_DEBUG)  $(LDFLAGS_DEBUG) $(LIB_DEBUG)
+
+$(OBJDIR_DEBUG)/src/main.o: src/main.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/main.cpp -o $(OBJDIR_DEBUG)/src/main.o
+
+$(OBJDIR_DEBUG)/src/Wager.o: src/Wager.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/Wager.cpp -o $(OBJDIR_DEBUG)/src/Wager.o
 
 $(OBJDIR_DEBUG)/src/Table.o: src/Table.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/Table.cpp -o $(OBJDIR_DEBUG)/src/Table.o
@@ -88,9 +93,6 @@ $(OBJDIR_DEBUG)/src/Dice.o: src/Dice.cpp
 $(OBJDIR_DEBUG)/src/Bet.o: src/Bet.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/Bet.cpp -o $(OBJDIR_DEBUG)/src/Bet.o
 
-$(OBJDIR_DEBUG)/main.o: main.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c main.cpp -o $(OBJDIR_DEBUG)/main.o
-
 $(OBJDIR_DEBUG)/__/CDataFile/src/CDataFile.o: ../CDataFile/src/CDataFile.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c ../CDataFile/src/CDataFile.cpp -o $(OBJDIR_DEBUG)/__/CDataFile/src/CDataFile.o
 
@@ -98,13 +100,11 @@ clean_debug:
 	rm -f $(OBJ_DEBUG) $(OUT_DEBUG)
 	rm -rf bin/Debug
 	rm -rf $(OBJDIR_DEBUG)/src
-	rm -rf $(OBJDIR_DEBUG)
 	rm -rf $(OBJDIR_DEBUG)/__/CDataFile/src
 
 before_release: 
 	test -d bin/Release || mkdir -p bin/Release
 	test -d $(OBJDIR_RELEASE)/src || mkdir -p $(OBJDIR_RELEASE)/src
-	test -d $(OBJDIR_RELEASE) || mkdir -p $(OBJDIR_RELEASE)
 	test -d $(OBJDIR_RELEASE)/__/CDataFile/src || mkdir -p $(OBJDIR_RELEASE)/__/CDataFile/src
 
 after_release: 
@@ -113,6 +113,12 @@ release: before_release out_release after_release
 
 out_release: before_release $(OBJ_RELEASE) $(DEP_RELEASE)
 	$(LD) $(LIBDIR_RELEASE) -o $(OUT_RELEASE) $(OBJ_RELEASE)  $(LDFLAGS_RELEASE) $(LIB_RELEASE)
+
+$(OBJDIR_RELEASE)/src/main.o: src/main.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/main.cpp -o $(OBJDIR_RELEASE)/src/main.o
+
+$(OBJDIR_RELEASE)/src/Wager.o: src/Wager.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/Wager.cpp -o $(OBJDIR_RELEASE)/src/Wager.o
 
 $(OBJDIR_RELEASE)/src/Table.o: src/Table.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/Table.cpp -o $(OBJDIR_RELEASE)/src/Table.o
@@ -141,9 +147,6 @@ $(OBJDIR_RELEASE)/src/Dice.o: src/Dice.cpp
 $(OBJDIR_RELEASE)/src/Bet.o: src/Bet.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/Bet.cpp -o $(OBJDIR_RELEASE)/src/Bet.o
 
-$(OBJDIR_RELEASE)/main.o: main.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c main.cpp -o $(OBJDIR_RELEASE)/main.o
-
 $(OBJDIR_RELEASE)/__/CDataFile/src/CDataFile.o: ../CDataFile/src/CDataFile.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c ../CDataFile/src/CDataFile.cpp -o $(OBJDIR_RELEASE)/__/CDataFile/src/CDataFile.o
 
@@ -151,7 +154,6 @@ clean_release:
 	rm -f $(OBJ_RELEASE) $(OUT_RELEASE)
 	rm -rf bin/Release
 	rm -rf $(OBJDIR_RELEASE)/src
-	rm -rf $(OBJDIR_RELEASE)
 	rm -rf $(OBJDIR_RELEASE)/__/CDataFile/src
 
 .PHONY: before_debug after_debug clean_debug before_release after_release clean_release
