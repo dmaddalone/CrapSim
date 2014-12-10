@@ -361,7 +361,7 @@ void Wager::OddsBetFullPayoffWager(const int nPoint)
 
     nModulo = m_nWager % nMultiple;
     if (nModulo != 0)
-        m_nWager = m_nWager - nModulo;  // TODO: is this right?
+        m_nWager = m_nWager - nModulo;
 }
 
 /**
@@ -395,7 +395,7 @@ void Wager::PlaceBetFullPayoffWager(const int nPlaceNumber)
 
     nModulo = m_nWager % nMultiple;
     if (nModulo != 0)
-        m_nWager = m_nWager + nMultiple - nModulo; // TODO: is this right?
+        m_nWager = m_nWager + nMultiple - nModulo;
 }
 
 /**
@@ -619,7 +619,30 @@ bool Wager::ModifyBets(Money &cMoney, const Table &cTable, std::list<Bet> &lBets
 }
 
 /**
-  * BetModificationSetup
+  * Modifiable Bets Exist
+  *
+  * Check to see if any modifiable bets exists.
+  *
+  * \param lBets The list container of bets
+  *
+  * \return True if modifiable bets exists, false otherwise
+  *
+  */
+
+bool Wager::ModifiableBetsExist(const std::list<Bet> &lBets) const
+{
+    if (lBets.empty()) return (false);
+
+    for (std::list<Bet>::const_iterator it = lBets.begin(); it != lBets.end(); ++it)
+    {
+        if (it->Modifiable()) return (true);
+    }
+
+    return (false);
+}
+
+/**
+  * Bet Modification Setup
   *
   * Reset counter if coming out and no bets are currently laid.
   * Loop through bets and check for a won bet.  If found, set flag to true.
@@ -630,8 +653,8 @@ bool Wager::ModifyBets(Money &cMoney, const Table &cTable, std::list<Bet> &lBets
 
 void Wager::BetModificationSetup(const Table &cTable, const std::list<Bet> &lBets)
 {
-    // If table is coming out and no bets exist, reset counter
-    if (cTable.IsComingOutRoll() && lBets.empty())  // This counts all bets  TODO: count only modifiable bets
+    // If table is coming out and no modifiable bets exist, reset counter
+    if (cTable.IsComingOutRoll() && !ModifiableBetsExist(lBets))  // This counts all bets  TODO: count only modifiable bets
     {
         m_nBetModCounter = 0;
     }

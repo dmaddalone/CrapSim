@@ -84,7 +84,7 @@
 1417902753 /home/maddalone/CCPP/CrapSim/include/Bet.h
 	"CrapSimException.h"
 
-1417913731 source:/home/maddalone/CCPP/CrapSim/src/Strategy.cpp
+1418177950 source:/home/maddalone/CCPP/CrapSim/src/Strategy.cpp
 	"Strategy.h"
 	<fstream>
 	<iostream>
@@ -110,7 +110,7 @@
 	"Strategy.h"
 	<vector>
 
-1417908550 source:/home/maddalone/CCPP/CrapSim/src/Simulation.cpp
+1417985448 source:/home/maddalone/CCPP/CrapSim/src/Simulation.cpp
 	"Simulation.h"
 	<iostream>
 	<iomanip>
@@ -172,7 +172,7 @@
 	"Dice.h"
 	"Table.h"
 
-1417902753 /home/maddalone/CCPP/CrapSim/include/CrapSimVersion.h
+1418177950 /home/maddalone/CCPP/CrapSim/include/CrapSimVersion.h
 	<string>
 
 1417976631 source:/home/maddalone/CCPP/CrapSim/src/main.cpp
@@ -191,7 +191,7 @@
 	"Strategy.h"
 	"CDataFile.h"
 
-1417985437 /home/maddalone/CCPP/CrapSim/include/Wager.h
+1418178289 /home/maddalone/CCPP/CrapSim/include/Wager.h
 	<list>
 	<locale>
 	<map>
@@ -202,7 +202,7 @@
 	"Money.h"
 	"Table.h"
 
-1417913990 source:/home/maddalone/CCPP/CrapSim/src/Wager.cpp
+1418178332 source:/home/maddalone/CCPP/CrapSim/src/Wager.cpp
 	"Wager.h"
 
 1417216523 /home/maddalone/CCPP/CrapSim/include/CrapSimException.h

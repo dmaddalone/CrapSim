@@ -702,7 +702,7 @@ void Strategy::MakePlaceBets(const Table &cTable)
                     ++m_nNumberOfComeBetsMade;
                     m_lBets.push_back(cBet);
                 }
-                // Make a Place bet // TODO: ensure wager is multuple of 5 for 4, 5, 9, 10 and a multiple of 6 got 6 and 8
+                // Make a Place bet
                 else
                 {
                     MakePlaceBet();

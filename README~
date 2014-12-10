@@ -1,0 +1,135 @@
+CrapSim v0.7.0 December 9, 2014
+
+CONTENTS
+---------------------------------------
+
+* Introduction
+* Configuration
+* Installation
+* Operating Instructions
+* File Manifest
+* Copyright and Licensing
+* Known Bugs
+* Troubleshooting
+* Credits and Acknowledgements
+* Contact Information
+
+Introduction
+---------------------------------------
+CrapSim is a craps simulator written in C++.  Configurations are described in
+a configuration file, which is passed to the simulator on the command line, 
+allow for multiple strategies to be played together.  The simlulator will report
+basic win and loss statistics when all runs are completed.
+
+See the CrapSim.ini file for more information on configuration options.
+
+
+
+
+Installation
+---------------------------------------
+Requirements:
+* C+11 compiler
+* Make utility
+
+1) Install source code (see File Manifest below) to a folder.
+2) Run make using CDatafile.cbp.mak.* where * is the operating system
+3) Run make using CrapSim.cbp.mak.* where * is the operating system
+
+
+Operating Instructions
+---------------------------------------
+Read and edit
+
+Usage: .CrapSim [OPTION] [FILE]
+Run a Craps Simulation based on settings in the FILE
+
+Options:
+    -h, --help     Show this help message and exit
+    -v, --version  Show version and exit
+
+
+
+
+File Manifest
+---------------------------------------
+CrapSim/CrapSim.cbp                 -- Code::Blocks project file
+CrapSim/CrapSim.cbp.mak.mac         -- Make file for Mac
+CrapSim/CrapSim.cbp.mak.unix        -- Make file for UNIX
+CrapSim/CrapSim.cbp.mak.windows     -- Make file for Windows
+CrapSim/CrapSim.ini                 -- Configfuration file
+
+CrapSim/src/Bet.cpp                 -- A bet
+CrapSim/src/Dice.cpp                -- The dice
+CrapSim/src/Die.cpp                 -- A Die
+CrapSim/src/Money.cpp               -- The bankroll
+CrapSim/src/QualfiedShooter.cpp     -- Methods to qualify a shooter
+CrapSim/src/Simulation.cpp          -- Simulation driver
+CrapSim/src/Strategy.cpp            -- A strategy
+CrapSim/src/StrategyTracker.cpp     -- A strategy tracer
+CrapSim/src/Table.cpp               -- The table
+CrapSim/src/Wager.cpp               -- Methods to manage wagers
+CrapSim/src/main.cpp                -- Read configuration file, run simulation
+
+CrapSim/include/Bet.h              
+CrapSim/include/CrapSimException.h  -- Custom exception
+CrapSim/include/CrapSimVersion.h    -- Version information
+CrapSim/include/Dice.h
+CrapSim/include/Die.h
+CrapSim/include/Money.h
+CrapSim/include/QualfiedShooter.h
+CrapSim/include/Simulation.h
+CrapSim/include/Strategy.h
+CrapSim/include/StrategyTracker.h
+CrapSim/include/Table.h
+CrapSim/include/Wager.h
+
+CrapSim/scripts/load_crapsim.sql    -- DML and DDL to load strategy trace
+CrapSim/scripts/review_pass_bet.sql -- Select statement to see pass bets
+
+CDataFile/CDataFile.cbp             -- Code::Blocks project file
+CDataFile/CDataFile.cbp             -- Code::Blocks project file
+CDataFile/CDataFile.cbp             -- Code::Blocks project file
+CDataFile/src/CDataFile.cpp         -- Read a configuration file
+CDataFile/include/CDataFile.h
+
+
+
+
+Copyright and Licensing
+---------------------------------------
+CrapSim is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+CrapSim is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with CrapSim.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+
+Known Bugs
+---------------------------------------
+No known bugs. Plenty of unknwon bugs.
+
+
+
+
+Credits and Acknowledgements
+---------------------------------------
+Jensen, Marten. "Beat the Craps Table"  New York: Cardoza Publishing, 2003.
+
+Gary McNickle <gary#sunstorm.net> CDataFile  2002
+
+
+
+
+Contact Information
+---------------------------------------
+Dom Maddalone dominick dot maddalone at gmail dot com

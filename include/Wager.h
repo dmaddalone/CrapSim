@@ -124,6 +124,8 @@ class Wager
         //
         // Bet Modification Methods
         //
+        // Check for the existence of modifable bets
+        bool ModifiableBetsExist(const std::list<Bet> &lBets) const;
         // Set up for bet modification methods
         void BetModificationSetup(const Table &cTable, const std::list<Bet> &lBets);
         // Collect, Press, Regress method

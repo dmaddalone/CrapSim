@@ -6,7 +6,7 @@
 namespace CrapSimVersion{
 
 	//Date Version Types
-	static const std::string DATE {"06"};
+	static const std::string DATE {"09"};
 	static const std::string MONTH {"12"};
 	static const std::string YEAR {"2014"};
 	std::string DateVersion() {return (YEAR+MONTH+DATE); }
