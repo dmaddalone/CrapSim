@@ -54,27 +54,27 @@ Options:
 
 File Manifest
 ---------------------------------------
-CrapSim/CrapSim.cbp                 -- Code::Blocks project file
-CrapSim/CrapSim.cbp.mak.mac         -- Make file for Mac
-CrapSim/CrapSim.cbp.mak.unix        -- Make file for UNIX
-CrapSim/CrapSim.cbp.mak.windows     -- Make file for Windows
-CrapSim/CrapSim.ini                 -- Configuration file
+CrapSim/CrapSim.cbp                         -- Code::Blocks project file
+CrapSim/CrapSim.cbp.mak.mac          -- Make file for Mac
+CrapSim/CrapSim.cbp.mak.unix          -- Make file for UNIX
+CrapSim/CrapSim.cbp.mak.windows   -- Make file for Windows
+CrapSim/CrapSim.ini                            -- Configuration file
 
-CrapSim/src/Bet.cpp                 -- A bet
-CrapSim/src/Dice.cpp                -- The dice
-CrapSim/src/Die.cpp                 -- A Die
-CrapSim/src/Money.cpp               -- The bankroll
-CrapSim/src/QualifiedShooter.cpp     -- Methods to qualify a shooter
-CrapSim/src/Simulation.cpp          -- Simulation driver
-CrapSim/src/Strategy.cpp            -- A strategy
-CrapSim/src/StrategyTracker.cpp     -- A strategy tracer
-CrapSim/src/Table.cpp               -- The table
-CrapSim/src/Wager.cpp               -- Methods to manage wagers
-CrapSim/src/main.cpp                -- Read configuration file, run simulation
+CrapSim/src/Bet.cpp                            -- A bet
+CrapSim/src/Dice.cpp                          -- The dice
+CrapSim/src/Die.cpp                            -- A Die
+CrapSim/src/Money.cpp                       -- The bankroll
+CrapSim/src/QualifiedShooter.cpp      -- Methods to qualify a shooter
+CrapSim/src/Simulation.cpp                -- Simulation driver
+CrapSim/src/Strategy.cpp                   -- A strategy
+CrapSim/src/StrategyTracker.cpp       -- A strategy tracer
+CrapSim/src/Table.cpp                        -- The table
+CrapSim/src/Wager.cpp                      -- Methods to manage wagers
+CrapSim/src/main.cpp                         -- Read configuration file, run simulation
 
 CrapSim/include/Bet.h              
 CrapSim/include/CrapSimException.h  -- Custom exception
-CrapSim/include/CrapSimVersion.h    -- Version information
+CrapSim/include/CrapSimVersion.h     -- Version information
 CrapSim/include/Dice.h
 CrapSim/include/Die.h
 CrapSim/include/Money.h
@@ -85,13 +85,13 @@ CrapSim/include/StrategyTracker.h
 CrapSim/include/Table.h
 CrapSim/include/Wager.h
 
-CrapSim/scripts/load_crapsim.sql    -- DML and DDL to load strategy trace
-CrapSim/scripts/review_pass_bet.sql -- Select statement to see pass bets
+CrapSim/scripts/load_crapsim.sql        -- DML and DDL to load strategy trace
+CrapSim/scripts/review_pass_bet.sql   -- Select statement to see pass bets
 
-CDataFile/CDataFile.cbp             -- Code::Blocks project file
-CDataFile/CDataFile.cbp             -- Code::Blocks project file
-CDataFile/CDataFile.cbp             -- Code::Blocks project file
-CDataFile/src/CDataFile.cpp         -- Read a configuration file
+CDataFile/CDataFile.cbp                      -- Code::Blocks project file
+CDataFile/CDataFile.cbp                      -- Code::Blocks project file
+CDataFile/CDataFile.cbp                      -- Code::Blocks project file
+CDataFile/src/CDataFile.cpp                -- Read a configuration file
 CDataFile/include/CDataFile.h
 
 
