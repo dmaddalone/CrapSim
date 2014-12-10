@@ -17,7 +17,7 @@ Introduction
 ---------------------------------------
 CrapSim is a craps simulator written in C++.  Configurations are described in
 a configuration file, which is passed to the simulator on the command line, 
-allow for multiple strategies to be played together.  The simlulator will report
+allow for multiple strategies to be played together.  The simulator will report
 basic win and loss statistics when all runs are completed.
 
 See the CrapSim.ini file for more information on configuration options.
@@ -58,13 +58,13 @@ CrapSim/CrapSim.cbp                 -- Code::Blocks project file
 CrapSim/CrapSim.cbp.mak.mac         -- Make file for Mac
 CrapSim/CrapSim.cbp.mak.unix        -- Make file for UNIX
 CrapSim/CrapSim.cbp.mak.windows     -- Make file for Windows
-CrapSim/CrapSim.ini                 -- Configfuration file
+CrapSim/CrapSim.ini                 -- Configuration file
 
 CrapSim/src/Bet.cpp                 -- A bet
 CrapSim/src/Dice.cpp                -- The dice
 CrapSim/src/Die.cpp                 -- A Die
 CrapSim/src/Money.cpp               -- The bankroll
-CrapSim/src/QualfiedShooter.cpp     -- Methods to qualify a shooter
+CrapSim/src/QualifiedShooter.cpp     -- Methods to qualify a shooter
 CrapSim/src/Simulation.cpp          -- Simulation driver
 CrapSim/src/Strategy.cpp            -- A strategy
 CrapSim/src/StrategyTracker.cpp     -- A strategy tracer
@@ -78,7 +78,7 @@ CrapSim/include/CrapSimVersion.h    -- Version information
 CrapSim/include/Dice.h
 CrapSim/include/Die.h
 CrapSim/include/Money.h
-CrapSim/include/QualfiedShooter.h
+CrapSim/include/QualifiedShooter.h
 CrapSim/include/Simulation.h
 CrapSim/include/Strategy.h
 CrapSim/include/StrategyTracker.h
@@ -117,7 +117,7 @@ along with CrapSim.  If not, see <http://www.gnu.org/licenses/>.
 
 Known Bugs
 ---------------------------------------
-No known bugs. Plenty of unknwon bugs.
+No known bugs. Plenty of unknown bugs.
 
 
 
